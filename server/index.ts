@@ -42,7 +42,7 @@ logEntry('server/index.ts:18', 'Server starting - checking env vars', {
 const __dirname = path.resolve();
 
 const app = express();
-const PORT = process.env.PORT || 4000;
+const PORT = parseInt(process.env.PORT || '4000', 10);
 
 // Middleware
 app.use(cors({
@@ -109,12 +109,35 @@ process.on('unhandledRejection', (reason: any, promise: Promise<any>) => {
 });
 // #endregion
 
-// Start server
-app.listen(PORT, () => {
-  console.log(`🚀 Server is running on port ${PORT}`);
-  console.log(`📁 Serving static files from: ${buildPath}`);
-  console.log(`🌍 Environment: ${process.env.NODE_ENV || 'development'}`);
-});
+// Start server with error handling
+try {
+  app.listen(PORT, '0.0.0.0', () => {
+    console.log(`🚀 Server is running on port ${PORT}`);
+    console.log(`📁 Serving static files from: ${buildPath}`);
+    console.log(`🌍 Environment: ${process.env.NODE_ENV || 'development'}`);
+    console.log(`📊 DATABASE_URL: ${process.env.DATABASE_URL ? 'SET' : 'NOT SET'}`);
+    logEntry('server/index.ts:113', 'Server started successfully', {
+      port: PORT,
+      buildPath,
+      nodeEnv: process.env.NODE_ENV || 'development',
+    });
+  }).on('error', (error: NodeJS.ErrnoException) => {
+    logEntry('server/index.ts:120', 'Server listen error', {
+      error: error.message,
+      errorCode: error.code,
+      port: PORT,
+    });
+    console.error(`❌ Failed to start server on port ${PORT}:`, error);
+    process.exit(1);
+  });
+} catch (error) {
+  logEntry('server/index.ts:127', 'Server startup error', {
+    error: error instanceof Error ? error.message : String(error),
+    errorName: error instanceof Error ? error.name : 'Unknown',
+  });
+  console.error('❌ Failed to start server:', error);
+  process.exit(1);
+}
 
 // Graceful shutdown
 process.on('SIGTERM', async () => {

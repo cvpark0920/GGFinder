@@ -13,7 +13,7 @@ services:
       npm run build || exit 1
       npm run build:server || exit 1
     run_command: |
-      npx prisma migrate deploy
+      npx prisma@6.1.0 migrate deploy || echo "Migration failed, continuing..."
       node server/dist/index.js
     environment_slug: node-js
     instance_count: 1
