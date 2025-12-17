@@ -39,23 +39,29 @@ logEntry('server/prisma.ts:8', 'Before PrismaClient init', {
 
 if (!dbUrl) {
   logEntry('server/prisma.ts:15', 'ERROR: DATABASE_URL not set', {});
-  throw new Error('DATABASE_URL environment variable is not set');
+  console.error('ERROR: DATABASE_URL environment variable is not set');
+  // Don't throw immediately - allow server to start and handle errors gracefully
+  // The error will be caught when PrismaClient is actually used
 }
 
 // #region agent log
 console.log('[DEBUG] Creating PrismaClient');
 const prismaVersion = require('@prisma/client/package.json').version;
-logEntry('server/prisma.ts:46', 'Creating PrismaClient', {
-  hasDatasources: false,
-  datasourceUrl: dbUrl.substring(0, 30) + '...',
-  engineType: 'default (no engineType specified)',
-  prismaVersion: prismaVersion,
-});
+  logEntry('server/prisma.ts:46', 'Creating PrismaClient', {
+    hasDatasources: false,
+    datasourceUrl: dbUrl ? dbUrl.substring(0, 30) + '...' : 'NOT SET',
+    engineType: 'default (no engineType specified)',
+    prismaVersion: prismaVersion,
+  });
 // #endregion
 
 let prisma: PrismaClient;
 
 try {
+  if (!dbUrl) {
+    throw new Error('DATABASE_URL environment variable is not set');
+  }
+  
   // Prisma 7에서는 datasources 옵션을 사용하지 않음
   // DATABASE_URL 환경 변수에서 자동으로 읽어옴
   // engineType은 schema.prisma의 generator 설정에서 읽어옴
@@ -78,7 +84,13 @@ try {
     errorName: error instanceof Error ? error.name : 'Unknown',
   });
   // #endregion
-  throw error;
+  // Don't throw - create a mock PrismaClient that throws on use
+  // This allows the server to start and handle errors gracefully
+  prisma = new Proxy({} as PrismaClient, {
+    get: () => {
+      throw new Error(`PrismaClient initialization failed: ${error instanceof Error ? error.message : String(error)}`);
+    }
+  });
 }
 
 export default prisma;
