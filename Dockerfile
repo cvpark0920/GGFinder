@@ -33,18 +33,19 @@ RUN apk add --no-cache wget
 
 # Copy package files
 COPY package*.json ./
+COPY prisma.config.ts ./
 COPY prisma ./prisma/
 
 # Install production dependencies only
 RUN npm ci --only=production && \
-    npm install -g prisma
+    npm install -g prisma@6.1.0
 
 # Copy built files from builder stage
 COPY --from=builder /app/build ./build
 COPY --from=builder /app/server/dist ./server/dist
 
-# Generate Prisma Client for production (using default schema.prisma, not prisma.config.ts)
-RUN npx prisma generate --schema=./prisma/schema.prisma
+# Generate Prisma Client for production
+RUN npx prisma generate
 
 # Environment variables
 ENV NODE_ENV=production
