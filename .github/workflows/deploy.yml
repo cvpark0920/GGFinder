@@ -1,4 +1,4 @@
-name: Build and Deploy
+name: Build Check
 
 on:
   push:
@@ -36,34 +36,6 @@ jobs:
       - name: Build server
         run: npm run build:server
       
-      - name: Upload build artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: build-files
-          path: |
-            build/
-            server/dist/
-            node_modules/
-            package*.json
-            prisma/
-            server/package.json
-            prisma.config.ts
-          retention-days: 1
-
-  deploy:
-    needs: build
-    runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-    
-    steps:
-      - name: Download build artifacts
-        uses: actions/download-artifact@v4
-        with:
-          name: build-files
-      
-      - name: Deploy to DigitalOcean
-        uses: digitalocean/app_action@v1
-        with:
-          app_name: ggfinder
-          token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
+      - name: Build check passed
+        run: echo "✅ Build check passed! DigitalOcean will deploy automatically."
 
