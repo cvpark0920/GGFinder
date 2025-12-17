@@ -4,14 +4,14 @@ region: sgp
 services:
   - name: app
     github:
-      repo: YOUR_USERNAME/GGFinder
+      repo: cvpark0920/GGFinder
       branch: main
       deploy_on_push: true
     build_command: |
-      npm ci
-      npx prisma generate
-      npm run build
-      npm run build:server
+      npm ci || exit 1
+      npx prisma generate || exit 1
+      npm run build || exit 1
+      npm run build:server || exit 1
     run_command: |
       npx prisma migrate deploy
       node server/dist/index.js
@@ -38,6 +38,7 @@ services:
         scope: RUN_TIME
         type: SECRET
       - key: VITE_API_BASE_URL
+        scope: BUILD_TIME
         value: ${_self.URL}
       - key: CORS_ORIGIN
         value: ${_self.URL}

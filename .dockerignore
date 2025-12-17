@@ -2,10 +2,9 @@
 node_modules
 npm-debug.log
 yarn-error.log
-package-lock.json
-yarn.lock
+# Note: package-lock.json is needed for npm ci
 
-# Build outputs (except build/ which we need)
+# Build outputs (we'll build these during Docker build)
 dist
 .server
 .cache
@@ -47,26 +46,12 @@ docs
 Thumbs.db
 *.log
 
-# Prisma (keep schema but ignore generated)
-# Note: We need prisma/ directory but not generated files
-# Generated files will be created during build
+# Uploads (don't need in Docker image)
+uploads
 
-# Source files (we only need compiled server code)
-src
-server/**/*.ts
-!server/**/*.js
-!server/dist
+# Debug logs
+.cursor
 
-# Vite
-vite.config.ts
-tsconfig.json
-tsconfig.*.json
-
-# Keep these
-!build
-!server
-!prisma
-!package.json
-!package-lock.json
-!prisma.config.ts
-
+# Note: src/, server/, vite.config.ts, index.html, package.json, prisma/ are needed for build
+# We exclude server TypeScript files but keep the directory structure
+server/dist
