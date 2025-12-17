@@ -1,0 +1,311 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// 사용자 관리
+model User {
+  id        Int       @id @default(autoincrement())
+  username  String    @unique
+  name      String
+  email     String    @unique
+  googleId  String?   @unique
+  picture   String?
+  realName  String?   // 실명
+  phone     String?   // 전화번호
+  role      UserRole  @default(agency_member)
+  agencyId  Int?
+  status    UserStatus @default(pending)
+  joinDate  DateTime  @default(now())
+  lastLogin DateTime?
+
+  // Relations
+  agency    Agency?   @relation(fields: [agencyId], references: [id], onDelete: SetNull)
+  favorites Favorite[]
+
+  @@index([agencyId])
+  @@index([role])
+  @@index([status])
+  @@index([googleId])
+  @@map("users")
+}
+
+enum UserRole {
+  super_admin
+  platform_admin
+  agency_member
+}
+
+enum UserStatus {
+  pending
+  active
+  suspended
+}
+
+// 소속사
+model Agency {
+  id               Int       @id @default(autoincrement())
+  name             String
+  role             AgencyRole
+  contact          String
+  phone            String
+  address          String
+  registrationDate DateTime  @default(now())
+  status           AgencyStatus @default(active)
+  memo             String?
+
+  // Relations
+  users            User[]
+  clients          Client[]
+
+  @@index([role])
+  @@index([status])
+  @@map("agencies")
+}
+
+enum AgencyRole {
+  groom
+  bride
+}
+
+enum AgencyStatus {
+  active
+  suspended
+}
+
+// 신랑/신부 프로필 (통합 모델)
+model Client {
+  id          Int       @id @default(autoincrement())
+  name        String
+  loc         String   // 지역/거주지
+  status      ClientStatus @default(registered)
+  date        DateTime  @default(now()) // 등록일
+  type        ClientType
+  
+  // 기본 정보
+  education   String?
+  height      Int?     // cm 단위 숫자로 저장
+  weight      Int?     // kg 단위 숫자로 저장
+  family      String?  // 가족사항
+  marriage    String?  // 결혼 상태 (미혼, 재혼, 이혼 등)
+  job         String?
+  tattoo      String?  // 문신 여부
+  income      String?  // 소득
+  smoking     String?  // 흡연 여부
+  drinking    String?  // 음주
+  idealType   String?  // 이상형 조건
+  
+  // 출생 정보 (신랑/신부 공통)
+  birthYear   Int      // 출생년도 (필수)
+  
+  // 신부 전용 필드
+  hasMarriedBefore    Boolean? @default(false)
+  exHusbandNationality String?
+  children            String?
+  addressRegistration String?  // 주소 등록
+  currentAddress      String?  // 현재 주소
+  monthlyIncome       String?  // 월 수입
+  siblings            String?
+  relativesOverseas    String?
+  fatherAge           Int?     // 아버지 나이 (신부 전용)
+  motherAge           Int?     // 어머니 나이 (신부 전용)
+  parentsPhone        String?
+  phone               String?
+  healthIssues        String?
+  desiredDestination  String?  // 희망 국가 (Korea/Taiwan)
+  guarantee           Boolean? @default(false)
+  
+  // 신랑 전용 필드
+  residence           String?   // 거주지
+  hobbies             String?
+  parentalSupport     String?
+  features            String?
+  religion            String?
+  
+  memo                String?
+  agencyId            Int?
+  avatarUrl           String?  // 아바타 이미지 URL
+
+  // Relations
+  agency              Agency?   @relation(fields: [agencyId], references: [id], onDelete: SetNull)
+  images              ClientImage[]
+  video               ClientVideo?
+  groomMatches        Match[]   @relation("GroomMatches")
+  brideMatches        Match[]   @relation("BrideMatches")
+  favorites           Favorite[]
+  favoritesFrom       Favorite[] @relation("FavoriteFromClient")
+
+  @@index([type])
+  @@index([status])
+  @@index([agencyId])
+  @@index([loc])
+  @@index([birthYear])
+  @@index([height])
+  @@index([weight])
+  @@map("clients")
+}
+
+enum ClientType {
+  groom
+  bride
+}
+
+enum ClientStatus {
+  registered    // 등록 완료
+  matching      // 매칭 중
+  meeting_scheduled  // 만남 예정
+  document_prep // 서류 준비
+  waiting       // 대기 중
+  in_progress   // 진행 중
+}
+
+// 프로필 이미지
+model ClientImage {
+  id        Int      @id @default(autoincrement())
+  clientId Int
+  url       String   // 이미지 URL 또는 파일 경로
+  order     Int      @default(0) // 이미지 순서
+  createdAt DateTime @default(now())
+
+  // Relations
+  client    Client   @relation(fields: [clientId], references: [id], onDelete: Cascade)
+
+  @@index([clientId])
+  @@map("client_images")
+}
+
+// 프로필 동영상
+model ClientVideo {
+  id        Int      @id @default(autoincrement())
+  clientId  Int      @unique
+  url       String   // 동영상 URL 또는 파일 경로
+  createdAt DateTime @default(now())
+
+  // Relations
+  client    Client   @relation(fields: [clientId], references: [id], onDelete: Cascade)
+
+  @@map("client_videos")
+}
+
+// 매칭 정보
+model Match {
+  id        Int       @id @default(autoincrement())
+  groomId   Int
+  brideId   Int
+  status    MatchStatus @default(in_progress)
+  stage     String    // 현재 단계명
+  progress  Int       @default(0) // 진행률 (0-100)
+  nextStep  String?   // 다음 단계
+  date      DateTime  @default(now()) // 매칭 시작일
+  startDate DateTime? // 시작일
+  memo      String?
+
+  // Relations
+  groom     Client    @relation("GroomMatches", fields: [groomId], references: [id], onDelete: Cascade)
+  bride     Client    @relation("BrideMatches", fields: [brideId], references: [id], onDelete: Cascade)
+  stages    MatchStage[]
+
+  @@index([groomId])
+  @@index([brideId])
+  @@index([status])
+  @@map("matches")
+}
+
+enum MatchStatus {
+  in_progress  // 진행 중
+  waiting      // 대기 중
+  completed    // 완료
+  on_hold      // 보류
+  cancelled    // 취소됨
+}
+
+// 매칭 단계별 진행 상황
+model MatchStage {
+  id            Int            @id @default(autoincrement())
+  matchId       Int
+  name          String         // 단계명 (예: "서류 확인", "화상 소개")
+  status        StageStatus    @default(pending)
+  completedDate DateTime?
+  memo          String?
+  duration      String?        // 예상 소요 시간
+  order         Int            @default(0) // 단계 순서
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+
+  // Relations
+  match         Match          @relation(fields: [matchId], references: [id], onDelete: Cascade)
+
+  @@index([matchId])
+  @@index([status])
+  @@map("match_stages")
+}
+
+enum StageStatus {
+  pending
+  in_progress
+  completed
+}
+
+// 유튜브 동영상 관리
+model YouTubeVideo {
+  id          Int       @id @default(autoincrement())
+  title       String
+  url         String
+  videoId     String   @unique // YouTube video ID
+  description String
+  status      VideoStatus @default(active)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([status])
+  @@index([videoId])
+  @@map("youtube_videos")
+}
+
+enum VideoStatus {
+  active
+  inactive
+}
+
+// 찜하기
+model Favorite {
+  id          Int               @id @default(autoincrement())
+  userId      Int
+  clientId    Int               // 찜받은 프로필 ID (toClientId)
+  fromClientId Int?             // 찜한 프로필 ID (신랑소속사가 찜할 때는 신랑 프로필 ID, 신부소속사가 찜할 때는 신부 프로필 ID)
+  direction   FavoriteDirection @default(groom_to_bride)
+  status      FavoriteStatus    @default(pending)
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+
+  // Relations
+  user        User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  client      Client            @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  fromClient  Client?           @relation("FavoriteFromClient", fields: [fromClientId], references: [id], onDelete: SetNull)
+
+  @@unique([userId, clientId, direction])
+  @@index([userId])
+  @@index([clientId])
+  @@index([fromClientId])
+  @@index([status])
+  @@index([direction, status])
+  @@map("favorites")
+}
+
+enum FavoriteDirection {
+  groom_to_bride
+  bride_to_groom
+}
+
+enum FavoriteStatus {
+  pending
+  accepted
+  rejected
+}

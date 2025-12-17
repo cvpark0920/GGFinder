@@ -1,0 +1,54 @@
+name: ggfinder
+region: sgp
+
+services:
+  - name: app
+    github:
+      repo: YOUR_USERNAME/GGFinder
+      branch: main
+      deploy_on_push: true
+    build_command: |
+      npm ci
+      npx prisma generate
+      npm run build
+      npm run build:server
+    run_command: |
+      npx prisma migrate deploy
+      node server/dist/index.js
+    environment_slug: node-js
+    instance_count: 1
+    instance_size_slug: basic-xxs
+    http_port: 4000
+    health_check:
+      http_path: /health
+    envs:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: "4000"
+      - key: DATABASE_URL
+        value: ${db.DATABASE_URL}
+      - key: JWT_SECRET
+        scope: RUN_TIME
+        type: SECRET
+      - key: GOOGLE_CLIENT_ID
+        scope: RUN_TIME
+        type: SECRET
+      - key: GOOGLE_CLIENT_SECRET
+        scope: RUN_TIME
+        type: SECRET
+      - key: VITE_API_BASE_URL
+        value: ${_self.URL}
+      - key: CORS_ORIGIN
+        value: ${_self.URL}
+      - key: FRONTEND_URL
+        value: ${_self.URL}
+
+databases:
+  - name: db
+    engine: PG
+    production: true
+    version: "16"
+    db_name: ggfinder
+    db_user: app
+

@@ -1,0 +1,304 @@
+{
+  "common": {
+    "save": "저장",
+    "cancel": "취소",
+    "delete": "삭제",
+    "edit": "수정",
+    "loading": "로딩 중...",
+    "search": "검색",
+    "filter": "필터",
+    "sort": "정렬",
+    "close": "닫기",
+    "confirm": "확인",
+    "yes": "예",
+    "no": "아니오",
+    "name": "이름",
+    "age": "나이",
+    "height": "키",
+    "weight": "몸무게",
+    "count": "건",
+    "people": "명",
+    "all": "전체",
+    "select": "선택",
+    "submit": "제출",
+    "reset": "초기화",
+    "back": "뒤로",
+    "next": "다음",
+    "previous": "이전",
+    "view": "보기",
+    "details": "상세",
+    "actions": "작업",
+    "status": "상태",
+    "date": "날짜",
+    "time": "시간",
+    "createdAt": "생성일",
+    "updatedAt": "수정일"
+  },
+  "nav": {
+    "home": "유튜브",
+    "brides": "신부 프로필",
+    "grooms": "신랑 프로필",
+    "profiles": "프로필",
+    "dashboard": "관리",
+    "login": "로그인",
+    "logout": "로그아웃",
+    "profile": "프로필",
+    "messages": "채팅",
+    "receivedFavorites": "찜받은 목록"
+  },
+  "dashboard": {
+    "tabs": {
+      "grooms": "신랑",
+      "brides": "신부",
+      "agencies": "소속사",
+      "users": "사용자",
+      "matches": "매칭",
+      "youtube": "유튜브"
+    },
+    "stats": {
+      "totalMembers": "총 관리 회원",
+      "activeMatches": "진행 중인 매칭",
+      "recentUpdate": "최근 업데이트",
+      "groom": "신랑",
+      "bride": "신부"
+    },
+    "buttons": {
+      "registerGroom": "신랑 등록",
+      "registerBride": "신부 등록",
+      "registerAgency": "소속사 등록",
+      "registerVideo": "동영상 등록",
+      "createMatch": "새로운 매칭 시작하기"
+    },
+    "search": {
+      "placeholder": "이름, 지역 검색",
+      "allStatus": "모든 상태",
+      "allRoles": "모든 역할"
+    },
+    "sort": {
+      "sortBy": "정렬",
+      "dateDesc": "최신 등록순",
+      "dateAsc": "오래된 순",
+      "nameAsc": "이름 오름차순",
+      "nameDesc": "이름 내림차순",
+      "ageAsc": "나이 어린순",
+      "ageDesc": "나이 많은순"
+    },
+    "status": {
+      "all": "모든 상태",
+      "active": "활성",
+      "inactive": "비활성",
+      "suspended": "중지",
+      "pending": "승인 대기",
+      "registered": "등록 완료",
+      "matching": "매칭 중",
+      "meetingScheduled": "만남 예정",
+      "documents": "서류 준비",
+      "waiting": "대기 중",
+      "inProgress": "진행 중",
+      "completed": "완료",
+      "activeStatus": "활동 중",
+      "suspendedStatus": "정지됨"
+    },
+    "roles": {
+      "all": "모든 역할",
+      "superAdmin": "슈퍼관리자",
+      "platformAdmin": "플랫폼 관리자",
+      "agencyMember": "소속사 회원"
+    }
+  },
+  "profile": {
+    "detail": "프로필 상세",
+    "list": "프로필 목록",
+    "filters": "필터",
+    "favorites": "찜 목록",
+    "favorite": "찜하기",
+    "unfavorite": "찜 해제",
+    "addToFavorites": "찜 목록에 추가",
+    "removeFromFavorites": "찜 목록에서 제거",
+    "favoriteAdded": "찜 목록에 추가되었습니다.",
+    "favoriteRemoved": "찜 목록에서 제거되었습니다.",
+    "noProfiles": "프로필을 찾을 수 없습니다",
+    "noProfilesDesc": "필터 조건을 조정해서 다시 검색해보세요.",
+    "resetFilters": "모든 필터 초기화",
+    "found": "명 발견",
+    "sortBy": "정렬 기준",
+    "recent": "최신순",
+    "name": "이름순",
+    "age": "나이순 (낮음→높음)",
+    "status": "상태순",
+    "basicInfo": "기본 정보",
+    "detailedInfo": "상세 정보",
+    "memo": "메모",
+    "additionalNotes": "추가 메모 및 특이사항",
+    "heightWeight": "신장 / 체중",
+    "residence": "거주지",
+    "job": "직업",
+    "maritalStatus": "결혼 상태",
+    "education": "학력",
+    "family": "가족사항",
+    "parentsAge": "부모님 연령",
+    "parentsPhone": "부모님 연락처",
+    "income": "연 수입",
+    "drinking": "음주",
+    "smoking": "흡연",
+    "religion": "종교",
+    "currentAddress": "현재 주소",
+    "desiredDestination": "희망 국가",
+    "monthlyIncome": "월 소득",
+    "children": "자녀",
+    "guarantee": "보증",
+    "selectProfile": "프로필 선택",
+    "selectProfileDesc": "찜하기를 위해 {{type}} 프로필을 선택해주세요.",
+    "noProfilesToSelect": "선택할 수 있는 {{type}} 프로필이 없습니다.",
+    "select": "선택",
+    "profileId": "프로필 ID"
+  },
+  "form": {
+    "labels": {
+      "name": "이름",
+      "dob": "생년월일",
+      "birthYear": "출생년도",
+      "height": "키",
+      "weight": "몸무게",
+      "education": "학력",
+      "maritalStatus": "결혼 상태",
+      "job": "직업",
+      "income": "소득",
+      "tattoo": "문신",
+      "religion": "종교",
+      "address": "거주지",
+      "residence": "거주지 주소",
+      "currentAddress": "현재 주소",
+      "phone": "전화번호",
+      "email": "이메일",
+      "photos": "사진",
+      "video": "동영상",
+      "avatar": "프로필 사진",
+      "memo": "메모"
+    },
+    "placeholders": {
+      "name": "이름을 입력하세요",
+      "height": "키를 입력하세요 (cm)",
+      "weight": "몸무게를 입력하세요 (kg)",
+      "education": "학력을 입력하세요",
+      "job": "직업을 입력하세요",
+      "address": "주소를 입력하세요",
+      "phone": "전화번호를 입력하세요",
+      "email": "이메일을 입력하세요",
+      "memo": "메모를 입력하세요"
+    },
+    "errors": {
+      "required": "필수 입력 항목입니다",
+      "invalid": "올바른 형식이 아닙니다",
+      "minLength": "최소 {{min}}자 이상 입력하세요",
+      "maxLength": "최대 {{max}}자까지 입력 가능합니다"
+    },
+    "success": {
+      "saved": "저장되었습니다",
+      "created": "생성되었습니다",
+      "updated": "수정되었습니다",
+      "deleted": "삭제되었습니다"
+    }
+  },
+  "match": {
+    "title": "매칭 관리",
+    "create": "새로운 매칭 시작하기",
+    "selectPartner": "매칭할 상대를 선택하고 매칭 정보를 입력하세요",
+    "selectGroom": "매칭할 신랑 선택",
+    "selectBride": "매칭할 신부 선택",
+    "matchInfo": "매칭 정보",
+    "memo": "메모",
+    "createMatch": "매칭 생성",
+    "stages": {
+      "title": "매칭 단계별 관리",
+      "documentReview": "서류 확인",
+      "initialConsultation": "초기 상담",
+      "profileExchange": "프로필 교환",
+      "videoIntroduction": "화상 소개",
+      "faceToFaceMeeting": "대면 미팅",
+      "marriageDocuments": "혼인 서류",
+      "marriagePreparation": "결혼 준비"
+    },
+    "status": {
+      "pending": "대기",
+      "inProgress": "진행중",
+      "completed": "완료"
+    },
+    "quickActions": {
+      "nextStage": "다음 단계",
+      "updateProgress": "진행률 업데이트"
+    },
+    "progress": {
+      "overall": "전체 진행률",
+      "completed": "단계 완료"
+    }
+  },
+  "favorite": {
+    "stats": {
+      "title": "찜 통계",
+      "total": "전체 찜",
+      "byStatus": "상태별",
+      "byAgency": "소속사별 찜 통계",
+      "recentActivity": "최근 활동",
+      "last7Days": "최근 7일",
+      "last30Days": "최근 30일",
+      "newActivity": "신규 찜 활동",
+      "groomToBride": "신랑→신부",
+      "brideToGroom": "신부→신랑",
+      "pending": "대기중",
+      "accepted": "승인됨",
+      "rejected": "거절됨"
+    },
+    "received": {
+      "title": "찜받은 목록",
+      "noFavorites": "받은 찜이 없습니다",
+      "approve": "승인",
+      "reject": "거절",
+      "approved": "승인됨",
+      "rejected": "거절됨",
+      "pending": "대기중",
+      "favoritedDate": "찜한 날짜",
+      "statusChangedDate": "상태 변경일"
+    }
+  },
+  "error": {
+    "generic": "오류가 발생했습니다",
+    "network": "네트워크 오류가 발생했습니다",
+    "unauthorized": "인증이 필요합니다",
+    "forbidden": "권한이 없습니다",
+    "notFound": "찾을 수 없습니다",
+    "serverError": "서버 오류가 발생했습니다",
+    "loadFailed": "불러오는데 실패했습니다",
+    "saveFailed": "저장에 실패했습니다",
+    "deleteFailed": "삭제에 실패했습니다"
+  },
+  "success": {
+    "saved": "저장되었습니다",
+    "created": "생성되었습니다",
+    "updated": "수정되었습니다",
+    "deleted": "삭제되었습니다",
+    "favoriteAdded": "찜 목록에 추가되었습니다",
+    "favoriteRemoved": "찜 목록에서 제거되었습니다"
+  },
+  "auth": {
+    "login": "로그인",
+    "logout": "로그아웃",
+    "profile": "프로필",
+    "loginRequired": "로그인이 필요합니다",
+    "loginSuccess": "로그인되었습니다",
+    "logoutSuccess": "로그아웃되었습니다"
+  },
+  "home": {
+    "youtube": {
+      "loading": "로딩 중...",
+      "loadError": "영상 목록을 불러오는데 실패했습니다.",
+      "noVideos": "등록된 영상이 없습니다"
+    }
+  },
+  "servicePending": {
+    "title": "서비스 준비 중입니다",
+    "description": "채팅 서비스는 관리자만 이용할 수 있습니다.",
+    "confirm": "확인"
+  }
+}
+

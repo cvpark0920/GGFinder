@@ -1,0 +1,304 @@
+{
+  "common": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "loading": "Loading...",
+    "search": "Search",
+    "filter": "Filter",
+    "sort": "Sort",
+    "close": "Close",
+    "confirm": "Confirm",
+    "yes": "Yes",
+    "no": "No",
+    "name": "Name",
+    "age": "Age",
+    "height": "Height",
+    "weight": "Weight",
+    "count": "items",
+    "people": "people",
+    "all": "All",
+    "select": "Select",
+    "submit": "Submit",
+    "reset": "Reset",
+    "back": "Back",
+    "next": "Next",
+    "previous": "Previous",
+    "view": "View",
+    "details": "Details",
+    "actions": "Actions",
+    "status": "Status",
+    "date": "Date",
+    "time": "Time",
+    "createdAt": "Created At",
+    "updatedAt": "Updated At"
+  },
+  "nav": {
+    "home": "YouTube",
+    "brides": "Brides",
+    "grooms": "Grooms",
+    "profiles": "Profiles",
+    "dashboard": "Dashboard",
+    "login": "Login",
+    "logout": "Logout",
+    "profile": "Profile",
+    "messages": "Messages",
+    "receivedFavorites": "Received Favorites"
+  },
+  "dashboard": {
+    "tabs": {
+      "grooms": "Grooms",
+      "brides": "Brides",
+      "agencies": "Agencies",
+      "users": "Users",
+      "matches": "Matches",
+      "youtube": "YouTube"
+    },
+    "stats": {
+      "totalMembers": "Total Members",
+      "activeMatches": "Active Matches",
+      "recentUpdate": "Recent Update",
+      "groom": "Groom",
+      "bride": "Bride"
+    },
+    "buttons": {
+      "registerGroom": "Register Groom",
+      "registerBride": "Register Bride",
+      "registerAgency": "Register Agency",
+      "registerVideo": "Register Video",
+      "createMatch": "Start New Match"
+    },
+    "search": {
+      "placeholder": "Search name, location",
+      "allStatus": "All Status",
+      "allRoles": "All Roles"
+    },
+    "sort": {
+      "sortBy": "Sort",
+      "dateDesc": "Newest First",
+      "dateAsc": "Oldest First",
+      "nameAsc": "Name A-Z",
+      "nameDesc": "Name Z-A",
+      "ageAsc": "Youngest First",
+      "ageDesc": "Oldest First"
+    },
+    "status": {
+      "all": "All Status",
+      "active": "Active",
+      "inactive": "Inactive",
+      "suspended": "Suspended",
+      "pending": "Pending Approval",
+      "registered": "Registered",
+      "matching": "Matching",
+      "meetingScheduled": "Meeting Scheduled",
+      "documents": "Document Preparation",
+      "waiting": "Waiting",
+      "inProgress": "In Progress",
+      "completed": "Completed",
+      "activeStatus": "Active",
+      "suspendedStatus": "Suspended"
+    },
+    "roles": {
+      "all": "All Roles",
+      "superAdmin": "Super Admin",
+      "platformAdmin": "Platform Admin",
+      "agencyMember": "Agency Member"
+    }
+  },
+  "profile": {
+    "detail": "Profile Details",
+    "list": "Profile List",
+    "filters": "Filters",
+    "favorites": "Favorites",
+    "favorite": "Favorite",
+    "unfavorite": "Unfavorite",
+    "addToFavorites": "Add to Favorites",
+    "removeFromFavorites": "Remove from Favorites",
+    "favoriteAdded": "Added to favorites",
+    "favoriteRemoved": "Removed from favorites",
+    "noProfiles": "No profiles found",
+    "noProfilesDesc": "Please adjust filter conditions and search again",
+    "resetFilters": "Reset All Filters",
+    "found": "found",
+    "sortBy": "Sort By",
+    "recent": "Recent",
+    "name": "Name",
+    "age": "Age (Low→High)",
+    "status": "Status",
+    "basicInfo": "Basic Information",
+    "detailedInfo": "Detailed Information",
+    "memo": "Memo",
+    "additionalNotes": "Additional Notes and Special Information",
+    "heightWeight": "Height / Weight",
+    "residence": "Residence",
+    "job": "Job",
+    "maritalStatus": "Marital Status",
+    "education": "Education",
+    "family": "Family Information",
+    "parentsAge": "Parents' Age",
+    "parentsPhone": "Parents' Phone",
+    "income": "Annual Income",
+    "drinking": "Drinking",
+    "smoking": "Smoking",
+    "religion": "Religion",
+    "currentAddress": "Current Address",
+    "desiredDestination": "Desired Country",
+    "monthlyIncome": "Monthly Income",
+    "children": "Children",
+    "guarantee": "Guarantee",
+    "selectProfile": "Select Profile",
+    "selectProfileDesc": "Please select a {{type}} profile to favorite",
+    "noProfilesToSelect": "No {{type}} profiles available to select",
+    "select": "Select",
+    "profileId": "Profile ID"
+  },
+  "form": {
+    "labels": {
+      "name": "Name",
+      "dob": "Date of Birth",
+      "birthYear": "Birth Year",
+      "height": "Height",
+      "weight": "Weight",
+      "education": "Education",
+      "maritalStatus": "Marital Status",
+      "job": "Job",
+      "income": "Income",
+      "tattoo": "Tattoo",
+      "religion": "Religion",
+      "address": "Address",
+      "residence": "Residence Address",
+      "currentAddress": "Current Address",
+      "phone": "Phone",
+      "email": "Email",
+      "photos": "Photos",
+      "video": "Video",
+      "avatar": "Profile Photo",
+      "memo": "Memo"
+    },
+    "placeholders": {
+      "name": "Enter name",
+      "height": "Enter height (cm)",
+      "weight": "Enter weight (kg)",
+      "education": "Enter education",
+      "job": "Enter job",
+      "address": "Enter address",
+      "phone": "Enter phone number",
+      "email": "Enter email",
+      "memo": "Enter memo"
+    },
+    "errors": {
+      "required": "Required field",
+      "invalid": "Invalid format",
+      "minLength": "Please enter at least {{min}} characters",
+      "maxLength": "Maximum {{max}} characters allowed"
+    },
+    "success": {
+      "saved": "Saved",
+      "created": "Created",
+      "updated": "Updated",
+      "deleted": "Deleted"
+    }
+  },
+  "match": {
+    "title": "Match Management",
+    "create": "Start New Match",
+    "selectPartner": "Select partner to match and enter match information",
+    "selectGroom": "Select Groom to Match",
+    "selectBride": "Select Bride to Match",
+    "matchInfo": "Match Information",
+    "memo": "Memo",
+    "createMatch": "Create Match",
+    "stages": {
+      "title": "Match Stage Management",
+      "documentReview": "Document Review",
+      "initialConsultation": "Initial Consultation",
+      "profileExchange": "Profile Exchange",
+      "videoIntroduction": "Video Introduction",
+      "faceToFaceMeeting": "Face-to-Face Meeting",
+      "marriageDocuments": "Marriage Documents",
+      "marriagePreparation": "Marriage Preparation"
+    },
+    "status": {
+      "pending": "Pending",
+      "inProgress": "In Progress",
+      "completed": "Completed"
+    },
+    "quickActions": {
+      "nextStage": "Next Stage",
+      "updateProgress": "Update Progress"
+    },
+    "progress": {
+      "overall": "Overall Progress",
+      "completed": "Stages Completed"
+    }
+  },
+  "favorite": {
+    "stats": {
+      "title": "Favorite Statistics",
+      "total": "Total Favorites",
+      "byStatus": "By Status",
+      "byAgency": "Favorites by Agency",
+      "recentActivity": "Recent Activity",
+      "last7Days": "Last 7 Days",
+      "last30Days": "Last 30 Days",
+      "newActivity": "New Favorite Activity",
+      "groomToBride": "Groom→Bride",
+      "brideToGroom": "Bride→Groom",
+      "pending": "Pending",
+      "accepted": "Accepted",
+      "rejected": "Rejected"
+    },
+    "received": {
+      "title": "Received Favorites",
+      "noFavorites": "No favorites received",
+      "approve": "Approve",
+      "reject": "Reject",
+      "approved": "Approved",
+      "rejected": "Rejected",
+      "pending": "Pending",
+      "favoritedDate": "Favorited Date",
+      "statusChangedDate": "Status Changed Date"
+    }
+  },
+  "error": {
+    "generic": "An error occurred",
+    "network": "Network error occurred",
+    "unauthorized": "Authentication required",
+    "forbidden": "Permission denied",
+    "notFound": "Not found",
+    "serverError": "Server error occurred",
+    "loadFailed": "Failed to load",
+    "saveFailed": "Failed to save",
+    "deleteFailed": "Failed to delete"
+  },
+  "success": {
+    "saved": "Saved",
+    "created": "Created",
+    "updated": "Updated",
+    "deleted": "Deleted",
+    "favoriteAdded": "Added to favorites",
+    "favoriteRemoved": "Removed from favorites"
+  },
+  "auth": {
+    "login": "Login",
+    "logout": "Logout",
+    "profile": "Profile",
+    "loginRequired": "Login required",
+    "loginSuccess": "Logged in",
+    "logoutSuccess": "Logged out"
+  },
+  "home": {
+    "youtube": {
+      "loading": "Loading...",
+      "loadError": "Failed to load video list",
+      "noVideos": "No videos available"
+    }
+  },
+  "servicePending": {
+    "title": "Service Under Preparation",
+    "description": "Chat service is only available for administrators.",
+    "confirm": "Confirm"
+  }
+}
+

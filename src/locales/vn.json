@@ -1,0 +1,304 @@
+{
+  "common": {
+    "save": "Lưu",
+    "cancel": "Hủy",
+    "delete": "Xóa",
+    "edit": "Sửa",
+    "loading": "Đang tải...",
+    "search": "Tìm kiếm",
+    "filter": "Lọc",
+    "sort": "Sắp xếp",
+    "close": "Đóng",
+    "confirm": "Xác nhận",
+    "yes": "Có",
+    "no": "Không",
+    "name": "Tên",
+    "age": "Tuổi",
+    "height": "Chiều cao",
+    "weight": "Cân nặng",
+    "count": "lượt",
+    "people": "người",
+    "all": "Tất cả",
+    "select": "Chọn",
+    "submit": "Gửi",
+    "reset": "Đặt lại",
+    "back": "Quay lại",
+    "next": "Tiếp theo",
+    "previous": "Trước",
+    "view": "Xem",
+    "details": "Chi tiết",
+    "actions": "Thao tác",
+    "status": "Trạng thái",
+    "date": "Ngày",
+    "time": "Giờ",
+    "createdAt": "Ngày tạo",
+    "updatedAt": "Ngày cập nhật"
+  },
+  "nav": {
+    "home": "YouTube",
+    "brides": "Hồ sơ cô dâu",
+    "grooms": "Hồ sơ chú rể",
+    "profiles": "Hồ sơ",
+    "dashboard": "Quản lý",
+    "login": "Đăng nhập",
+    "logout": "Đăng xuất",
+    "profile": "Hồ sơ",
+    "messages": "Tin nhắn",
+    "receivedFavorites": "Danh sách được yêu thích"
+  },
+  "dashboard": {
+    "tabs": {
+      "grooms": "Chú rể",
+      "brides": "Cô dâu",
+      "agencies": "Cơ quan",
+      "users": "Người dùng",
+      "matches": "Kết đôi",
+      "youtube": "YouTube"
+    },
+    "stats": {
+      "totalMembers": "Tổng số thành viên quản lý",
+      "activeMatches": "Kết đôi đang tiến hành",
+      "recentUpdate": "Cập nhật gần đây",
+      "groom": "Chú rể",
+      "bride": "Cô dâu"
+    },
+    "buttons": {
+      "registerGroom": "Đăng ký chú rể",
+      "registerBride": "Đăng ký cô dâu",
+      "registerAgency": "Đăng ký cơ quan",
+      "registerVideo": "Đăng ký video",
+      "createMatch": "Bắt đầu kết đôi mới"
+    },
+    "search": {
+      "placeholder": "Tìm kiếm tên, khu vực",
+      "allStatus": "Tất cả trạng thái",
+      "allRoles": "Tất cả vai trò"
+    },
+    "sort": {
+      "sortBy": "Sắp xếp",
+      "dateDesc": "Mới đăng ký nhất",
+      "dateAsc": "Cũ nhất",
+      "nameAsc": "Tên A-Z",
+      "nameDesc": "Tên Z-A",
+      "ageAsc": "Tuổi trẻ nhất",
+      "ageDesc": "Tuổi già nhất"
+    },
+    "status": {
+      "all": "Tất cả trạng thái",
+      "active": "Hoạt động",
+      "inactive": "Không hoạt động",
+      "suspended": "Tạm dừng",
+      "pending": "Chờ phê duyệt",
+      "registered": "Đã đăng ký",
+      "matching": "Đang kết đôi",
+      "meetingScheduled": "Đã lên lịch gặp",
+      "documents": "Chuẩn bị giấy tờ",
+      "waiting": "Đang chờ",
+      "inProgress": "Đang tiến hành",
+      "completed": "Hoàn thành",
+      "activeStatus": "Đang hoạt động",
+      "suspendedStatus": "Đã tạm dừng"
+    },
+    "roles": {
+      "all": "Tất cả vai trò",
+      "superAdmin": "Quản trị viên cấp cao",
+      "platformAdmin": "Quản trị viên nền tảng",
+      "agencyMember": "Thành viên cơ quan"
+    }
+  },
+  "profile": {
+    "detail": "Chi tiết hồ sơ",
+    "list": "Danh sách hồ sơ",
+    "filters": "Bộ lọc",
+    "favorites": "Danh sách yêu thích",
+    "favorite": "Yêu thích",
+    "unfavorite": "Bỏ yêu thích",
+    "addToFavorites": "Thêm vào danh sách yêu thích",
+    "removeFromFavorites": "Xóa khỏi danh sách yêu thích",
+    "favoriteAdded": "Đã thêm vào danh sách yêu thích",
+    "favoriteRemoved": "Đã xóa khỏi danh sách yêu thích",
+    "noProfiles": "Không tìm thấy hồ sơ",
+    "noProfilesDesc": "Vui lòng điều chỉnh điều kiện lọc và tìm kiếm lại",
+    "resetFilters": "Đặt lại tất cả bộ lọc",
+    "found": "người được tìm thấy",
+    "sortBy": "Tiêu chí sắp xếp",
+    "recent": "Mới nhất",
+    "name": "Theo tên",
+    "age": "Theo tuổi (thấp→cao)",
+    "status": "Theo trạng thái",
+    "basicInfo": "Thông tin cơ bản",
+    "detailedInfo": "Thông tin chi tiết",
+    "memo": "Ghi chú",
+    "additionalNotes": "Ghi chú và đặc biệt bổ sung",
+    "heightWeight": "Chiều cao / Cân nặng",
+    "residence": "Nơi cư trú",
+    "job": "Nghề nghiệp",
+    "maritalStatus": "Tình trạng hôn nhân",
+    "education": "Học vấn",
+    "family": "Thông tin gia đình",
+    "parentsAge": "Tuổi cha mẹ",
+    "parentsPhone": "Số điện thoại cha mẹ",
+    "income": "Thu nhập hàng năm",
+    "drinking": "Uống rượu",
+    "smoking": "Hút thuốc",
+    "religion": "Tôn giáo",
+    "currentAddress": "Địa chỉ hiện tại",
+    "desiredDestination": "Quốc gia mong muốn",
+    "monthlyIncome": "Thu nhập hàng tháng",
+    "children": "Con cái",
+    "guarantee": "Bảo lãnh",
+    "selectProfile": "Chọn hồ sơ",
+    "selectProfileDesc": "Vui lòng chọn hồ sơ {{type}} để yêu thích",
+    "noProfilesToSelect": "Không có hồ sơ {{type}} nào để chọn",
+    "select": "Chọn",
+    "profileId": "ID hồ sơ"
+  },
+  "form": {
+    "labels": {
+      "name": "Tên",
+      "dob": "Ngày sinh",
+      "birthYear": "Năm sinh",
+      "height": "Chiều cao",
+      "weight": "Cân nặng",
+      "education": "Học vấn",
+      "maritalStatus": "Tình trạng hôn nhân",
+      "job": "Nghề nghiệp",
+      "income": "Thu nhập",
+      "tattoo": "Hình xăm",
+      "religion": "Tôn giáo",
+      "address": "Nơi cư trú",
+      "residence": "Địa chỉ cư trú",
+      "currentAddress": "Địa chỉ hiện tại",
+      "phone": "Số điện thoại",
+      "email": "Email",
+      "photos": "Ảnh",
+      "video": "Video",
+      "avatar": "Ảnh đại diện",
+      "memo": "Ghi chú"
+    },
+    "placeholders": {
+      "name": "Nhập tên",
+      "height": "Nhập chiều cao (cm)",
+      "weight": "Nhập cân nặng (kg)",
+      "education": "Nhập học vấn",
+      "job": "Nhập nghề nghiệp",
+      "address": "Nhập địa chỉ",
+      "phone": "Nhập số điện thoại",
+      "email": "Nhập email",
+      "memo": "Nhập ghi chú"
+    },
+    "errors": {
+      "required": "Trường bắt buộc",
+      "invalid": "Định dạng không hợp lệ",
+      "minLength": "Vui lòng nhập tối thiểu {{min}} ký tự",
+      "maxLength": "Chỉ có thể nhập tối đa {{max}} ký tự"
+    },
+    "success": {
+      "saved": "Đã lưu",
+      "created": "Đã tạo",
+      "updated": "Đã cập nhật",
+      "deleted": "Đã xóa"
+    }
+  },
+  "match": {
+    "title": "Quản lý kết đôi",
+    "create": "Bắt đầu kết đôi mới",
+    "selectPartner": "Chọn đối tác để kết đôi và nhập thông tin kết đôi",
+    "selectGroom": "Chọn chú rể để kết đôi",
+    "selectBride": "Chọn cô dâu để kết đôi",
+    "matchInfo": "Thông tin kết đôi",
+    "memo": "Ghi chú",
+    "createMatch": "Tạo kết đôi",
+    "stages": {
+      "title": "Quản lý từng giai đoạn kết đôi",
+      "documentReview": "Xem xét giấy tờ",
+      "initialConsultation": "Tư vấn ban đầu",
+      "profileExchange": "Trao đổi hồ sơ",
+      "videoIntroduction": "Giới thiệu qua video",
+      "faceToFaceMeeting": "Gặp mặt trực tiếp",
+      "marriageDocuments": "Giấy tờ kết hôn",
+      "marriagePreparation": "Chuẩn bị kết hôn"
+    },
+    "status": {
+      "pending": "Chờ",
+      "inProgress": "Đang tiến hành",
+      "completed": "Hoàn thành"
+    },
+    "quickActions": {
+      "nextStage": "Giai đoạn tiếp theo",
+      "updateProgress": "Cập nhật tiến độ"
+    },
+    "progress": {
+      "overall": "Tiến độ tổng thể",
+      "completed": "Giai đoạn hoàn thành"
+    }
+  },
+  "favorite": {
+    "stats": {
+      "title": "Thống kê yêu thích",
+      "total": "Tổng yêu thích",
+      "byStatus": "Theo trạng thái",
+      "byAgency": "Thống kê yêu thích theo cơ quan",
+      "recentActivity": "Hoạt động gần đây",
+      "last7Days": "7 ngày qua",
+      "last30Days": "30 ngày qua",
+      "newActivity": "Hoạt động yêu thích mới",
+      "groomToBride": "Chú rể→Cô dâu",
+      "brideToGroom": "Cô dâu→Chú rể",
+      "pending": "Đang chờ",
+      "accepted": "Đã chấp nhận",
+      "rejected": "Đã từ chối"
+    },
+    "received": {
+      "title": "Danh sách được yêu thích",
+      "noFavorites": "Không có yêu thích nào được nhận",
+      "approve": "Chấp nhận",
+      "reject": "Từ chối",
+      "approved": "Đã chấp nhận",
+      "rejected": "Đã từ chối",
+      "pending": "Đang chờ",
+      "favoritedDate": "Ngày yêu thích",
+      "statusChangedDate": "Ngày thay đổi trạng thái"
+    }
+  },
+  "error": {
+    "generic": "Đã xảy ra lỗi",
+    "network": "Đã xảy ra lỗi mạng",
+    "unauthorized": "Yêu cầu xác thực",
+    "forbidden": "Không có quyền",
+    "notFound": "Không tìm thấy",
+    "serverError": "Đã xảy ra lỗi máy chủ",
+    "loadFailed": "Không thể tải",
+    "saveFailed": "Không thể lưu",
+    "deleteFailed": "Không thể xóa"
+  },
+  "success": {
+    "saved": "Đã lưu",
+    "created": "Đã tạo",
+    "updated": "Đã cập nhật",
+    "deleted": "Đã xóa",
+    "favoriteAdded": "Đã thêm vào danh sách yêu thích",
+    "favoriteRemoved": "Đã xóa khỏi danh sách yêu thích"
+  },
+  "auth": {
+    "login": "Đăng nhập",
+    "logout": "Đăng xuất",
+    "profile": "Hồ sơ",
+    "loginRequired": "Yêu cầu đăng nhập",
+    "loginSuccess": "Đã đăng nhập",
+    "logoutSuccess": "Đã đăng xuất"
+  },
+  "home": {
+    "youtube": {
+      "loading": "Đang tải...",
+      "loadError": "Không thể tải danh sách video",
+      "noVideos": "Chưa có video nào"
+    }
+  },
+  "servicePending": {
+    "title": "Dịch vụ đang được chuẩn bị",
+    "description": "Dịch vụ chat chỉ dành cho quản trị viên.",
+    "confirm": "Xác nhận"
+  }
+}
+

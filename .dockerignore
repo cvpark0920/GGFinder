@@ -1,0 +1,72 @@
+# Dependencies
+node_modules
+npm-debug.log
+yarn-error.log
+package-lock.json
+yarn.lock
+
+# Build outputs (except build/ which we need)
+dist
+.server
+.cache
+
+# Development files
+.vscode
+.idea
+*.swp
+*.swo
+*~
+
+# Git
+.git
+.gitignore
+.gitattributes
+
+# Environment files
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Testing
+coverage
+.nyc_output
+*.test.ts
+*.test.tsx
+*.spec.ts
+*.spec.tsx
+
+# Documentation
+README.md
+*.md
+docs
+
+# Misc
+.DS_Store
+Thumbs.db
+*.log
+
+# Prisma (keep schema but ignore generated)
+# Note: We need prisma/ directory but not generated files
+# Generated files will be created during build
+
+# Source files (we only need compiled server code)
+src
+server/**/*.ts
+!server/**/*.js
+!server/dist
+
+# Vite
+vite.config.ts
+tsconfig.json
+tsconfig.*.json
+
+# Keep these
+!build
+!server
+!prisma
+!package.json
+!package-lock.json
+!prisma.config.ts
+
