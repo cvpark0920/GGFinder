@@ -11,7 +11,10 @@ COPY prisma ./prisma/
 # Install all dependencies (including dev dependencies for build)
 RUN npm ci
 
-# Generate Prisma Client (explicitly use Prisma 6.1.0 from package-lock.json)
+# Ensure Prisma 6.1.0 is installed (force version to avoid Prisma 7)
+RUN npm install prisma@6.1.0 @prisma/client@6.1.0 --save-dev --save-exact
+
+# Generate Prisma Client (explicitly use Prisma 6.1.0)
 RUN npx prisma@6.1.0 generate
 
 # Copy source files
