@@ -9,7 +9,8 @@ COPY prisma.config.ts ./
 COPY prisma ./prisma/
 
 # Install all dependencies (including dev dependencies for build)
-RUN npm ci
+# Force Prisma 6.1.0 to avoid Prisma 7 compatibility issues
+RUN npm ci && npm install prisma@6.1.0 @prisma/client@6.1.0 --save-dev
 
 # Generate Prisma Client
 RUN npx prisma generate
