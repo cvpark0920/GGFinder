@@ -6,32 +6,34 @@ WORKDIR /app
 # Build-time environment variables
 # DigitalOcean App Platform은 BUILD_TIME scope 환경 변수를 빌드 환경에 설정함
 # Dockerfile에서 빌드 시 환경 변수를 직접 읽어서 .env 파일 생성
-# ARG는 --build-arg로 전달되거나, 없으면 빌드 환경의 환경 변수에서 읽음
-
-# ARG 선언 (--build-arg로 전달되거나, 없으면 빌드 환경의 환경 변수 사용)
-ARG VITE_API_BASE_URL=${VITE_API_BASE_URL}
-ARG VITE_GOOGLE_CLIENT_ID=${VITE_GOOGLE_CLIENT_ID}
+# 주의: ARG는 --build-arg로 전달되지 않으면 undefined가 되므로,
+# RUN 단계에서 빌드 환경의 환경 변수를 직접 읽어야 함
 
 # 빌드 시 .env 파일 생성 (Vite가 빌드 시 읽음)
 # 빌드 환경의 환경 변수를 직접 읽어서 사용
+# DigitalOcean은 BUILD_TIME 환경 변수를 빌드 환경에 설정하므로,
+# RUN 단계에서 $VITE_API_BASE_URL을 직접 참조 가능
 RUN echo "=== Creating .env file for Vite build ===" && \
+    echo "=== Checking build environment variables ===" && \
+    env | grep VITE || echo "No VITE_* variables found in build environment" && \
     echo "VITE_API_BASE_URL=${VITE_API_BASE_URL:-http://localhost:4000}" > .env && \
     echo "VITE_GOOGLE_CLIENT_ID=${VITE_GOOGLE_CLIENT_ID:-}" >> .env && \
-    echo "=== Build-time Environment Variables ===" && \
+    echo "=== Created .env file contents ===" && \
     cat .env && \
     echo "==========================================" && \
     if [ -z "${VITE_API_BASE_URL:-}" ] || [ "${VITE_API_BASE_URL:-}" = "http://localhost:4000" ]; then \
       echo "⚠️ WARNING: VITE_API_BASE_URL is not set or using default!"; \
-      echo "⚠️ Build environment variables:"; \
-      env | grep VITE || echo "No VITE_* variables found"; \
+      echo "⚠️ Please ensure VITE_API_BASE_URL is set as BUILD_TIME environment variable in DigitalOcean"; \
     fi && \
     if [ -z "${VITE_GOOGLE_CLIENT_ID:-}" ]; then \
       echo "⚠️ WARNING: VITE_GOOGLE_CLIENT_ID is not set!"; \
+      echo "⚠️ Please ensure VITE_GOOGLE_CLIENT_ID is set as BUILD_TIME SECRET in DigitalOcean"; \
     fi
 
 # ENV로 설정 (빌드 시 사용)
-ENV VITE_API_BASE_URL=${VITE_API_BASE_URL}
-ENV VITE_GOOGLE_CLIENT_ID=${VITE_GOOGLE_CLIENT_ID}
+# 빌드 환경의 환경 변수를 직접 참조
+ENV VITE_API_BASE_URL=${VITE_API_BASE_URL:-http://localhost:4000}
+ENV VITE_GOOGLE_CLIENT_ID=${VITE_GOOGLE_CLIENT_ID:-}
 
 # Copy package files
 COPY package*.json ./
