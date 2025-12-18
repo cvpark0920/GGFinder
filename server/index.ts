@@ -54,9 +54,6 @@ logEntry('server/index.ts:18', 'Server starting - checking env vars', {
 });
 // #endregion
 
-// __dirname is automatically available in CommonJS modules
-const __dirname = typeof __dirname !== 'undefined' ? __dirname : path.resolve();
-
 const app = express();
 const PORT = parseInt(process.env.PORT || '4000', 10);
 
