@@ -59,7 +59,12 @@ const PORT = parseInt(process.env.PORT || '4000', 10);
 
 // Middleware
 // CORS 설정: FRONTEND_URL 또는 CORS_ORIGIN 환경 변수 사용
-const allowedOrigin = process.env.CORS_ORIGIN || process.env.FRONTEND_URL || 'http://localhost:4001';
+// #region agent log
+const corsOrigin = process.env.CORS_ORIGIN;
+const frontendUrl = process.env.FRONTEND_URL;
+const allowedOrigin = corsOrigin || frontendUrl || 'http://localhost:4001';
+fetch('http://127.0.0.1:7243/ingest/1ea1dcfc-80be-42cc-9332-f848c10e9a0f',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'server/index.ts:62',message:'CORS origin configuration',data:{corsOrigin:corsOrigin||'NOT_SET',frontendUrl:frontendUrl||'NOT_SET',allowedOrigin:allowedOrigin},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'B'})}).catch(()=>{});
+// #endregion
 app.use(cors({
   origin: allowedOrigin,
   credentials: true, // 쿠키 전송 허용
@@ -69,6 +74,13 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // API routes (must be before static file serving)
+// #region agent log
+app.use('/api', (req, res, next) => {
+  const origin = req.headers.origin || 'NO_ORIGIN';
+  fetch('http://127.0.0.1:7243/ingest/1ea1dcfc-80be-42cc-9332-f848c10e9a0f',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'server/index.ts:72',message:'API request received',data:{method:req.method,path:req.path,origin:origin,allowedOrigin:allowedOrigin},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'B'})}).catch(()=>{});
+  next();
+});
+// #endregion
 app.use('/api', apiRoutes);
 
 // Serve uploaded files (must be before React app static files)
@@ -137,6 +149,12 @@ console.log(`Port: ${PORT}`);
 console.log(`Build Path: ${buildPath}`);
 console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
 console.log(`DATABASE_URL: ${process.env.DATABASE_URL ? 'SET' : 'NOT SET'}`);
+// #region agent log
+console.log(`CORS_ORIGIN: ${process.env.CORS_ORIGIN || 'NOT SET'}`);
+console.log(`FRONTEND_URL: ${process.env.FRONTEND_URL || 'NOT SET'}`);
+console.log(`Allowed Origin: ${allowedOrigin}`);
+fetch('http://127.0.0.1:7243/ingest/1ea1dcfc-80be-42cc-9332-f848c10e9a0f',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'server/index.ts:135',message:'Server startup - CORS config',data:{corsOrigin:process.env.CORS_ORIGIN||'NOT_SET',frontendUrl:process.env.FRONTEND_URL||'NOT_SET',allowedOrigin:allowedOrigin},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'B'})}).catch(()=>{});
+// #endregion
 console.log(`Node Version: ${process.version}`);
 console.log(`Working Directory: ${process.cwd()}`);
 

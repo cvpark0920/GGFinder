@@ -6,23 +6,32 @@ WORKDIR /app
 # Build-time environment variables
 # DigitalOcean App Platform은 BUILD_TIME scope 환경 변수를 빌드 환경에 설정하지만
 # Docker ARG로 자동 전달하지 않으므로, 빌드 전에 .env 파일을 생성해야 함
-# 또는 ARG로 전달받거나, 없으면 빌드 시 환경 변수에서 읽기 시도
+# ARG로 전달받거나, 없으면 빌드 시 환경 변수에서 읽기 시도
 
 # ARG 선언 (--build-arg로 전달되거나, 없으면 undefined)
 ARG VITE_API_BASE_URL
 ARG VITE_GOOGLE_CLIENT_ID
 
-# 빌드 시 환경 변수에서 읽기 시도 (ARG가 없을 경우)
-# 주의: Dockerfile에서는 빌드 환경의 환경 변수를 직접 읽을 수 없으므로
-# build_command에서 --build-arg로 전달하거나 .env 파일을 생성해야 함
+# 빌드 시 .env 파일 생성 (Vite가 빌드 시 읽음)
+# ARG가 설정되어 있으면 사용하고, 없으면 빌드 환경의 환경 변수 사용
+RUN echo "=== Creating .env file for Vite build ===" && \
+    if [ -n "$VITE_API_BASE_URL" ]; then \
+      echo "VITE_API_BASE_URL=$VITE_API_BASE_URL" > .env; \
+    else \
+      echo "VITE_API_BASE_URL=${VITE_API_BASE_URL:-http://localhost:4000}" > .env; \
+    fi && \
+    if [ -n "$VITE_GOOGLE_CLIENT_ID" ]; then \
+      echo "VITE_GOOGLE_CLIENT_ID=$VITE_GOOGLE_CLIENT_ID" >> .env; \
+    else \
+      echo "VITE_GOOGLE_CLIENT_ID=${VITE_GOOGLE_CLIENT_ID:-}" >> .env; \
+    fi && \
+    echo "=== Build-time Environment Variables ===" && \
+    cat .env && \
+    echo "=========================================="
+
+# ENV로 설정 (빌드 시 사용)
 ENV VITE_API_BASE_URL=${VITE_API_BASE_URL}
 ENV VITE_GOOGLE_CLIENT_ID=${VITE_GOOGLE_CLIENT_ID}
-
-# 빌드 시 환경 변수 확인 (디버깅용)
-RUN echo "=== Build-time Environment Variables ===" && \
-    echo "VITE_API_BASE_URL=${VITE_API_BASE_URL:-NOT_SET}" && \
-    echo "VITE_GOOGLE_CLIENT_ID=${VITE_GOOGLE_CLIENT_ID:-NOT_SET}" && \
-    echo "=========================================="
 
 # Copy package files
 COPY package*.json ./

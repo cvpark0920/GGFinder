@@ -10,20 +10,6 @@ services:
     # Docker 빌드 사용
     dockerfile_path: Dockerfile
     source_dir: /
-    # 빌드 타임 환경 변수를 Docker ARG로 전달
-    # DigitalOcean은 BUILD_TIME 환경 변수를 자동으로 --build-arg로 전달하지 않으므로
-    # build_command를 사용하여 명시적으로 전달
-    build_command: |
-      echo "=== Creating .env file for build ==="
-      echo "VITE_API_BASE_URL=${VITE_API_BASE_URL:-${_self.URL}}" > .env.build
-      echo "VITE_GOOGLE_CLIENT_ID=${VITE_GOOGLE_CLIENT_ID:-${GOOGLE_CLIENT_ID}}" >> .env.build
-      echo "=== Building Docker image ==="
-      docker build \
-        --build-arg VITE_API_BASE_URL="${VITE_API_BASE_URL:-${_self.URL}}" \
-        --build-arg VITE_GOOGLE_CLIENT_ID="${VITE_GOOGLE_CLIENT_ID:-${GOOGLE_CLIENT_ID}}" \
-        -t app \
-        -f Dockerfile \
-        .
     instance_count: 1
     instance_size_slug: basic-xxs
     http_port: 4000

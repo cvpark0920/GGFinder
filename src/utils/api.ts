@@ -1,6 +1,11 @@
 import { User, Agency, Client, YouTubeVideo } from '../types/dashboard';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:4000';
+// #region agent log
+if (typeof window !== 'undefined') {
+  fetch('http://127.0.0.1:7243/ingest/1ea1dcfc-80be-42cc-9332-f848c10e9a0f',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'src/utils/api.ts:3',message:'API_BASE_URL configuration',data:{viteApiBaseUrl:import.meta.env.VITE_API_BASE_URL||'NOT_SET',apiBaseUrl:API_BASE_URL,currentOrigin:window.location.origin},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
+}
+// #endregion
 
 /**
  * API 호출 헬퍼 함수
@@ -49,7 +54,9 @@ async function publicApiCall<T>(
   options: RequestInit = {}
 ): Promise<T> {
   const url = `${API_BASE_URL}${endpoint}`;
-
+  // #region agent log
+  fetch('http://127.0.0.1:7243/ingest/1ea1dcfc-80be-42cc-9332-f848c10e9a0f',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'src/utils/api.ts:47',message:'publicApiCall - before fetch',data:{url:url,apiBaseUrl:API_BASE_URL,endpoint:endpoint,currentOrigin:typeof window!=='undefined'?window.location.origin:'N/A'},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
+  // #endregion
   const response = await fetch(url, {
     ...options,
     headers: {
@@ -58,8 +65,14 @@ async function publicApiCall<T>(
     },
   });
 
+  // #region agent log
+  fetch('http://127.0.0.1:7243/ingest/1ea1dcfc-80be-42cc-9332-f848c10e9a0f',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'src/utils/api.ts:61',message:'publicApiCall - response received',data:{url:url,status:response.status,statusText:response.statusText,ok:response.ok,headers:Object.fromEntries(response.headers.entries())},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
+  // #endregion
   if (!response.ok) {
     const errorData = await response.json().catch(() => ({ error: '알 수 없는 오류가 발생했습니다.' }));
+    // #region agent log
+    fetch('http://127.0.0.1:7243/ingest/1ea1dcfc-80be-42cc-9332-f848c10e9a0f',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'src/utils/api.ts:64',message:'publicApiCall - error response',data:{url:url,status:response.status,errorData:errorData},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
+    // #endregion
     throw new Error(errorData.error || `HTTP ${response.status}: ${response.statusText}`);
   }
 
