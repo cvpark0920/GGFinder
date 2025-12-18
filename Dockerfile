@@ -3,6 +3,27 @@ FROM node:20-alpine AS builder
 
 WORKDIR /app
 
+# Build-time environment variables
+# DigitalOcean App Platform은 BUILD_TIME scope 환경 변수를 빌드 환경에 설정하지만
+# Docker ARG로 자동 전달하지 않으므로, 빌드 전에 .env 파일을 생성해야 함
+# 또는 ARG로 전달받거나, 없으면 빌드 시 환경 변수에서 읽기 시도
+
+# ARG 선언 (--build-arg로 전달되거나, 없으면 undefined)
+ARG VITE_API_BASE_URL
+ARG VITE_GOOGLE_CLIENT_ID
+
+# 빌드 시 환경 변수에서 읽기 시도 (ARG가 없을 경우)
+# 주의: Dockerfile에서는 빌드 환경의 환경 변수를 직접 읽을 수 없으므로
+# build_command에서 --build-arg로 전달하거나 .env 파일을 생성해야 함
+ENV VITE_API_BASE_URL=${VITE_API_BASE_URL}
+ENV VITE_GOOGLE_CLIENT_ID=${VITE_GOOGLE_CLIENT_ID}
+
+# 빌드 시 환경 변수 확인 (디버깅용)
+RUN echo "=== Build-time Environment Variables ===" && \
+    echo "VITE_API_BASE_URL=${VITE_API_BASE_URL:-NOT_SET}" && \
+    echo "VITE_GOOGLE_CLIENT_ID=${VITE_GOOGLE_CLIENT_ID:-NOT_SET}" && \
+    echo "=========================================="
+
 # Copy package files
 COPY package*.json ./
 COPY prisma.config.ts ./
@@ -20,7 +41,7 @@ RUN npx prisma@6.1.0 generate
 # Copy source files
 COPY . .
 
-# Build frontend
+# Build frontend (VITE_API_BASE_URL will be used during build)
 RUN npm run build
 
 # Build server

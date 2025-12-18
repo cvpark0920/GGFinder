@@ -25,14 +25,25 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+      args:
+        # 빌드 타임 환경 변수 (Dockerfile의 ARG로 전달)
+        VITE_API_BASE_URL: ${VITE_API_BASE_URL:-http://localhost:4000}
     container_name: ggfinder_app
     restart: unless-stopped
     ports:
       - "${PORT:-4000}:4000"
     environment:
-      NODE_ENV: production
-      PORT: 4000
+      # 런타임 환경 변수
+      NODE_ENV: ${NODE_ENV:-production}
+      PORT: ${PORT:-4000}
       DATABASE_URL: postgresql://${POSTGRES_USER:-app}:${POSTGRES_PASSWORD:-app}@db:5432/${POSTGRES_DB:-ggfinder}?schema=public
+      # JWT 및 OAuth 설정 (.env 파일에서 로드)
+      JWT_SECRET: ${JWT_SECRET:-change-this-secret-key}
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:-}
+      GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET:-}
+      # CORS 및 프론트엔드 URL 설정
+      CORS_ORIGIN: ${CORS_ORIGIN:-http://localhost:4000}
+      FRONTEND_URL: ${FRONTEND_URL:-http://localhost:4000}
     depends_on:
       db:
         condition: service_healthy

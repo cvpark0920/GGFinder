@@ -1,0 +1,138 @@
+name: Docker Build Test
+
+on:
+  pull_request:
+    branches:
+      - main
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+env:
+  DOCKER_IMAGE_NAME: ggfinder
+
+jobs:
+  docker-build:
+    name: Docker Build Test
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+        with:
+          driver-opts: |
+            image=moby/buildkit:latest
+
+      - name: Build Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./Dockerfile
+          push: false
+          tags: ${{ env.DOCKER_IMAGE_NAME }}:test
+          build-args: |
+            VITE_API_BASE_URL=${{ secrets.VITE_API_BASE_URL || 'http://localhost:4000' }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          outputs: type=docker,dest=/tmp/image.tar
+
+      - name: Inspect Docker image
+        run: |
+          echo "🔍 Inspecting Docker image..."
+          
+          # 이미지 로드
+          docker load -i /tmp/image.tar
+          
+          # 이미지 정보
+          echo "📊 Image Information:"
+          docker images ${{ env.DOCKER_IMAGE_NAME }}:test
+          
+          # 이미지 레이어 확인
+          echo ""
+          echo "📦 Image Layers:"
+          docker history ${{ env.DOCKER_IMAGE_NAME }}:test --no-trunc | head -15
+          
+          # 이미지 크기 확인
+          IMAGE_SIZE=$(docker images ${{ env.DOCKER_IMAGE_NAME }}:test --format "{{.Size}}")
+          echo ""
+          echo "💾 Image Size: $IMAGE_SIZE"
+
+      - name: Verify image contents
+        run: |
+          echo "🔍 Verifying image contents..."
+          
+          # 컨테이너 생성
+          CONTAINER_ID=$(docker create ${{ env.DOCKER_IMAGE_NAME }}:test)
+          
+          # 필수 파일 확인
+          echo "Checking required files..."
+          
+          # Frontend build 확인
+          if docker cp $CONTAINER_ID:/app/build/index.html - > /dev/null 2>&1; then
+            echo "✅ Frontend build (build/index.html) exists"
+          else
+            echo "❌ Frontend build (build/index.html) missing"
+            exit 1
+          fi
+          
+          # Server build 확인
+          if docker cp $CONTAINER_ID:/app/server/dist/index.js - > /dev/null 2>&1; then
+            echo "✅ Server build (server/dist/index.js) exists"
+          else
+            echo "❌ Server build (server/dist/index.js) missing"
+            exit 1
+          fi
+          
+          # Prisma schema 확인
+          if docker cp $CONTAINER_ID:/app/prisma/schema.prisma - > /dev/null 2>&1; then
+            echo "✅ Prisma schema exists"
+          else
+            echo "❌ Prisma schema missing"
+            exit 1
+          fi
+          
+          # package.json 확인
+          if docker cp $CONTAINER_ID:/app/package.json - > /dev/null 2>&1; then
+            echo "✅ package.json exists"
+          else
+            echo "❌ package.json missing"
+            exit 1
+          fi
+          
+          # 컨테이너 정리
+          docker rm $CONTAINER_ID
+          
+          echo ""
+          echo "✅ All required files verified"
+
+      - name: Test Docker image health check
+        run: |
+          echo "🏥 Testing health check configuration..."
+          
+          # Health check 명령어 확인
+          HEALTHCHECK=$(docker inspect ${{ env.DOCKER_IMAGE_NAME }}:test --format='{{json .Config.Healthcheck}}')
+          echo "Health check config: $HEALTHCHECK"
+          
+          if [ "$HEALTHCHECK" != "null" ] && [ "$HEALTHCHECK" != "" ]; then
+            echo "✅ Health check configured"
+          else
+            echo "⚠️ Health check not configured"
+          fi
+
+      - name: Build summary
+        if: success()
+        run: |
+          echo ""
+          echo "=========================================="
+          echo "✅ Docker Build Test Completed Successfully"
+          echo "=========================================="
+          echo ""
+          echo "Image: ${{ env.DOCKER_IMAGE_NAME }}:test"
+          echo "Size: $(docker images ${{ env.DOCKER_IMAGE_NAME }}:test --format '{{.Size}}')"
+          echo ""
+          echo "The Docker image is ready for deployment."
+

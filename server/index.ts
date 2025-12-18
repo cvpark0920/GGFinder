@@ -58,8 +58,10 @@ const app = express();
 const PORT = parseInt(process.env.PORT || '4000', 10);
 
 // Middleware
+// CORS 설정: FRONTEND_URL 또는 CORS_ORIGIN 환경 변수 사용
+const allowedOrigin = process.env.CORS_ORIGIN || process.env.FRONTEND_URL || 'http://localhost:4001';
 app.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:4001',
+  origin: allowedOrigin,
   credentials: true, // 쿠키 전송 허용
 }));
 app.use(cookieParser());

@@ -7,55 +7,23 @@ services:
       repo: cvpark0920/GGFinder
       branch: main
       deploy_on_push: true
+    # Docker 빌드 사용
+    dockerfile_path: Dockerfile
+    source_dir: /
+    # 빌드 타임 환경 변수를 Docker ARG로 전달
+    # DigitalOcean은 BUILD_TIME 환경 변수를 자동으로 --build-arg로 전달하지 않으므로
+    # build_command를 사용하여 명시적으로 전달
     build_command: |
-      npm ci || exit 1
-      npm install prisma@6.1.0 @prisma/client@6.1.0 --save-dev || exit 1
-      npx prisma@6.1.0 generate || exit 1
-      npm run build || exit 1
-      npm run build:server || exit 1
-    run_command: |
-      # set -e 제거: 마이그레이션 실패 시에도 서버가 시작되도록
-      echo "=== Environment Debug Info ==="
-      echo "Working Directory: $(pwd)"
-      echo "Node Version: $(node --version)"
-      echo "NPM Version: $(npm --version)"
-      echo "PORT: ${PORT:-4000}"
-      echo "NODE_ENV: ${NODE_ENV:-production}"
-      echo "DATABASE_URL: ${DATABASE_URL:+SET}"
-      echo ""
-      
-      echo "=== File Structure Check ==="
-      echo "Files in current directory:"
-      ls -la | head -10
-      echo ""
-      echo "server/dist exists: $([ -d server/dist ] && echo 'YES' || echo 'NO')"
-      echo "build exists: $([ -d build ] && echo 'YES' || echo 'NO')"
-      echo "server/dist/index.js exists: $([ -f server/dist/index.js ] && echo 'YES' || echo 'NO')"
-      echo "build/index.html exists: $([ -f build/index.html ] && echo 'YES' || echo 'NO')"
-      echo ""
-      
-      echo "=== Checking Prisma CLI ==="
-      if ! command -v npx &> /dev/null; then
-        echo "ERROR: npx not found"
-        exit 1
-      fi
-      
-      echo "npx path: $(which npx)"
-      echo "node_modules/.bin/prisma exists: $([ -f node_modules/.bin/prisma ] && echo 'YES' || echo 'NO')"
-      npx prisma@6.1.0 --version 2>&1 || echo "WARNING: Could not verify Prisma version"
-      echo ""
-      
-      echo "=== Running Prisma Migration ==="
-      npx prisma@6.1.0 migrate deploy 2>&1 || {
-        echo "WARNING: Migration failed, but continuing with server start..."
-      }
-      echo ""
-      
-      echo "=== Starting Node.js Server ==="
-      echo "Executing: node server/dist/index.js"
-      # 서버 시작 (실패 시에만 종료)
-      exec node server/dist/index.js
-    environment_slug: node-js
+      echo "=== Creating .env file for build ==="
+      echo "VITE_API_BASE_URL=${VITE_API_BASE_URL:-${_self.URL}}" > .env.build
+      echo "VITE_GOOGLE_CLIENT_ID=${VITE_GOOGLE_CLIENT_ID:-${GOOGLE_CLIENT_ID}}" >> .env.build
+      echo "=== Building Docker image ==="
+      docker build \
+        --build-arg VITE_API_BASE_URL="${VITE_API_BASE_URL:-${_self.URL}}" \
+        --build-arg VITE_GOOGLE_CLIENT_ID="${VITE_GOOGLE_CLIENT_ID:-${GOOGLE_CLIENT_ID}}" \
+        -t app \
+        -f Dockerfile \
+        .
     instance_count: 1
     instance_size_slug: basic-xxs
     http_port: 4000
@@ -80,6 +48,11 @@ services:
       - key: VITE_API_BASE_URL
         scope: BUILD_TIME
         value: ${_self.URL}
+      # 빌드 타임 환경 변수: 프론트엔드 빌드 시 Google Client ID 필요
+      # 주의: DigitalOcean 콘솔에서 GOOGLE_CLIENT_ID와 동일한 값으로 수동 설정 필요
+      - key: VITE_GOOGLE_CLIENT_ID
+        scope: BUILD_TIME
+        type: SECRET
       - key: CORS_ORIGIN
         value: ${_self.URL}
       - key: FRONTEND_URL

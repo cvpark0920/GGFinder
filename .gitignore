@@ -45,6 +45,9 @@ Thumbs.db
 *.swo
 *~
 
+# GitHub Actions (keep workflows)
+# .github/workflows/ should be committed
+
 # Temporary files
 *.tmp
 *.temp
