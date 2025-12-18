@@ -35,6 +35,9 @@ jobs:
 
       - name: Validate Prisma schema
         run: npx prisma@6.1.0 validate
+        env:
+          # CI 환경에서는 실제 데이터베이스 연결이 필요하지 않으므로 더미 URL 사용
+          DATABASE_URL: "postgresql://user:password@localhost:5432/db?schema=public"
 
       - name: Build frontend
         run: npm run build
