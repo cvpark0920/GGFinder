@@ -13,21 +13,19 @@ ARG VITE_API_BASE_URL
 ARG VITE_GOOGLE_CLIENT_ID
 
 # 빌드 시 .env 파일 생성 (Vite가 빌드 시 읽음)
-# ARG가 설정되어 있으면 사용하고, 없으면 빌드 환경의 환경 변수 사용
+# ARG가 --build-arg로 전달되어야 함 (build_command에서 전달)
 RUN echo "=== Creating .env file for Vite build ===" && \
-    if [ -n "$VITE_API_BASE_URL" ]; then \
-      echo "VITE_API_BASE_URL=$VITE_API_BASE_URL" > .env; \
-    else \
-      echo "VITE_API_BASE_URL=${VITE_API_BASE_URL:-http://localhost:4000}" > .env; \
-    fi && \
-    if [ -n "$VITE_GOOGLE_CLIENT_ID" ]; then \
-      echo "VITE_GOOGLE_CLIENT_ID=$VITE_GOOGLE_CLIENT_ID" >> .env; \
-    else \
-      echo "VITE_GOOGLE_CLIENT_ID=${VITE_GOOGLE_CLIENT_ID:-}" >> .env; \
-    fi && \
+    echo "VITE_API_BASE_URL=${VITE_API_BASE_URL}" > .env && \
+    echo "VITE_GOOGLE_CLIENT_ID=${VITE_GOOGLE_CLIENT_ID}" >> .env && \
     echo "=== Build-time Environment Variables ===" && \
     cat .env && \
-    echo "=========================================="
+    echo "==========================================" && \
+    if [ -z "$VITE_API_BASE_URL" ]; then \
+      echo "⚠️ WARNING: VITE_API_BASE_URL is not set!"; \
+    fi && \
+    if [ -z "$VITE_GOOGLE_CLIENT_ID" ]; then \
+      echo "⚠️ WARNING: VITE_GOOGLE_CLIENT_ID is not set!"; \
+    fi
 
 # ENV로 설정 (빌드 시 사용)
 ENV VITE_API_BASE_URL=${VITE_API_BASE_URL}
