@@ -5,7 +5,7 @@ import cookieParser from 'cookie-parser';
 import path from 'path';
 import { appendFileSync } from 'fs';
 import { join } from 'path';
-import { errorHandler, notFoundHandler } from './middleware/errorHandler';
+import { errorHandler, notFoundHandler } from './middleware/errorHandler.js';
 // Import API routes after server setup to avoid early Prisma initialization errors
 let apiRoutes: any;
 try {
