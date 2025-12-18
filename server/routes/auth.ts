@@ -6,10 +6,31 @@ import crypto from 'crypto';
 const router = Router();
 
 // Google OAuth2 클라이언트 초기화
+// 환경 변수 검증
+if (!process.env.GOOGLE_CLIENT_ID) {
+  console.error('⚠️ ERROR: GOOGLE_CLIENT_ID is not set!');
+  console.error('Please set GOOGLE_CLIENT_ID as RUN_TIME SECRET in DigitalOcean');
+}
+
+if (!process.env.GOOGLE_CLIENT_SECRET) {
+  console.error('⚠️ ERROR: GOOGLE_CLIENT_SECRET is not set!');
+  console.error('Please set GOOGLE_CLIENT_SECRET as RUN_TIME SECRET in DigitalOcean');
+}
+
+const googleClientId = process.env.GOOGLE_CLIENT_ID;
+const googleClientSecret = process.env.GOOGLE_CLIENT_SECRET;
+const googleRedirectUri = process.env.GOOGLE_REDIRECT_URI || 'http://localhost:4000/api/auth/google/callback';
+
+if (!googleClientId || !googleClientSecret) {
+  console.error('⚠️ CRITICAL: Google OAuth credentials are missing!');
+  console.error(`GOOGLE_CLIENT_ID: ${googleClientId ? 'SET' : 'NOT SET'}`);
+  console.error(`GOOGLE_CLIENT_SECRET: ${googleClientSecret ? 'SET' : 'NOT SET'}`);
+}
+
 const client = new OAuth2Client(
-  process.env.GOOGLE_CLIENT_ID,
-  process.env.GOOGLE_CLIENT_SECRET,
-  process.env.GOOGLE_REDIRECT_URI || 'http://localhost:4000/api/auth/google/callback'
+  googleClientId,
+  googleClientSecret,
+  googleRedirectUri
 );
 
 /**
