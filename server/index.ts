@@ -73,7 +73,8 @@ app.use('/api', apiRoutes);
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Serve static files from the React app build directory
-const buildPath = path.join(__dirname, 'build');
+// __dirname is server/dist, so we need to go up one level to find build/
+const buildPath = path.join(__dirname, '..', 'build');
 app.use(express.static(buildPath));
 
 // Health check endpoint (before SPA routing)
