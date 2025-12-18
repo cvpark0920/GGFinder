@@ -14,18 +14,36 @@ services:
       npm run build || exit 1
       npm run build:server || exit 1
     run_command: |
-      set -e
+      # set -e 제거: 마이그레이션 실패 시에도 서버가 시작되도록
       echo "=== Starting Server ==="
       echo "DATABASE_URL: ${DATABASE_URL:+SET}"
       echo "PORT: ${PORT:-4000}"
       echo "NODE_ENV: ${NODE_ENV:-production}"
+      echo "Working Directory: $(pwd)"
+      echo "Node Version: $(node --version)"
+      echo "NPM Version: $(npm --version)"
+      echo ""
+      
+      # Prisma CLI 확인 및 설치
+      echo "=== Checking Prisma CLI ==="
+      if ! command -v npx &> /dev/null; then
+        echo "ERROR: npx not found"
+        exit 1
+      fi
+      
+      # Prisma 버전 확인 (실패해도 계속 진행)
+      npx prisma@6.1.0 --version 2>&1 || echo "WARNING: Could not verify Prisma version"
+      
       echo ""
       echo "=== Running Prisma Migration ==="
-      npx prisma@6.1.0 migrate deploy || {
-        echo "WARNING: Migration failed, but continuing..."
+      # 마이그레이션 실패 시에도 서버 시작
+      npx prisma@6.1.0 migrate deploy 2>&1 || {
+        echo "WARNING: Migration failed, but continuing with server start..."
       }
+      
       echo ""
       echo "=== Starting Node.js Server ==="
+      # 서버 시작 (실패 시에만 종료)
       exec node server/dist/index.js
     environment_slug: node-js
     instance_count: 1
