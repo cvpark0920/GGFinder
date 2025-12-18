@@ -15,34 +15,44 @@ services:
       npm run build:server || exit 1
     run_command: |
       # set -e 제거: 마이그레이션 실패 시에도 서버가 시작되도록
-      echo "=== Starting Server ==="
-      echo "DATABASE_URL: ${DATABASE_URL:+SET}"
-      echo "PORT: ${PORT:-4000}"
-      echo "NODE_ENV: ${NODE_ENV:-production}"
+      echo "=== Environment Debug Info ==="
       echo "Working Directory: $(pwd)"
       echo "Node Version: $(node --version)"
       echo "NPM Version: $(npm --version)"
+      echo "PORT: ${PORT:-4000}"
+      echo "NODE_ENV: ${NODE_ENV:-production}"
+      echo "DATABASE_URL: ${DATABASE_URL:+SET}"
       echo ""
       
-      # Prisma CLI 확인 및 설치
+      echo "=== File Structure Check ==="
+      echo "Files in current directory:"
+      ls -la | head -10
+      echo ""
+      echo "server/dist exists: $([ -d server/dist ] && echo 'YES' || echo 'NO')"
+      echo "build exists: $([ -d build ] && echo 'YES' || echo 'NO')"
+      echo "server/dist/index.js exists: $([ -f server/dist/index.js ] && echo 'YES' || echo 'NO')"
+      echo "build/index.html exists: $([ -f build/index.html ] && echo 'YES' || echo 'NO')"
+      echo ""
+      
       echo "=== Checking Prisma CLI ==="
       if ! command -v npx &> /dev/null; then
         echo "ERROR: npx not found"
         exit 1
       fi
       
-      # Prisma 버전 확인 (실패해도 계속 진행)
+      echo "npx path: $(which npx)"
+      echo "node_modules/.bin/prisma exists: $([ -f node_modules/.bin/prisma ] && echo 'YES' || echo 'NO')"
       npx prisma@6.1.0 --version 2>&1 || echo "WARNING: Could not verify Prisma version"
-      
       echo ""
+      
       echo "=== Running Prisma Migration ==="
-      # 마이그레이션 실패 시에도 서버 시작
       npx prisma@6.1.0 migrate deploy 2>&1 || {
         echo "WARNING: Migration failed, but continuing with server start..."
       }
-      
       echo ""
+      
       echo "=== Starting Node.js Server ==="
+      echo "Executing: node server/dist/index.js"
       # 서버 시작 (실패 시에만 종료)
       exec node server/dist/index.js
     environment_slug: node-js
