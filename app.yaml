@@ -9,11 +9,16 @@ services:
       deploy_on_push: true
     build_command: |
       npm ci || exit 1
-      npx prisma generate || exit 1
+      npm install prisma@6.1.0 @prisma/client@6.1.0 --save-dev || exit 1
+      npx prisma@6.1.0 generate || exit 1
       npm run build || exit 1
       npm run build:server || exit 1
     run_command: |
+      echo "Starting server..."
+      echo "DATABASE_URL: ${DATABASE_URL:+SET}"
+      echo "PORT: ${PORT}"
       npx prisma@6.1.0 migrate deploy || echo "Migration failed, continuing..."
+      echo "Starting Node.js server..."
       node server/dist/index.js
     environment_slug: node-js
     instance_count: 1

@@ -46,13 +46,18 @@ if (!dbUrl) {
 
 // #region agent log
 console.log('[DEBUG] Creating PrismaClient');
-const prismaVersion = require('@prisma/client/package.json').version;
-  logEntry('server/prisma.ts:46', 'Creating PrismaClient', {
-    hasDatasources: false,
-    datasourceUrl: dbUrl ? dbUrl.substring(0, 30) + '...' : 'NOT SET',
-    engineType: 'default (no engineType specified)',
-    prismaVersion: prismaVersion,
-  });
+let prismaVersion = 'unknown';
+try {
+  prismaVersion = require('@prisma/client/package.json').version;
+} catch (e) {
+  console.warn('[DEBUG] Could not read Prisma version:', e);
+}
+logEntry('server/prisma.ts:46', 'Creating PrismaClient', {
+  hasDatasources: false,
+  datasourceUrl: dbUrl ? dbUrl.substring(0, 30) + '...' : 'NOT SET',
+  engineType: 'default (no engineType specified)',
+  prismaVersion: prismaVersion,
+});
 // #endregion
 
 let prisma: PrismaClient;

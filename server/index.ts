@@ -6,7 +6,22 @@ import path from 'path';
 import { appendFileSync } from 'fs';
 import { join } from 'path';
 import { errorHandler, notFoundHandler } from './middleware/errorHandler';
-import apiRoutes from './routes/api';
+// Import API routes after server setup to avoid early Prisma initialization errors
+let apiRoutes: any;
+try {
+  console.log('[DEBUG] Loading API routes...');
+  apiRoutes = require('./routes/api').default;
+  console.log('[DEBUG] API routes loaded successfully');
+} catch (error) {
+  console.error('[ERROR] Failed to load API routes:', error);
+  console.error('[ERROR] Error stack:', error instanceof Error ? error.stack : 'No stack');
+  // Create a minimal router that returns errors
+  const { Router } = require('express');
+  apiRoutes = Router();
+  apiRoutes.use('*', (req: any, res: any) => {
+    res.status(503).json({ error: 'API routes failed to load', details: error instanceof Error ? error.message : String(error) });
+  });
+}
 
 // #region agent log
 const logPath = join(process.cwd(), '.cursor', 'debug.log');
