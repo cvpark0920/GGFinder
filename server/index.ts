@@ -80,7 +80,13 @@ app.use(express.static(buildPath));
 
 // Health check endpoint (before SPA routing)
 app.get('/health', (req: Request, res: Response) => {
-  res.json({ status: 'ok', timestamp: new Date().toISOString() });
+  console.log(`[${new Date().toISOString()}] Health check requested`);
+  res.json({ 
+    status: 'ok', 
+    timestamp: new Date().toISOString(),
+    port: PORT,
+    uptime: process.uptime(),
+  });
 });
 
 // SPA routing: All other requests send back React's index.html file
@@ -125,32 +131,59 @@ process.on('unhandledRejection', (reason: any, promise: Promise<any>) => {
 // #endregion
 
 // Start server with error handling
+console.log('=== Server Startup ===');
+console.log(`Port: ${PORT}`);
+console.log(`Build Path: ${buildPath}`);
+console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
+console.log(`DATABASE_URL: ${process.env.DATABASE_URL ? 'SET' : 'NOT SET'}`);
+console.log(`Node Version: ${process.version}`);
+console.log(`Working Directory: ${process.cwd()}`);
+
 try {
-  app.listen(PORT, '0.0.0.0', () => {
-    console.log(`🚀 Server is running on port ${PORT}`);
+  const server = app.listen(PORT, '0.0.0.0', () => {
+    console.log(`✅ Server is running on port ${PORT}`);
     console.log(`📁 Serving static files from: ${buildPath}`);
     console.log(`🌍 Environment: ${process.env.NODE_ENV || 'development'}`);
     console.log(`📊 DATABASE_URL: ${process.env.DATABASE_URL ? 'SET' : 'NOT SET'}`);
+    console.log(`🔗 Health check available at: http://0.0.0.0:${PORT}/health`);
     logEntry('server/index.ts:113', 'Server started successfully', {
       port: PORT,
       buildPath,
       nodeEnv: process.env.NODE_ENV || 'development',
     });
-  }).on('error', (error: NodeJS.ErrnoException) => {
+  });
+  
+  server.on('error', (error: NodeJS.ErrnoException) => {
     logEntry('server/index.ts:120', 'Server listen error', {
       error: error.message,
       errorCode: error.code,
       port: PORT,
+      syscall: error.syscall,
     });
     console.error(`❌ Failed to start server on port ${PORT}:`, error);
+    console.error(`Error Code: ${error.code}`);
+    console.error(`Error Message: ${error.message}`);
+    if (error.code === 'EADDRINUSE') {
+      console.error(`Port ${PORT} is already in use`);
+    }
     process.exit(1);
   });
+  
+  server.on('listening', () => {
+    const address = server.address();
+    console.log(`✅ Server is listening on:`, address);
+  });
+  
 } catch (error) {
   logEntry('server/index.ts:127', 'Server startup error', {
     error: error instanceof Error ? error.message : String(error),
     errorName: error instanceof Error ? error.name : 'Unknown',
+    stack: error instanceof Error ? error.stack : undefined,
   });
   console.error('❌ Failed to start server:', error);
+  if (error instanceof Error) {
+    console.error('Error Stack:', error.stack);
+  }
   process.exit(1);
 }
 

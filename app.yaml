@@ -14,12 +14,19 @@ services:
       npm run build || exit 1
       npm run build:server || exit 1
     run_command: |
-      echo "Starting server..."
+      set -e
+      echo "=== Starting Server ==="
       echo "DATABASE_URL: ${DATABASE_URL:+SET}"
-      echo "PORT: ${PORT}"
-      npx prisma@6.1.0 migrate deploy || echo "Migration failed, continuing..."
-      echo "Starting Node.js server..."
-      node server/dist/index.js
+      echo "PORT: ${PORT:-4000}"
+      echo "NODE_ENV: ${NODE_ENV:-production}"
+      echo ""
+      echo "=== Running Prisma Migration ==="
+      npx prisma@6.1.0 migrate deploy || {
+        echo "WARNING: Migration failed, but continuing..."
+      }
+      echo ""
+      echo "=== Starting Node.js Server ==="
+      exec node server/dist/index.js
     environment_slug: node-js
     instance_count: 1
     instance_size_slug: basic-xxs
