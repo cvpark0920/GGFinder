@@ -73,15 +73,25 @@ jobs:
 
       - name: Docker build verification
         uses: docker/build-push-action@v5
+        id: docker_build
         with:
           context: .
           file: ./Dockerfile
           push: false
+          load: true
           tags: ggfinder:deploy-test
           build-args: |
             VITE_API_BASE_URL=${{ secrets.VITE_API_BASE_URL || 'https://your-app.ondigitalocean.app' }}
+            VITE_GOOGLE_CLIENT_ID=${{ secrets.VITE_GOOGLE_CLIENT_ID || '' }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
+          outputs: type=docker,dest=/tmp/image.tar
+
+      - name: Load Docker image
+        run: |
+          echo "📥 Loading Docker image..."
+          docker load -i /tmp/image.tar
+          echo "✅ Docker image loaded"
 
       - name: Verify Docker image structure
         run: |
