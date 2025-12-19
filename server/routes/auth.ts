@@ -114,20 +114,30 @@ router.get('/google/callback', async (req: Request, res: Response) => {
     // 환경 변수 확인 및 fallback 처리
     let frontendUrl = process.env.FRONTEND_URL || process.env.CORS_ORIGIN;
     
-    // 환경 변수가 없으면 요청의 origin을 사용
+    // 환경 변수가 없으면 요청의 host를 사용하여 URL 구성
+    // Google OAuth 콜백은 Google 서버에서 직접 호출되므로 origin/referer가 없을 수 있음
     if (!frontendUrl) {
-      const requestOrigin = req.get('origin') || req.get('referer');
-      if (requestOrigin) {
-        try {
-          const url = new URL(requestOrigin);
-          frontendUrl = `${url.protocol}//${url.host}`;
-          console.warn('[OAuth Callback] Using request origin as fallback:', frontendUrl);
-        } catch (e) {
-          console.error('[OAuth Callback] Failed to parse origin:', requestOrigin);
+      const requestHost = req.get('host');
+      const protocol = req.protocol || (req.secure ? 'https' : 'http');
+      
+      if (requestHost) {
+        frontendUrl = `${protocol}://${requestHost}`;
+        console.warn('[OAuth Callback] Using request host as fallback:', frontendUrl);
+      } else {
+        // 최후의 수단: origin 또는 referer 시도
+        const requestOrigin = req.get('origin') || req.get('referer');
+        if (requestOrigin) {
+          try {
+            const url = new URL(requestOrigin);
+            frontendUrl = `${url.protocol}//${url.host}`;
+            console.warn('[OAuth Callback] Using request origin/referer as fallback:', frontendUrl);
+          } catch (e) {
+            console.error('[OAuth Callback] Failed to parse origin/referer:', requestOrigin);
+            frontendUrl = 'http://localhost:4000'; // 최종 fallback
+          }
+        } else {
           frontendUrl = 'http://localhost:4000'; // 최종 fallback
         }
-      } else {
-        frontendUrl = 'http://localhost:4000'; // 최종 fallback
       }
     }
     
@@ -135,6 +145,9 @@ router.get('/google/callback', async (req: Request, res: Response) => {
       FRONTEND_URL: process.env.FRONTEND_URL,
       CORS_ORIGIN: process.env.CORS_ORIGIN,
       frontendUrl,
+      requestHost: req.get('host'),
+      requestProtocol: req.protocol,
+      requestSecure: req.secure,
       requestOrigin: req.get('origin'),
       requestReferer: req.get('referer'),
     });
@@ -170,20 +183,8 @@ router.get('/google/callback', async (req: Request, res: Response) => {
     });
     
     if (!storedState || storedState !== state) {
-      // 환경 변수가 없으면 요청의 origin을 사용
-      let redirectUrl = frontendUrl;
-      if (!process.env.FRONTEND_URL && !process.env.CORS_ORIGIN) {
-        const requestOrigin = req.get('origin') || req.get('referer');
-        if (requestOrigin) {
-          try {
-            const url = new URL(requestOrigin);
-            redirectUrl = `${url.protocol}//${url.host}`;
-            console.warn('[OAuth Callback] Using request origin as fallback:', redirectUrl);
-          } catch (e) {
-            console.error('[OAuth Callback] Failed to parse origin:', requestOrigin);
-          }
-        }
-      }
+      // frontendUrl은 이미 위에서 결정되었으므로 그대로 사용
+      const redirectUrl = frontendUrl;
       
       console.error('OAuth state validation failed:', {
         hasStoredState: !!storedState,
@@ -315,24 +316,35 @@ router.get('/google/callback', async (req: Request, res: Response) => {
     // 에러 발생 시에도 동일한 frontendUrl 로직 사용
     let errorFrontendUrl = process.env.FRONTEND_URL || process.env.CORS_ORIGIN;
     if (!errorFrontendUrl) {
-      const requestOrigin = req.get('origin') || req.get('referer');
-      if (requestOrigin) {
-        try {
-          const url = new URL(requestOrigin);
-          errorFrontendUrl = `${url.protocol}//${url.host}`;
-          console.warn('[OAuth Callback] Error handler - Using request origin as fallback:', errorFrontendUrl);
-        } catch (e) {
-          console.error('[OAuth Callback] Error handler - Failed to parse origin:', requestOrigin);
+      const requestHost = req.get('host');
+      const protocol = req.protocol || (req.secure ? 'https' : 'http');
+      
+      if (requestHost) {
+        errorFrontendUrl = `${protocol}://${requestHost}`;
+        console.warn('[OAuth Callback] Error handler - Using request host as fallback:', errorFrontendUrl);
+      } else {
+        const requestOrigin = req.get('origin') || req.get('referer');
+        if (requestOrigin) {
+          try {
+            const url = new URL(requestOrigin);
+            errorFrontendUrl = `${url.protocol}//${url.host}`;
+            console.warn('[OAuth Callback] Error handler - Using request origin/referer as fallback:', errorFrontendUrl);
+          } catch (e) {
+            console.error('[OAuth Callback] Error handler - Failed to parse origin/referer:', requestOrigin);
+            errorFrontendUrl = 'http://localhost:4000';
+          }
+        } else {
           errorFrontendUrl = 'http://localhost:4000';
         }
-      } else {
-        errorFrontendUrl = 'http://localhost:4000';
       }
     }
     console.log('[OAuth Callback] Error handler - Frontend URL:', {
       FRONTEND_URL: process.env.FRONTEND_URL,
       CORS_ORIGIN: process.env.CORS_ORIGIN,
       errorFrontendUrl,
+      requestHost: req.get('host'),
+      requestProtocol: req.protocol,
+      requestSecure: req.secure,
       requestOrigin: req.get('origin'),
       requestReferer: req.get('referer'),
     });
