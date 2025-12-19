@@ -94,6 +94,7 @@ export function GroomRegistrationForm({
   selectedAvatar,
   onAvatarChange,
 }: GroomRegistrationFormProps) {
+  const { t } = useLanguage();
   const [isAvatarDialogOpen, setIsAvatarDialogOpen] = useState(false);
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
 

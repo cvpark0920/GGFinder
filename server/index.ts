@@ -84,7 +84,9 @@ app.use('/api', (req, res, next) => {
 app.use('/api', apiRoutes);
 
 // Serve uploaded files (must be before React app static files)
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+// __dirname is server/dist, so we need to go up two levels to reach project root/uploads/
+const uploadsPath = path.join(__dirname, '..', '..', 'uploads');
+app.use('/uploads', express.static(uploadsPath));
 
 // Serve static files from the React app build directory
 // __dirname is server/dist, so we need to go up two levels to reach project root/build/
