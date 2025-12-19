@@ -46,19 +46,22 @@ router.get('/google/redirect', async (req: Request, res: Response) => {
     const returnUrl = req.query.returnUrl as string || '/';
     
     // 세션 또는 쿠키에 state 저장 (간단한 구현을 위해 쿠키 사용)
-    res.cookie('oauth_state', state, {
+    // DigitalOcean App Platform은 HTTPS를 사용하므로 secure: true 필요
+    // sameSite: 'none'은 크로스 도메인 요청을 허용 (Google OAuth 리디렉션용)
+    const isProduction = process.env.NODE_ENV === 'production';
+    const cookieOptions: any = {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
+      secure: isProduction, // 프로덕션에서는 HTTPS만 허용
+      sameSite: isProduction ? 'none' : 'lax', // 프로덕션에서는 크로스 도메인 허용
       maxAge: 10 * 60 * 1000, // 10분
-    });
+    };
     
-    res.cookie('oauth_return_url', returnUrl, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
-      maxAge: 10 * 60 * 1000, // 10분
-    });
+    // 도메인 설정 (프로덕션에서 필요할 수 있음)
+    // DigitalOcean App Platform에서는 도메인을 명시적으로 설정하지 않음
+    // (브라우저가 자동으로 설정함)
+    
+    res.cookie('oauth_state', state, cookieOptions);
+    res.cookie('oauth_return_url', returnUrl, cookieOptions);
 
     // Google OAuth 인증 URL 생성
     const authUrl = client.generateAuthUrl({
