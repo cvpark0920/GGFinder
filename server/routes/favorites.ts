@@ -53,7 +53,7 @@ router.get('/', ...requireAuth, async (req: Request, res: Response) => {
           console.error('[Favorites Mapping Error]', fav.id, e);
           return null;
         }
-      }).filter(Boolean),
+      }).filter((f): f is NonNullable<typeof f> => f !== null),
     });
   } catch (error: any) {
     console.error('Favorites fetch error:', error);
@@ -994,10 +994,10 @@ router.get('/matches-overview', ...requireAuth, async (req: Request, res: Respon
             console.error('[Matches Overview Mapping Error]', fav.id, e);
             return null;
           }
-        }).filter(Boolean);
+        }).filter((f): f is NonNullable<typeof f> => f !== null);
 
         // 승인된 찜 중 매칭이 생성되었는지 확인
-        const acceptedFavorites = favoritesWithOppositeProfiles.filter(f => f.status === 'accepted');
+        const acceptedFavorites = favoritesWithOppositeProfiles.filter((f): f is NonNullable<typeof f> => f !== null && f.status === 'accepted');
         let hasMatch = false;
         let matchId: number | undefined;
 
@@ -1042,10 +1042,10 @@ router.get('/matches-overview', ...requireAuth, async (req: Request, res: Respon
 
     // 요약 통계
     const allAcceptedFavorites = profilesWithFavorites.flatMap(p => 
-      p.favorites.filter(f => f.status === 'accepted')
+      p.favorites.filter((f): f is NonNullable<typeof f> => f !== null && f.status === 'accepted')
     );
     const matchedCount = profilesWithFavorites.filter(p => p.hasMatch).length;
-    const unmatchedCount = profilesWithFavorites.filter(p => !p.hasMatch && p.favorites.some(f => f.status === 'accepted')).length;
+    const unmatchedCount = profilesWithFavorites.filter(p => !p.hasMatch && p.favorites.some(f => f !== null && f.status === 'accepted')).length;
 
     res.json({
       profiles: profilesWithFavorites,
