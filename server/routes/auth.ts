@@ -312,8 +312,31 @@ router.get('/google/callback', async (req: Request, res: Response) => {
     res.redirect(`${frontendUrl}/auth/callback?token=${tokenParam}&returnUrl=${encodeURIComponent(returnUrl)}`);
   } catch (error) {
     console.error('Google OAuth callback error:', error);
-    const frontendUrl = process.env.FRONTEND_URL || process.env.CORS_ORIGIN || 'http://localhost:4000';
-    res.redirect(`${frontendUrl}/login?error=authentication_failed`);
+    // 에러 발생 시에도 동일한 frontendUrl 로직 사용
+    let errorFrontendUrl = process.env.FRONTEND_URL || process.env.CORS_ORIGIN;
+    if (!errorFrontendUrl) {
+      const requestOrigin = req.get('origin') || req.get('referer');
+      if (requestOrigin) {
+        try {
+          const url = new URL(requestOrigin);
+          errorFrontendUrl = `${url.protocol}//${url.host}`;
+          console.warn('[OAuth Callback] Error handler - Using request origin as fallback:', errorFrontendUrl);
+        } catch (e) {
+          console.error('[OAuth Callback] Error handler - Failed to parse origin:', requestOrigin);
+          errorFrontendUrl = 'http://localhost:4000';
+        }
+      } else {
+        errorFrontendUrl = 'http://localhost:4000';
+      }
+    }
+    console.log('[OAuth Callback] Error handler - Frontend URL:', {
+      FRONTEND_URL: process.env.FRONTEND_URL,
+      CORS_ORIGIN: process.env.CORS_ORIGIN,
+      errorFrontendUrl,
+      requestOrigin: req.get('origin'),
+      requestReferer: req.get('referer'),
+    });
+    res.redirect(`${errorFrontendUrl}/login?error=authentication_failed`);
   }
 });
 
