@@ -141,7 +141,7 @@ jobs:
       - name: Get deployment status
         run: |
           echo "📊 Deployment Status:"
-          doctl apps list-deployments ${{ secrets.DIGITALOCEAN_APP_ID }} --format ID,Phase,Progress.SuccessSteps,Progress.TotalSteps,Created
+          doctl apps list-deployments ${{ secrets.DIGITALOCEAN_APP_ID }} --format ID,Phase,Created,Updated
           
       - name: Deployment summary
         if: success()
