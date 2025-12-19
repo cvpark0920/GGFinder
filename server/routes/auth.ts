@@ -49,19 +49,36 @@ router.get('/google/redirect', async (req: Request, res: Response) => {
     // DigitalOcean App Platform은 HTTPS를 사용하므로 secure: true 필요
     // sameSite: 'none'은 크로스 도메인 요청을 허용 (Google OAuth 리디렉션용)
     const isProduction = process.env.NODE_ENV === 'production';
+    const frontendUrl = process.env.FRONTEND_URL || process.env.CORS_ORIGIN || 'http://localhost:4000';
+    
+    // 디버깅: 환경 변수 로그
+    console.log('[OAuth Redirect] Environment check:', {
+      NODE_ENV: process.env.NODE_ENV,
+      FRONTEND_URL: process.env.FRONTEND_URL,
+      CORS_ORIGIN: process.env.CORS_ORIGIN,
+      frontendUrl,
+      isProduction,
+    });
+    
     const cookieOptions: any = {
       httpOnly: true,
       secure: isProduction, // 프로덕션에서는 HTTPS만 허용
       sameSite: isProduction ? 'none' : 'lax', // 프로덕션에서는 크로스 도메인 허용
       maxAge: 10 * 60 * 1000, // 10분
+      path: '/', // 모든 경로에서 쿠키 접근 가능
     };
     
-    // 도메인 설정 (프로덕션에서 필요할 수 있음)
-    // DigitalOcean App Platform에서는 도메인을 명시적으로 설정하지 않음
-    // (브라우저가 자동으로 설정함)
+    // 프로덕션에서는 도메인을 명시적으로 설정하지 않음 (브라우저가 자동 설정)
+    // 하지만 필요시 도메인을 설정할 수 있음
     
     res.cookie('oauth_state', state, cookieOptions);
     res.cookie('oauth_return_url', returnUrl, cookieOptions);
+    
+    console.log('[OAuth Redirect] Cookie set:', {
+      stateLength: state.length,
+      returnUrl,
+      cookieOptions,
+    });
 
     // Google OAuth 인증 URL 생성
     const authUrl = client.generateAuthUrl({
@@ -94,29 +111,48 @@ router.get('/google/callback', async (req: Request, res: Response) => {
   try {
     const { code, state, error } = req.query;
 
+    const frontendUrl = process.env.FRONTEND_URL || process.env.CORS_ORIGIN || 'http://localhost:4000';
+    
     // 에러 처리
     if (error) {
       console.error('Google OAuth error:', error);
-      return res.redirect(`${process.env.FRONTEND_URL || 'http://localhost:4001'}/login?error=${encodeURIComponent(String(error))}`);
+      return res.redirect(`${frontendUrl}/login?error=${encodeURIComponent(String(error))}`);
     }
 
     if (!code || !state) {
-      return res.redirect(`${process.env.FRONTEND_URL || 'http://localhost:4001'}/login?error=missing_parameters`);
+      return res.redirect(`${frontendUrl}/login?error=missing_parameters`);
     }
 
     // CSRF 보호: state 검증
     const storedState = req.cookies?.oauth_state;
+    const frontendUrl = process.env.FRONTEND_URL || process.env.CORS_ORIGIN || 'http://localhost:4000';
     
     // 디버깅: 쿠키 상태 로그
+    console.log('[OAuth Callback] State validation:', {
+      hasStoredState: !!storedState,
+      storedStateLength: storedState?.length || 0,
+      receivedStateLength: (state as string)?.length || 0,
+      statesMatch: storedState === state,
+      cookies: Object.keys(req.cookies || {}),
+      allCookies: req.cookies,
+      FRONTEND_URL: process.env.FRONTEND_URL,
+      CORS_ORIGIN: process.env.CORS_ORIGIN,
+      frontendUrl,
+    });
+    
     if (!storedState || storedState !== state) {
       console.error('OAuth state validation failed:', {
         hasStoredState: !!storedState,
         storedStateLength: storedState?.length || 0,
-        receivedStateLength: state?.length || 0,
+        receivedStateLength: (state as string)?.length || 0,
         statesMatch: storedState === state,
         cookies: Object.keys(req.cookies || {}),
+        allCookies: req.cookies,
+        FRONTEND_URL: process.env.FRONTEND_URL,
+        CORS_ORIGIN: process.env.CORS_ORIGIN,
+        frontendUrl,
       });
-      return res.redirect(`${process.env.FRONTEND_URL || 'http://localhost:4001'}/login?error=invalid_state`);
+      return res.redirect(`${frontendUrl}/login?error=invalid_state`);
     }
 
     // 쿠키에서 returnUrl 가져오기
@@ -126,7 +162,7 @@ router.get('/google/callback', async (req: Request, res: Response) => {
     const { tokens } = await client.getToken(code as string);
     
     if (!tokens.id_token) {
-      return res.redirect(`${process.env.FRONTEND_URL || 'http://localhost:4001'}/login?error=no_id_token`);
+      return res.redirect(`${frontendUrl}/login?error=no_id_token`);
     }
 
     // ID 토큰 검증
@@ -137,13 +173,13 @@ router.get('/google/callback', async (req: Request, res: Response) => {
 
     const payload = ticket.getPayload();
     if (!payload) {
-      return res.redirect(`${process.env.FRONTEND_URL || 'http://localhost:4001'}/login?error=invalid_token`);
+      return res.redirect(`${frontendUrl}/login?error=invalid_token`);
     }
 
     const { sub: googleId, email, name, picture } = payload;
 
     if (!email) {
-      return res.redirect(`${process.env.FRONTEND_URL || 'http://localhost:4001'}/login?error=no_email`);
+      return res.redirect(`${frontendUrl}/login?error=no_email`);
     }
 
     // 사용자 정보 추출
@@ -219,12 +255,15 @@ router.get('/google/callback', async (req: Request, res: Response) => {
 
     // 프론트엔드로 리디렉션 (토큰을 쿼리 파라미터로 전달)
     // 보안을 위해 짧은 세션 토큰을 사용하거나, httpOnly 쿠키로 전달하는 것이 더 안전함
-    const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:4001';
     const tokenParam = encodeURIComponent(tokens.id_token);
+    console.log('[OAuth Callback] Success redirect:', {
+      frontendUrl,
+      returnUrl,
+    });
     res.redirect(`${frontendUrl}/auth/callback?token=${tokenParam}&returnUrl=${encodeURIComponent(returnUrl)}`);
   } catch (error) {
     console.error('Google OAuth callback error:', error);
-    const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:4001';
+    const frontendUrl = process.env.FRONTEND_URL || process.env.CORS_ORIGIN || 'http://localhost:4000';
     res.redirect(`${frontendUrl}/login?error=authentication_failed`);
   }
 });
