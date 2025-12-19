@@ -35,10 +35,15 @@ RUN echo "=== Creating .env file for Vite build ===" && \
       echo "⚠️ Please ensure VITE_API_BASE_URL is set as BUILD_TIME environment variable in DigitalOcean"; \
     fi && \
     if [ -z "${VITE_GOOGLE_CLIENT_ID:-}" ]; then \
-      echo "❌ ERROR: VITE_GOOGLE_CLIENT_ID is not set!"; \
-      echo "❌ Please ensure VITE_GOOGLE_CLIENT_ID is set as BUILD_TIME SECRET in DigitalOcean"; \
-      echo "❌ The build will continue but the frontend will not work correctly!"; \
-      exit 1; \
+      echo "⚠️ WARNING: VITE_GOOGLE_CLIENT_ID is not set!"; \
+      echo "⚠️ This might be a CI/test build - using dummy value"; \
+      echo "⚠️ Please ensure VITE_GOOGLE_CLIENT_ID is set as BUILD_TIME SECRET in DigitalOcean for production"; \
+      if [ "${CI:-false}" = "true" ] || [ "${GITHUB_ACTIONS:-false}" = "true" ]; then \
+        echo "✅ CI environment detected - allowing build to continue"; \
+      else \
+        echo "❌ ERROR: VITE_GOOGLE_CLIENT_ID is required for production builds!"; \
+        exit 1; \
+      fi; \
     fi && \
     echo "✅ Environment variables verified successfully"
 
