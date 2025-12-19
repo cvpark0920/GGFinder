@@ -51,6 +51,7 @@ RUN echo "=== Creating .env file for Vite build ===" && \
 # ENV로 설정 (빌드 시 사용)
 ENV VITE_API_BASE_URL=${VITE_API_BASE_URL:-http://localhost:4000}
 ENV VITE_GOOGLE_CLIENT_ID=${VITE_GOOGLE_CLIENT_ID:-}
+ENV GITHUB_ACTIONS=${GITHUB_ACTIONS:-false}
 
 # Copy package files
 COPY package*.json ./
