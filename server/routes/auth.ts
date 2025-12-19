@@ -5,6 +5,9 @@ import crypto from 'crypto';
 
 const router = Router();
 
+// 슈퍼 관리자 이메일 상수 정의
+const SUPER_ADMIN_EMAIL = 'cvpark0920@gmail.com';
+
 // Google OAuth2 클라이언트 초기화
 // 환경 변수 검증
 if (!process.env.GOOGLE_CLIENT_ID) {
@@ -237,6 +240,9 @@ router.get('/google/callback', async (req: Request, res: Response) => {
     const userName = name || email.split('@')[0];
     const userPicture = picture || null;
 
+    // 슈퍼 관리자 여부 확인
+    const isSuperAdmin = userEmail === SUPER_ADMIN_EMAIL;
+
     // DB에서 사용자 조회 또는 생성
     let user = await prisma.user.findFirst({
       where: {
@@ -259,6 +265,7 @@ router.get('/google/callback', async (req: Request, res: Response) => {
           picture: userPicture,
           email: userEmail,
           lastLogin: new Date(),
+          ...(isSuperAdmin ? { role: 'super_admin' } : {}),
         },
         include: {
           agency: true,
@@ -282,7 +289,7 @@ router.get('/google/callback', async (req: Request, res: Response) => {
           email: userEmail,
           googleId: googleId,
           picture: userPicture,
-          role: 'agency_member',
+          role: isSuperAdmin ? 'super_admin' : 'agency_member',
           status: 'pending',
           joinDate: new Date(),
           lastLogin: new Date(),
@@ -386,6 +393,9 @@ router.post('/google', async (req: Request, res: Response) => {
     const userName = name || email.split('@')[0];
     const userPicture = picture || null;
 
+    // 슈퍼 관리자 여부 확인
+    const isSuperAdmin = userEmail === SUPER_ADMIN_EMAIL;
+
     // DB에서 사용자 조회 또는 생성
     let user = await prisma.user.findFirst({
       where: {
@@ -408,6 +418,7 @@ router.post('/google', async (req: Request, res: Response) => {
           picture: userPicture,
           email: userEmail,
           lastLogin: new Date(),
+          ...(isSuperAdmin ? { role: 'super_admin' } : {}),
         },
         include: {
           agency: true,
@@ -433,7 +444,7 @@ router.post('/google', async (req: Request, res: Response) => {
           email: userEmail,
           googleId: googleId,
           picture: userPicture,
-          role: 'agency_member', // 기본 역할
+          role: isSuperAdmin ? 'super_admin' : 'agency_member', // 기본 역할
           status: 'pending', // 기본 상태는 승인 대기
           joinDate: new Date(),
           lastLogin: new Date(),
