@@ -106,7 +106,16 @@ router.get('/google/callback', async (req: Request, res: Response) => {
 
     // CSRF 보호: state 검증
     const storedState = req.cookies?.oauth_state;
+    
+    // 디버깅: 쿠키 상태 로그
     if (!storedState || storedState !== state) {
+      console.error('OAuth state validation failed:', {
+        hasStoredState: !!storedState,
+        storedStateLength: storedState?.length || 0,
+        receivedStateLength: state?.length || 0,
+        statesMatch: storedState === state,
+        cookies: Object.keys(req.cookies || {}),
+      });
       return res.redirect(`${process.env.FRONTEND_URL || 'http://localhost:4001'}/login?error=invalid_state`);
     }
 
@@ -198,9 +207,15 @@ router.get('/google/callback', async (req: Request, res: Response) => {
       });
     }
 
-    // 쿠키 정리
-    res.clearCookie('oauth_state');
-    res.clearCookie('oauth_return_url');
+    // 쿠키 정리 (clearCookie도 동일한 옵션 필요)
+    const isProduction = process.env.NODE_ENV === 'production';
+    const clearCookieOptions: any = {
+      httpOnly: true,
+      secure: isProduction,
+      sameSite: isProduction ? 'none' : 'lax',
+    };
+    res.clearCookie('oauth_state', clearCookieOptions);
+    res.clearCookie('oauth_return_url', clearCookieOptions);
 
     // 프론트엔드로 리디렉션 (토큰을 쿼리 파라미터로 전달)
     // 보안을 위해 짧은 세션 토큰을 사용하거나, httpOnly 쿠키로 전달하는 것이 더 안전함
