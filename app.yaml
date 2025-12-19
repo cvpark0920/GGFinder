@@ -14,10 +14,12 @@ services:
     # DigitalOcean은 BUILD_TIME 환경 변수를 빌드 환경에 설정하지만,
     # Dockerfile의 RUN 단계에서는 직접 접근할 수 없으므로
     # build_command를 사용하여 --build-arg로 명시적으로 전달해야 함
+    # 주의: build_command에서 ${GOOGLE_CLIENT_ID}는 빌드 환경에서 사용할 수 없으므로
+    # VITE_GOOGLE_CLIENT_ID를 DigitalOcean 콘솔에서 BUILD_TIME SECRET으로 설정해야 함
     build_command: |
       docker build \
         --build-arg VITE_API_BASE_URL="${VITE_API_BASE_URL:-https://ggfinder-app-joib6.ondigitalocean.app}" \
-        --build-arg VITE_GOOGLE_CLIENT_ID="${VITE_GOOGLE_CLIENT_ID:-${GOOGLE_CLIENT_ID}}" \
+        --build-arg VITE_GOOGLE_CLIENT_ID="${VITE_GOOGLE_CLIENT_ID}" \
         -t app \
         -f Dockerfile \
         .

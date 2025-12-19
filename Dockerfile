@@ -14,23 +14,33 @@ ARG VITE_GOOGLE_CLIENT_ID
 
 # 빌드 시 .env 파일 생성 (Vite가 빌드 시 읽음)
 # ARG로 전달받은 값을 사용
+# 주의: ARG는 빌드 시에만 사용 가능하며, RUN 단계에서 $ARG_NAME으로 참조
 RUN echo "=== Creating .env file for Vite build ===" && \
     echo "=== Build arguments ===" && \
     echo "VITE_API_BASE_URL=${VITE_API_BASE_URL:-NOT_SET}" && \
     echo "VITE_GOOGLE_CLIENT_ID=${VITE_GOOGLE_CLIENT_ID:-NOT_SET}" && \
+    echo "==========================================" && \
     echo "VITE_API_BASE_URL=${VITE_API_BASE_URL:-http://localhost:4000}" > .env && \
     echo "VITE_GOOGLE_CLIENT_ID=${VITE_GOOGLE_CLIENT_ID:-}" >> .env && \
     echo "=== Created .env file contents ===" && \
     cat .env && \
     echo "==========================================" && \
+    echo "=== Verifying .env file ===" && \
+    if [ ! -f .env ]; then \
+      echo "❌ ERROR: .env file was not created!"; \
+      exit 1; \
+    fi && \
     if [ -z "${VITE_API_BASE_URL:-}" ] || [ "${VITE_API_BASE_URL:-}" = "http://localhost:4000" ]; then \
       echo "⚠️ WARNING: VITE_API_BASE_URL is not set or using default!"; \
       echo "⚠️ Please ensure VITE_API_BASE_URL is set as BUILD_TIME environment variable in DigitalOcean"; \
     fi && \
     if [ -z "${VITE_GOOGLE_CLIENT_ID:-}" ]; then \
-      echo "⚠️ WARNING: VITE_GOOGLE_CLIENT_ID is not set!"; \
-      echo "⚠️ Please ensure VITE_GOOGLE_CLIENT_ID is set as BUILD_TIME SECRET in DigitalOcean"; \
-    fi
+      echo "❌ ERROR: VITE_GOOGLE_CLIENT_ID is not set!"; \
+      echo "❌ Please ensure VITE_GOOGLE_CLIENT_ID is set as BUILD_TIME SECRET in DigitalOcean"; \
+      echo "❌ The build will continue but the frontend will not work correctly!"; \
+      exit 1; \
+    fi && \
+    echo "✅ Environment variables verified successfully"
 
 # ENV로 설정 (빌드 시 사용)
 ENV VITE_API_BASE_URL=${VITE_API_BASE_URL:-http://localhost:4000}
