@@ -125,7 +125,6 @@ router.get('/google/callback', async (req: Request, res: Response) => {
 
     // CSRF 보호: state 검증
     const storedState = req.cookies?.oauth_state;
-    const frontendUrl = process.env.FRONTEND_URL || process.env.CORS_ORIGIN || 'http://localhost:4000';
     
     // 디버깅: 쿠키 상태 로그
     console.log('[OAuth Callback] State validation:', {
