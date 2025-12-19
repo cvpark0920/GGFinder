@@ -23,13 +23,11 @@ export default function AuthCallback() {
     hasProcessed.current = true;
 
     if (error) {
-      toast.error(`로그인 실패: ${error}`);
       navigate('/login');
       return;
     }
 
     if (!token) {
-      toast.error('인증 토큰이 없습니다.');
       navigate('/login');
       return;
     }
@@ -55,52 +53,8 @@ export default function AuthCallback() {
 
         const data = await response.json();
         
-        // #region agent log
-        fetch('http://127.0.0.1:7243/ingest/1ea1dcfc-80be-42cc-9332-f848c10e9a0f', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            location: 'AuthCallback.tsx:fetchUserInfo',
-            message: 'User info received',
-            data: {
-              hasRealName: !!data.user.realName,
-              hasPhone: !!data.user.phone,
-              userId: data.user.id,
-            },
-            timestamp: Date.now(),
-            sessionId: 'debug-session',
-            runId: 'run1',
-            hypothesisId: 'B',
-          }),
-        }).catch(() => {});
-        // #endregion
-        
         // AuthContext에 사용자 정보 저장
         login(data.user, data.idToken);
-        
-        // 실명과 전화번호가 없으면 추가 정보 입력 페이지로 리디렉션
-        if (!data.user.realName || !data.user.phone) {
-          // #region agent log
-          fetch('http://127.0.0.1:7243/ingest/1ea1dcfc-80be-42cc-9332-f848c10e9a0f', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              location: 'AuthCallback.tsx:redirectToCompleteRegistration',
-              message: 'Redirecting to complete registration',
-              data: {
-                hasRealName: !!data.user.realName,
-                hasPhone: !!data.user.phone,
-              },
-              timestamp: Date.now(),
-              sessionId: 'debug-session',
-              runId: 'run1',
-              hypothesisId: 'B',
-            }),
-          }).catch(() => {});
-          // #endregion
-          navigate('/complete-registration');
-          return;
-        }
         
         toast.success(`환영합니다, ${data.user.name}님!`);
         
@@ -108,7 +62,6 @@ export default function AuthCallback() {
         navigate(returnUrl);
       } catch (error) {
         console.error('Auth callback error:', error);
-        toast.error(error instanceof Error ? error.message : '로그인에 실패했습니다.');
         navigate('/login');
       }
     };

@@ -105,7 +105,6 @@ export default function Dashboard() {
   useEffect(() => {
     if (isAgencyMember && (activeTab === "users" || activeTab === "agencies" || activeTab === "youtube")) {
       setActiveTab("grooms");
-      toast.error("접근 권한이 없습니다.");
     }
   }, [isAgencyMember, activeTab]);
   
@@ -142,7 +141,6 @@ export default function Dashboard() {
   const handleTabChange = (value: string) => {
     // 소속사 회원은 관리 탭에 접근할 수 없음
     if (isAgencyMember && (value === "users" || value === "agencies" || value === "youtube")) {
-      toast.error("접근 권한이 없습니다.");
       return;
     }
     setActiveTab(value);
@@ -287,7 +285,6 @@ export default function Dashboard() {
 
   const handleCreateMatch = async () => {
     if (!matchDialogHook.matchingClient || !matchDialogHook.selectedPartner) {
-      toast.error("매칭할 상대를 선택해주세요.");
       return;
     }
 
@@ -363,7 +360,6 @@ export default function Dashboard() {
           setFavoriteMatchesOverview(overview);
         } catch (error) {
           console.error('Failed to load favorite data:', error);
-          toast.error('찜 현황을 불러오는데 실패했습니다.');
         } finally {
           setFavoritesLoading(false);
         }
@@ -378,7 +374,6 @@ export default function Dashboard() {
     const bride = clientsHook.brides.find(c => c.id === brideId);
     
     if (!groom || !bride) {
-      toast.error("프로필을 찾을 수 없습니다.");
       return;
     }
 

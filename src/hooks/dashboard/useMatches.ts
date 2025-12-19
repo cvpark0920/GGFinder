@@ -19,7 +19,6 @@ export function useMatches() {
       setMatches(data.matches);
     } catch (error) {
       console.error('Failed to load matches:', error);
-      toast.error('매칭 목록을 불러오는데 실패했습니다.');
     } finally {
       setLoading(false);
     }
@@ -71,7 +70,6 @@ export function useMatches() {
         return newMatch;
       } catch (error) {
         console.error('Failed to create match:', error);
-        toast.error('매칭 생성에 실패했습니다.');
         throw error;
       }
     },
@@ -96,7 +94,6 @@ export function useMatches() {
         return response.match;
       } catch (error) {
         console.error('Failed to update match:', error);
-        toast.error('매칭 수정에 실패했습니다.');
         throw error;
       }
     },
@@ -111,7 +108,6 @@ export function useMatches() {
         toast.success('매칭이 삭제되었습니다.');
       } catch (error) {
         console.error('Failed to delete match:', error);
-        toast.error('매칭 삭제에 실패했습니다.');
         throw error;
       }
     },

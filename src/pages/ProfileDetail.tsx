@@ -62,7 +62,6 @@ export default function ProfileDetail() {
       } catch (err) {
         const errorMessage = err instanceof Error ? err.message : '프로필을 불러오는데 실패했습니다.';
         setError(errorMessage);
-        toast.error(errorMessage);
         console.error('Failed to load profile:', err);
       } finally {
         setIsLoading(false);
@@ -95,13 +94,11 @@ export default function ProfileDetail() {
 
   const toggleFavorite = async () => {
     if (!user) {
-      toast.error('로그인이 필요합니다.');
       return;
     }
 
     // 소속사 회원인지 확인
     if (!user.agencyId || !user.agency) {
-      toast.error('소속사 회원만 찜하기 기능을 사용할 수 있습니다.');
       return;
     }
 
@@ -131,8 +128,6 @@ export default function ProfileDetail() {
         setIsProfileSelectDialogOpen(true);
       }
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : '찜하기 작업에 실패했습니다.';
-      toast.error(errorMessage);
       console.error('Failed to toggle favorite:', err);
       setFavoriteLoading(false);
     }
@@ -148,8 +143,6 @@ export default function ProfileDetail() {
       toast.success('찜 목록에 추가되었습니다.');
       setPendingFavoriteClientId(null);
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : '찜하기 작업에 실패했습니다.';
-      toast.error(errorMessage);
       console.error('Failed to add favorite:', err);
     } finally {
       setFavoriteLoading(false);

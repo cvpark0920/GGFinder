@@ -11,7 +11,6 @@ import ProfileDetail from './pages/ProfileDetail';
 import Profile from './pages/Profile';
 import Login from './pages/Login';
 import AuthCallback from './pages/AuthCallback';
-import CompleteRegistration from './pages/CompleteRegistration';
 import Dashboard from './pages/Dashboard';
 import ProcessDetail from './pages/ProcessDetail';
 import Messages from './pages/Messages';
@@ -67,7 +66,6 @@ export default function App() {
                 />
                 <Route path="login" element={<Login />} />
                 <Route path="auth/callback" element={<AuthCallback />} />
-                <Route path="complete-registration" element={<CompleteRegistration />} />
                 <Route
                   path="profile"
                   element={

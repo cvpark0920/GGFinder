@@ -31,7 +31,6 @@ export function useClients(initialGrooms: Client[], initialBrides: Client[]) {
       } catch (err) {
         const errorMessage = err instanceof Error ? err.message : "클라이언트 목록을 불러오는데 실패했습니다.";
         setError(errorMessage);
-        toast.error(errorMessage);
         console.error("Failed to load clients:", err);
       } finally {
         setIsLoading(false);
@@ -67,7 +66,6 @@ export function useClients(initialGrooms: Client[], initialBrides: Client[]) {
       } catch (err) {
         const errorMessage = err instanceof Error ? err.message : "클라이언트 등록에 실패했습니다.";
         setError(errorMessage);
-        toast.error(errorMessage);
         console.error("Failed to create client:", err);
         return false;
       } finally {
@@ -137,7 +135,6 @@ export function useClients(initialGrooms: Client[], initialBrides: Client[]) {
       } catch (err) {
         const errorMessage = err instanceof Error ? err.message : "클라이언트 수정에 실패했습니다.";
         setError(errorMessage);
-        toast.error(errorMessage);
         console.error("Failed to update client:", err);
       } finally {
         setIsLoading(false);
@@ -164,7 +161,6 @@ export function useClients(initialGrooms: Client[], initialBrides: Client[]) {
       } catch (err) {
         const errorMessage = err instanceof Error ? err.message : "클라이언트 삭제에 실패했습니다.";
         setError(errorMessage);
-        toast.error(errorMessage);
         console.error("Failed to delete client:", err);
       } finally {
         setIsLoading(false);
@@ -194,7 +190,6 @@ export function useClients(initialGrooms: Client[], initialBrides: Client[]) {
       } catch (err) {
         const errorMessage = err instanceof Error ? err.message : "상태 업데이트에 실패했습니다.";
         setError(errorMessage);
-        toast.error(errorMessage);
         console.error("Failed to update status:", err);
       } finally {
         setIsLoading(false);

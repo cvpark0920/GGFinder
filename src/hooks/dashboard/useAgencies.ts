@@ -26,7 +26,6 @@ export function useAgencies() {
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : "소속사 목록을 불러오는데 실패했습니다.";
       setError(errorMessage);
-      toast.error(errorMessage);
       console.error("Failed to load agencies:", err);
     } finally {
       setIsLoading(false);
@@ -60,8 +59,6 @@ export function useAgencies() {
       toast.success("소속사가 등록되었습니다.");
       return newAgencyData;
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : "소속사 등록에 실패했습니다.";
-      toast.error(errorMessage);
       throw err;
     }
   }, [newAgency, agencies]);
@@ -99,8 +96,6 @@ export function useAgencies() {
       setEditingAgency(null);
       toast.success("소속사 정보가 수정되었습니다.");
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : "소속사 정보 수정에 실패했습니다.";
-      toast.error(errorMessage);
       throw err;
     }
   }, [editingAgency, newAgency, agencies]);
@@ -116,8 +111,7 @@ export function useAgencies() {
         setAgencies(agencies.filter((a) => a.id !== id));
         toast.success("소속사가 삭제되었습니다.");
       } catch (err) {
-        const errorMessage = err instanceof Error ? err.message : "소속사 삭제에 실패했습니다.";
-        toast.error(errorMessage);
+        console.error("Failed to delete agency:", err);
       }
     },
     [agencies]

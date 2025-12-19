@@ -67,6 +67,27 @@
 
 ### Docker를 사용한 로컬 실행
 
+**상세 가이드는 [DOCKER_LOCAL_SETUP.md](./DOCKER_LOCAL_SETUP.md)를 참조하세요.**
+
+#### 빠른 시작
+
+```bash
+# 1. 환경 변수 설정
+cp .env.example .env
+# .env 파일을 열어 JWT_SECRET 등 필수 값 설정
+
+# 2. Docker 컨테이너 빌드 및 실행
+docker-compose up -d --build
+
+# 3. 로그 확인
+docker-compose logs -f app
+
+# 4. 브라우저에서 확인
+# http://localhost:4000 접속
+```
+
+#### npm 스크립트 사용
+
 ```bash
 # Docker Compose로 전체 스택 실행
 npm run docker:build
@@ -77,6 +98,9 @@ npm run docker:logs
 
 # 중지
 npm run docker:down
+
+# 완전 정리 (데이터 삭제)
+npm run docker:clean
 ```
 
 ## 빌드

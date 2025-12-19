@@ -24,7 +24,6 @@ export function useUsers() {
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : "사용자 목록을 불러오는데 실패했습니다.";
       setError(errorMessage);
-      toast.error(errorMessage);
       console.error("Failed to load users:", err);
     } finally {
       setIsLoading(false);
@@ -47,8 +46,6 @@ export function useUsers() {
       toast.success(`${newUser.name} 사용자가 추가되었습니다.`);
       return newUser;
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : "사용자 추가에 실패했습니다.";
-      toast.error(errorMessage);
       throw err;
     }
   }, [users]);
@@ -58,7 +55,6 @@ export function useUsers() {
       try {
         const user = users.find((u) => u.id === userId);
         if (!user) {
-          toast.error("사용자를 찾을 수 없습니다.");
           return;
         }
 
@@ -66,8 +62,7 @@ export function useUsers() {
         setUsers(users.map((u) => (u.id === userId ? updatedUser : u)));
         toast.success("사용자 상태가 변경되었습니다.");
       } catch (err) {
-        const errorMessage = err instanceof Error ? err.message : "사용자 상태 변경에 실패했습니다.";
-        toast.error(errorMessage);
+        console.error("Failed to update user status:", err);
       }
     },
     [users]
@@ -84,8 +79,7 @@ export function useUsers() {
         setUsers(users.filter((u) => u.id !== userId));
         toast.success("사용자가 삭제되었습니다.");
       } catch (err) {
-        const errorMessage = err instanceof Error ? err.message : "사용자 삭제에 실패했습니다.";
-        toast.error(errorMessage);
+        console.error("Failed to delete user:", err);
       }
     },
     [users]
@@ -105,8 +99,6 @@ export function useUsers() {
         setEditingUser(null);
         toast.success("사용자 정보가 수정되었습니다.");
       } catch (err) {
-        const errorMessage = err instanceof Error ? err.message : "사용자 정보 수정에 실패했습니다.";
-        toast.error(errorMessage);
         throw err;
       }
     },

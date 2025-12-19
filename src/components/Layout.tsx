@@ -47,8 +47,7 @@ export default function Layout() {
     // 로딩이 완료되고 인증되지 않은 상태이며, 현재 경로가 홈이 아닐 때
     // (ProtectedRoute가 아닌 일반 라우트인 경우)
     if (!isLoading && !isAuthenticated && location.pathname !== '/' && 
-        !location.pathname.startsWith('/auth/') && 
-        location.pathname !== '/complete-registration') {
+        !location.pathname.startsWith('/auth/')) {
       // 홈으로 리다이렉트하고 로그인 Sheet 열기
       navigate('/', { replace: true, state: { fromProtectedRoute: true } });
       setLoginSheetOpen(true);

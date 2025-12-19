@@ -42,7 +42,6 @@ export default function Login({ onSuccess }: LoginProps) {
   React.useEffect(() => {
     const error = searchParams.get('error');
     if (error) {
-      toast.error(`로그인 실패: ${error}`);
       // URL에서 에러 파라미터 제거
       window.history.replaceState({}, '', window.location.pathname);
     }
@@ -90,7 +89,6 @@ export default function Login({ onSuccess }: LoginProps) {
       }
     } catch (error) {
       console.error('Login error:', error);
-      toast.error(error instanceof Error ? error.message : '로그인에 실패했습니다.');
     } finally {
       setIsLoading(false);
     }
@@ -98,7 +96,6 @@ export default function Login({ onSuccess }: LoginProps) {
 
   const handleGoogleLoginError = (error: any) => {
     console.error('Google Login Error:', error);
-    toast.error('Google 로그인에 실패했습니다.');
   };
 
   return (

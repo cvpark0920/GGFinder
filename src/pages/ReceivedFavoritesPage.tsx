@@ -105,7 +105,6 @@ export default function ReceivedFavoritesPage() {
 
   useEffect(() => {
     if (!user?.agency?.role || (user.agency.role !== 'bride' && user.agency.role !== 'groom')) {
-      toast.error('소속사 회원만 접근할 수 있습니다.');
       return;
     }
 
@@ -124,7 +123,6 @@ export default function ReceivedFavoritesPage() {
       setAgencyRole(data.agencyRole || null);
     } catch (error) {
       console.error('Failed to load received favorites:', error);
-      toast.error(t('error.loadFailed'));
     } finally {
       setLoading(false);
     }
@@ -138,7 +136,6 @@ export default function ReceivedFavoritesPage() {
       await loadReceivedFavorites();
     } catch (error) {
       console.error('Failed to update favorite status:', error);
-      toast.error('상태 업데이트에 실패했습니다.');
     } finally {
       setUpdatingStatus(null);
     }
@@ -164,12 +161,9 @@ export default function ReceivedFavoritesPage() {
           : mapClientToBrideProfile(oppositeClient);
         setSelectedProfile(oppositeProfile);
         setIsDetailSheetOpen(true);
-      } else {
-        toast.error(`${oppositeLabel} 프로필을 찾을 수 없습니다.`);
       }
     } catch (error) {
       console.error('Failed to load profile:', error);
-      toast.error('프로필을 불러오는데 실패했습니다.');
     }
   };
 
@@ -186,12 +180,9 @@ export default function ReceivedFavoritesPage() {
           : mapClientToGroomProfile(client);
         setSelectedProfile(profile);
         setIsDetailSheetOpen(true);
-      } else {
-        toast.error(`${profileLabel} 프로필을 찾을 수 없습니다.`);
       }
     } catch (error) {
       console.error('Failed to load profile:', error);
-      toast.error('프로필을 불러오는데 실패했습니다.');
     }
   };
 

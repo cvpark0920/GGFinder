@@ -31,7 +31,6 @@ export function useVideos() {
             ? err.message
             : "동영상 목록을 불러오는데 실패했습니다.";
         setError(errorMessage);
-        toast.error(errorMessage);
         console.error("Failed to load videos:", err);
       } finally {
         setIsLoading(false);
@@ -74,7 +73,6 @@ export function useVideos() {
             ? "동영상 수정에 실패했습니다."
             : "동영상 등록에 실패했습니다.";
         setError(errorMessage);
-        toast.error(errorMessage);
         console.error("Failed to save video:", err);
         return false;
       } finally {
@@ -103,7 +101,6 @@ export function useVideos() {
             ? err.message
             : "동영상 삭제에 실패했습니다.";
         setError(errorMessage);
-        toast.error(errorMessage);
         console.error("Failed to delete video:", err);
       } finally {
         setIsLoading(false);
