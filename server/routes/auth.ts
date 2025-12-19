@@ -111,7 +111,33 @@ router.get('/google/callback', async (req: Request, res: Response) => {
   try {
     const { code, state, error } = req.query;
 
-    const frontendUrl = process.env.FRONTEND_URL || process.env.CORS_ORIGIN || 'http://localhost:4000';
+    // 환경 변수 확인 및 fallback 처리
+    let frontendUrl = process.env.FRONTEND_URL || process.env.CORS_ORIGIN;
+    
+    // 환경 변수가 없으면 요청의 origin을 사용
+    if (!frontendUrl) {
+      const requestOrigin = req.get('origin') || req.get('referer');
+      if (requestOrigin) {
+        try {
+          const url = new URL(requestOrigin);
+          frontendUrl = `${url.protocol}//${url.host}`;
+          console.warn('[OAuth Callback] Using request origin as fallback:', frontendUrl);
+        } catch (e) {
+          console.error('[OAuth Callback] Failed to parse origin:', requestOrigin);
+          frontendUrl = 'http://localhost:4000'; // 최종 fallback
+        }
+      } else {
+        frontendUrl = 'http://localhost:4000'; // 최종 fallback
+      }
+    }
+    
+    console.log('[OAuth Callback] Frontend URL determined:', {
+      FRONTEND_URL: process.env.FRONTEND_URL,
+      CORS_ORIGIN: process.env.CORS_ORIGIN,
+      frontendUrl,
+      requestOrigin: req.get('origin'),
+      requestReferer: req.get('referer'),
+    });
     
     // 에러 처리
     if (error) {
@@ -126,7 +152,7 @@ router.get('/google/callback', async (req: Request, res: Response) => {
     // CSRF 보호: state 검증
     const storedState = req.cookies?.oauth_state;
     
-    // 디버깅: 쿠키 상태 로그
+    // 디버깅: 쿠키 상태 및 환경 변수 로그
     console.log('[OAuth Callback] State validation:', {
       hasStoredState: !!storedState,
       storedStateLength: storedState?.length || 0,
@@ -136,10 +162,29 @@ router.get('/google/callback', async (req: Request, res: Response) => {
       allCookies: req.cookies,
       FRONTEND_URL: process.env.FRONTEND_URL,
       CORS_ORIGIN: process.env.CORS_ORIGIN,
+      NODE_ENV: process.env.NODE_ENV,
       frontendUrl,
+      requestHost: req.get('host'),
+      requestOrigin: req.get('origin'),
+      requestReferer: req.get('referer'),
     });
     
     if (!storedState || storedState !== state) {
+      // 환경 변수가 없으면 요청의 origin을 사용
+      let redirectUrl = frontendUrl;
+      if (!process.env.FRONTEND_URL && !process.env.CORS_ORIGIN) {
+        const requestOrigin = req.get('origin') || req.get('referer');
+        if (requestOrigin) {
+          try {
+            const url = new URL(requestOrigin);
+            redirectUrl = `${url.protocol}//${url.host}`;
+            console.warn('[OAuth Callback] Using request origin as fallback:', redirectUrl);
+          } catch (e) {
+            console.error('[OAuth Callback] Failed to parse origin:', requestOrigin);
+          }
+        }
+      }
+      
       console.error('OAuth state validation failed:', {
         hasStoredState: !!storedState,
         storedStateLength: storedState?.length || 0,
@@ -149,9 +194,14 @@ router.get('/google/callback', async (req: Request, res: Response) => {
         allCookies: req.cookies,
         FRONTEND_URL: process.env.FRONTEND_URL,
         CORS_ORIGIN: process.env.CORS_ORIGIN,
+        NODE_ENV: process.env.NODE_ENV,
         frontendUrl,
+        redirectUrl,
+        requestHost: req.get('host'),
+        requestOrigin: req.get('origin'),
+        requestReferer: req.get('referer'),
       });
-      return res.redirect(`${frontendUrl}/login?error=invalid_state`);
+      return res.redirect(`${redirectUrl}/login?error=invalid_state`);
     }
 
     // 쿠키에서 returnUrl 가져오기
