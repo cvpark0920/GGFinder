@@ -41,12 +41,19 @@ router.get('/', ...requireAuth, async (req: Request, res: Response) => {
     });
 
     res.json({
-      favorites: favorites.map((fav) => ({
-        id: fav.id,
-        clientId: fav.clientId,
-        createdAt: fav.createdAt.toISOString(),
-        client: fav.client,
-      })),
+      favorites: favorites.map((fav) => {
+        try {
+          return {
+            id: fav.id,
+            clientId: fav.clientId,
+            createdAt: fav.createdAt.toISOString(),
+            client: fav.client ? mapClientToFrontend(fav.client) : null,
+          };
+        } catch (e) {
+          console.error('[Favorites Mapping Error]', fav.id, e);
+          return null;
+        }
+      }).filter(Boolean),
     });
   } catch (error: any) {
     console.error('Favorites fetch error:', error);

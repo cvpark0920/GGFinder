@@ -65,78 +65,102 @@ function getAbsoluteUrl(relativePath: string): string {
  * Prisma Client 모델을 프론트엔드 Client 타입으로 변환
  */
 export function mapClientToFrontend(client: any) {
-  const mappedImages = client.images?.map((img: any) => {
-    const imagePath = img.url.startsWith('/uploads/') ? img.url : `/uploads/images/${path.basename(img.url)}`;
-    const absoluteUrl = getAbsoluteUrl(imagePath);
-    return absoluteUrl;
-  }) || [];
-  
-  const mappedVideo = client.video ? (() => {
-    const videoPath = client.video.url.startsWith('/uploads/') ? client.video.url : `/uploads/videos/${path.basename(client.video.url)}`;
-    const absoluteUrl = getAbsoluteUrl(videoPath);
-    return absoluteUrl;
-  })() : undefined;
-  
-  // 나이 계산
-  const age = calculateAge(client.birthYear);
-  
-  // 아바타 URL 매핑
-  const mappedAvatarUrl = client.avatarUrl ? (() => {
-    const avatarPath = client.avatarUrl.startsWith('/uploads/') ? client.avatarUrl : `/uploads/avatars/${path.basename(client.avatarUrl)}`;
-    return getAbsoluteUrl(avatarPath);
-  })() : undefined;
-  
-  const result = {
-    id: client.id,
-    name: client.name,
-    age: age, // 계산된 나이
-    loc: client.loc,
-    status: mapStatusFromDb(client.status),
-    date: client.date.toISOString().split('T')[0],
-    type: client.type,
-    education: client.education || undefined,
-    height: client.height || undefined, // Int로 저장됨
-    weight: client.weight || undefined, // Int로 저장됨
-    family: client.family || undefined,
-    marriage: client.marriage || undefined,
-    job: client.job || undefined,
-    tattoo: client.tattoo || undefined,
-    income: client.income || undefined,
-    smoking: client.smoking || undefined,
-    drinking: client.drinking || undefined,
-    idealType: client.idealType || undefined,
-    memo: client.memo || undefined,
-    agencyId: client.agencyId || undefined,
-    images: mappedImages,
-    video: mappedVideo,
-    avatarUrl: mappedAvatarUrl,
-    // 출생 정보 (신랑/신부 공통)
-    birthYear: client.birthYear,
-    // 신부 전용 필드
-    hasMarriedBefore: client.hasMarriedBefore || false,
-    exHusbandNationality: client.exHusbandNationality || undefined,
-    children: client.children || undefined,
-    addressRegistration: client.addressRegistration || undefined,
-    currentAddress: client.currentAddress || undefined,
-    monthlyIncome: client.monthlyIncome || undefined,
-    siblings: client.siblings || undefined,
-    relativesOverseas: client.relativesOverseas || undefined,
-    fatherAge: client.fatherAge !== null && client.fatherAge !== undefined ? client.fatherAge.toString() : undefined,
-    motherAge: client.motherAge !== null && client.motherAge !== undefined ? client.motherAge.toString() : undefined,
-    parentsPhone: client.parentsPhone || undefined,
-    phone: client.phone || undefined,
-    healthIssues: client.healthIssues || undefined,
-    desiredDestination: client.desiredDestination || undefined,
-    guarantee: client.guarantee || false,
-    // 신랑 전용 필드
-    residence: client.residence || undefined,
-    hobbies: client.hobbies || undefined,
-    parentalSupport: client.parentalSupport || undefined,
-    features: client.features || undefined,
-    religion: client.religion || undefined,
-  };
-  
-  return result;
+  if (!client) return null;
+
+  try {
+    const mappedImages = client.images?.map((img: any) => {
+      if (!img || !img.url) return '';
+      const imagePath = img.url.startsWith('/uploads/') ? img.url : `/uploads/images/${path.basename(img.url)}`;
+      const absoluteUrl = getAbsoluteUrl(imagePath);
+      return absoluteUrl;
+    }).filter((url: string) => url !== '') || [];
+    
+    const mappedVideo = client.video && client.video.url ? (() => {
+      const videoPath = client.video.url.startsWith('/uploads/') ? client.video.url : `/uploads/videos/${path.basename(client.video.url)}`;
+      const absoluteUrl = getAbsoluteUrl(videoPath);
+      return absoluteUrl;
+    })() : undefined;
+    
+    // 나이 계산
+    const age = client.birthYear ? calculateAge(client.birthYear) : 0;
+    
+    // 아바타 URL 매핑
+    const mappedAvatarUrl = client.avatarUrl ? (() => {
+      const avatarPath = client.avatarUrl.startsWith('/uploads/') ? client.avatarUrl : `/uploads/avatars/${path.basename(client.avatarUrl)}`;
+      return getAbsoluteUrl(avatarPath);
+    })() : undefined;
+    
+    // Date 처리 안전하게
+    let dateStr = new Date().toISOString().split('T')[0];
+    if (client.date) {
+      if (typeof client.date === 'string') {
+        dateStr = client.date.split('T')[0];
+      } else if (client.date instanceof Date) {
+        dateStr = client.date.toISOString().split('T')[0];
+      }
+    }
+
+    const result = {
+      id: client.id,
+      name: client.name || 'Unknown',
+      age: age,
+      loc: client.loc || '',
+      status: mapStatusFromDb(client.status),
+      date: dateStr,
+      type: client.type,
+      education: client.education || undefined,
+      height: client.height || undefined,
+      weight: client.weight || undefined,
+      family: client.family || undefined,
+      marriage: client.marriage || undefined,
+      job: client.job || undefined,
+      tattoo: client.tattoo || undefined,
+      income: client.income || undefined,
+      smoking: client.smoking || undefined,
+      drinking: client.drinking || undefined,
+      idealType: client.idealType || undefined,
+      memo: client.memo || undefined,
+      agencyId: client.agencyId || undefined,
+      images: mappedImages,
+      video: mappedVideo,
+      avatarUrl: mappedAvatarUrl,
+      birthYear: client.birthYear,
+      hasMarriedBefore: client.hasMarriedBefore || false,
+      exHusbandNationality: client.exHusbandNationality || undefined,
+      children: client.children || undefined,
+      addressRegistration: client.addressRegistration || undefined,
+      currentAddress: client.currentAddress || undefined,
+      monthlyIncome: client.monthlyIncome || undefined,
+      siblings: client.siblings || undefined,
+      relativesOverseas: client.relativesOverseas || undefined,
+      fatherAge: client.fatherAge !== null && client.fatherAge !== undefined ? client.fatherAge.toString() : undefined,
+      motherAge: client.motherAge !== null && client.motherAge !== undefined ? client.motherAge.toString() : undefined,
+      parentsPhone: client.parentsPhone || undefined,
+      phone: client.phone || undefined,
+      healthIssues: client.healthIssues || undefined,
+      desiredDestination: client.desiredDestination || undefined,
+      guarantee: client.guarantee || false,
+      residence: client.residence || undefined,
+      hobbies: client.hobbies || undefined,
+      parentalSupport: client.parentalSupport || undefined,
+      features: client.features || undefined,
+      religion: client.religion || undefined,
+    };
+    
+    return result;
+  } catch (e) {
+    console.error('[Client Mapping Error] Failed to map client:', client?.id, e);
+    // 최소한의 데이터라도 반환 시도
+    return {
+      id: client?.id,
+      name: client?.name || 'Error',
+      status: '등록 완료',
+      date: new Date().toISOString().split('T')[0],
+      type: client?.type || 'groom',
+      images: [],
+      error: 'Data mapping error'
+    };
+  }
 }
 
 /**
