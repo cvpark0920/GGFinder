@@ -571,17 +571,22 @@ router.get('/received-by-agency', ...requireAuth, async (req: Request, res: Resp
 
         // 각 찜에 대해 상대방 프로필 정보 조회
         const favoritesWithOppositeProfiles = favorites.map((fav) => {
-          return {
-            id: fav.id,
-            clientId: fav.clientId,
-            userId: fav.userId,
-            status: fav.status,
-            createdAt: fav.createdAt.toISOString(),
-            updatedAt: fav.updatedAt.toISOString(),
-            user: fav.user,
-            oppositeProfile: fav.fromClient ? mapClientToFrontend(fav.fromClient) : null,
-          };
-        });
+          try {
+            return {
+              id: fav.id,
+              clientId: fav.clientId,
+              userId: fav.userId,
+              status: fav.status,
+              createdAt: fav.createdAt ? (typeof fav.createdAt === 'string' ? fav.createdAt : fav.createdAt.toISOString()) : new Date().toISOString(),
+              updatedAt: fav.updatedAt ? (typeof fav.updatedAt === 'string' ? fav.updatedAt : fav.updatedAt.toISOString()) : new Date().toISOString(),
+              user: fav.user,
+              oppositeProfile: fav.fromClient ? mapClientToFrontend(fav.fromClient) : null,
+            };
+          } catch (e) {
+            console.error('[Matches Overview Mapping Error]', fav.id, e);
+            return null;
+          }
+        }).filter(Boolean);
 
         return {
           profile: {
@@ -974,17 +979,22 @@ router.get('/matches-overview', ...requireAuth, async (req: Request, res: Respon
 
         // 각 찜에 대해 상대방 프로필 정보 조회
         const favoritesWithOppositeProfiles = favorites.map((fav) => {
-          return {
-            id: fav.id,
-            clientId: fav.clientId,
-            userId: fav.userId,
-            status: fav.status,
-            createdAt: fav.createdAt.toISOString(),
-            updatedAt: fav.updatedAt.toISOString(),
-            user: fav.user,
-            oppositeProfile: fav.fromClient ? mapClientToFrontend(fav.fromClient) : null,
-          };
-        });
+          try {
+            return {
+              id: fav.id,
+              clientId: fav.clientId,
+              userId: fav.userId,
+              status: fav.status,
+              createdAt: fav.createdAt ? (typeof fav.createdAt === 'string' ? fav.createdAt : fav.createdAt.toISOString()) : new Date().toISOString(),
+              updatedAt: fav.updatedAt ? (typeof fav.updatedAt === 'string' ? fav.updatedAt : fav.updatedAt.toISOString()) : new Date().toISOString(),
+              user: fav.user,
+              oppositeProfile: fav.fromClient ? mapClientToFrontend(fav.fromClient) : null,
+            };
+          } catch (e) {
+            console.error('[Matches Overview Mapping Error]', fav.id, e);
+            return null;
+          }
+        }).filter(Boolean);
 
         // 승인된 찜 중 매칭이 생성되었는지 확인
         const acceptedFavorites = favoritesWithOppositeProfiles.filter(f => f.status === 'accepted');
