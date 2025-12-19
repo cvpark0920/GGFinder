@@ -85,6 +85,7 @@
             "docker:down": "docker-compose down",
             "docker:logs": "docker-compose logs -f",
             "docker:restart": "docker-compose restart",
-            "docker:clean": "docker-compose down -v"
+            "docker:clean": "docker-compose down -v",
+            "create-super-admin": "tsx server/scripts/create-super-admin.ts"
       }
 }
