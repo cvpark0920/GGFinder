@@ -30,6 +30,13 @@ const logEntry = (location: string, message: string, data: any) => {
 
 const dbUrl = process.env.DATABASE_URL;
 console.log('[DEBUG] DATABASE_URL check:', dbUrl ? `SET (length: ${dbUrl.length})` : 'NOT SET');
+
+// DigitalOcean 등 프로덕션 환경에서 SSL 모드 강제 설정
+if (process.env.NODE_ENV === 'production' && dbUrl && !dbUrl.includes('sslmode=')) {
+  console.log('[DEBUG] Appending sslmode=require to DATABASE_URL');
+  process.env.DATABASE_URL = dbUrl + (dbUrl.includes('?') ? '&sslmode=require' : '?sslmode=require');
+}
+
 logEntry('server/prisma.ts:8', 'Before PrismaClient init', {
   databaseUrlSet: !!dbUrl,
   databaseUrlLength: dbUrl?.length || 0,

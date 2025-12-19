@@ -208,11 +208,19 @@ router.get('/', authenticateToken, async (req: Request, res: Response) => {
     res.json({
       clients: clients.map(mapClientToFrontend),
     });
-  } catch (error) {
+  } catch (error: any) {
     console.error('Clients fetch error:', error);
+    // Prisma 에러 상세 로깅
+    if (error.code) {
+      console.error('Prisma Error Code:', error.code);
+      console.error('Prisma Error Message:', error.message);
+      console.error('Prisma Error Meta:', error.meta);
+    }
+    
     res.status(500).json({
       error: '클라이언트 목록 조회에 실패했습니다.',
       message: error instanceof Error ? error.message : 'Unknown error',
+      code: error.code || 'UNKNOWN', // 프론트엔드에서 디버깅용으로 확인 가능하도록 추가
     });
   }
 });
