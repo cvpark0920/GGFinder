@@ -57,6 +57,10 @@ logEntry('server/index.ts:18', 'Server starting - checking env vars', {
 const app = express();
 const PORT = parseInt(process.env.PORT || '4000', 10);
 
+// Trust proxy 설정 (DigitalOcean App Platform은 로드밸런서 뒤에 있음)
+// X-Forwarded-Proto, X-Forwarded-For 헤더를 신뢰하여 req.protocol, req.secure가 올바르게 설정됨
+app.set('trust proxy', true);
+
 // Middleware
 // CORS 설정: FRONTEND_URL 또는 CORS_ORIGIN 환경 변수 사용
 // #region agent log
