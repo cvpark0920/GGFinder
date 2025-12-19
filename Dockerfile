@@ -112,6 +112,6 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
   CMD wget --no-verbose --tries=1 --spider http://localhost:4000/health || exit 1
 
 # Run migrations and start server (explicitly use Prisma 6.1.0)
-# Use ; instead of && to allow server to start even if migrations fail
-CMD ["sh", "-c", "npx prisma@6.1.0 migrate deploy; node server/dist/index.js"]
+# Run migrations first, exit if they fail
+CMD ["sh", "-c", "echo '🔄 Running database migrations...' && npx prisma@6.1.0 migrate deploy && echo '✅ Migrations completed successfully' && node server/dist/index.js"]
 
