@@ -377,9 +377,9 @@ router.post('/', ...adminOnly, uploadImages, async (req: Request, res: Response)
     const heightNum = height ? (typeof height === 'string' ? parseInt(height.replace(/[^0-9]/g, '')) : (typeof height === 'number' ? height : parseInt(String(height)))) : null;
     const weightNum = weight ? (typeof weight === 'string' ? parseInt(weight.replace(/[^0-9]/g, '')) : (typeof weight === 'number' ? weight : parseInt(String(weight)))) : null;
     
-    // 부모님 나이 처리 (숫자로 저장)
-    const fatherAgeNum = fatherAge ? (typeof fatherAge === 'string' ? parseInt(fatherAge.replace(/[^0-9]/g, '')) : parseInt(String(fatherAge))) : null;
-    const motherAgeNum = motherAge ? (typeof motherAge === 'string' ? parseInt(motherAge.replace(/[^0-9]/g, '')) : parseInt(String(motherAge))) : null;
+    // 부모님 나이 처리 (숫자로 저장) - 신부 전용 필드
+    const fatherAgeNum = type === 'bride' && fatherAge ? (typeof fatherAge === 'string' ? parseInt(fatherAge.replace(/[^0-9]/g, '')) : parseInt(String(fatherAge))) : null;
+    const motherAgeNum = type === 'bride' && motherAge ? (typeof motherAge === 'string' ? parseInt(motherAge.replace(/[^0-9]/g, '')) : parseInt(String(motherAge))) : null;
 
     const createData = {
         name: name.trim(),
