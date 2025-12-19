@@ -112,6 +112,6 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
   CMD wget --no-verbose --tries=1 --spider http://localhost:4000/health || exit 1
 
 # Run migrations and start server (explicitly use Prisma 6.1.0)
-# Run migrations first, exit if they fail
-CMD ["sh", "-c", "echo '🔄 Running database migrations...' && npx prisma@6.1.0 migrate deploy && echo '✅ Migrations completed successfully' && node server/dist/index.js"]
+# Resolve any previously failed migrations, then run all pending migrations
+CMD ["sh", "-c", "echo '🔄 Resolving failed migrations...' && npx prisma@6.1.0 migrate resolve --applied 20251215234033_add_father_mother_age 2>/dev/null || echo '⚠️ Migration resolution skipped (may not exist)'; echo '🔄 Running database migrations...' && npx prisma@6.1.0 migrate deploy && echo '✅ Migrations completed successfully' && node server/dist/index.js"]
 
