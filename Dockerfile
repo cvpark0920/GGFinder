@@ -12,6 +12,7 @@ WORKDIR /app
 ARG VITE_API_BASE_URL
 ARG VITE_GOOGLE_CLIENT_ID
 ARG GITHUB_ACTIONS
+ARG BUILD_VALIDATE_ENV=true
 
 # 빌드 시 .env 파일 생성 (Vite가 빌드 시 읽음)
 # ARG로 전달받은 값을 사용
@@ -37,13 +38,14 @@ RUN echo "=== Creating .env file for Vite build ===" && \
     fi && \
     if [ -z "${VITE_GOOGLE_CLIENT_ID:-}" ]; then \
       echo "⚠️ WARNING: VITE_GOOGLE_CLIENT_ID is not set!"; \
-      echo "⚠️ This might be a CI/test build - using dummy value"; \
-      echo "⚠️ Please ensure VITE_GOOGLE_CLIENT_ID is set as BUILD_TIME SECRET in DigitalOcean for production"; \
-      if [ "${CI:-false}" = "true" ] || [ "${GITHUB_ACTIONS:-false}" = "true" ]; then \
-        echo "✅ CI environment detected - allowing build to continue"; \
-      else \
+      if [ "${BUILD_VALIDATE_ENV:-true}" = "true" ]; then \
         echo "❌ ERROR: VITE_GOOGLE_CLIENT_ID is required for production builds!"; \
+        echo "❌ Please ensure VITE_GOOGLE_CLIENT_ID is set as BUILD_TIME SECRET in DigitalOcean"; \
+        echo "❌ Or set BUILD_VALIDATE_ENV=false to skip validation (for CI/test builds)"; \
         exit 1; \
+      else \
+        echo "✅ BUILD_VALIDATE_ENV=false - skipping validation (CI/test build)"; \
+        echo "⚠️ This build will use empty VITE_GOOGLE_CLIENT_ID - frontend may not work correctly"; \
       fi; \
     fi && \
     echo "✅ Environment variables verified successfully"
