@@ -65,6 +65,7 @@ export default function App() {
                     </ProtectedRoute>
                   }
                 />
+                <Route path="login" element={<Login />} />
                 <Route path="auth/callback" element={<AuthCallback />} />
                 <Route path="complete-registration" element={<CompleteRegistration />} />
                 <Route
