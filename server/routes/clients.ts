@@ -379,7 +379,7 @@ router.post('/', ...adminOnly, uploadImages, async (req: Request, res: Response)
     
     // 부모님 나이 처리 (숫자로 저장)
     const fatherAgeNum = fatherAge ? (typeof fatherAge === 'string' ? parseInt(fatherAge.replace(/[^0-9]/g, '')) : parseInt(String(fatherAge))) : null;
-    const motherAgeNum = motherAge ? (typeof fatherAge === 'string' ? parseInt(motherAge.replace(/[^0-9]/g, '')) : parseInt(String(motherAge))) : null;
+    const motherAgeNum = motherAge ? (typeof motherAge === 'string' ? parseInt(motherAge.replace(/[^0-9]/g, '')) : parseInt(String(motherAge))) : null;
 
     const createData = {
         name: name.trim(),
@@ -472,9 +472,13 @@ router.post('/', ...adminOnly, uploadImages, async (req: Request, res: Response)
     });
   } catch (error) {
     console.error('Client creation error:', error);
+    console.error('Error stack:', error instanceof Error ? error.stack : 'No stack');
+    console.error('Request body:', req.body);
+    console.error('Request files:', req.files);
     res.status(500).json({
       error: '클라이언트 생성에 실패했습니다.',
       message: error instanceof Error ? error.message : 'Unknown error',
+      details: process.env.NODE_ENV === 'development' ? (error instanceof Error ? error.stack : String(error)) : undefined,
     });
   }
 });
