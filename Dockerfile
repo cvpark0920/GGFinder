@@ -11,6 +11,7 @@ WORKDIR /app
 # ARG 선언 (--build-arg로 전달됨)
 ARG VITE_API_BASE_URL
 ARG VITE_GOOGLE_CLIENT_ID
+ARG GITHUB_ACTIONS
 
 # 빌드 시 .env 파일 생성 (Vite가 빌드 시 읽음)
 # ARG로 전달받은 값을 사용
