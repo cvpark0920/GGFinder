@@ -97,15 +97,42 @@ app.use('/uploads', express.static(uploadsPath));
 const buildPath = path.join(__dirname, '..', '..', 'build');
 app.use(express.static(buildPath));
 
+import prisma from './prisma';
+
+// ... (existing imports)
+
 // Health check endpoint (before SPA routing)
-app.get('/health', (req: Request, res: Response) => {
-  console.log(`[${new Date().toISOString()}] Health check requested`);
-  res.json({ 
-    status: 'ok', 
+app.get('/health', async (req: Request, res: Response) => {
+  const healthCheck = {
+    status: 'ok',
     timestamp: new Date().toISOString(),
     port: PORT,
     uptime: process.uptime(),
-  });
+    database: {
+      status: 'unknown',
+      latency: 0,
+      error: null as string | null
+    }
+  };
+
+  try {
+    const start = Date.now();
+    // 간단한 쿼리로 DB 연결 확인
+    await prisma.$queryRaw`SELECT 1`;
+    const end = Date.now();
+    
+    healthCheck.database.status = 'connected';
+    healthCheck.database.latency = end - start;
+  } catch (error) {
+    console.error('Health check DB error:', error);
+    healthCheck.database.status = 'disconnected';
+    healthCheck.database.error = error instanceof Error ? error.message : String(error);
+    // DB 연결 실패 시에도 200 OK를 반환하되 상태 정보를 포함
+    // (로드밸런서 설정에 따라 500을 반환해야 할 수도 있음)
+  }
+
+  console.log(`[${new Date().toISOString()}] Health check requested`, healthCheck);
+  res.json(healthCheck);
 });
 
 // SPA routing: All other requests send back React's index.html file

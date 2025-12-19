@@ -48,11 +48,18 @@ router.get('/', ...requireAuth, async (req: Request, res: Response) => {
         client: fav.client,
       })),
     });
-  } catch (error) {
+  } catch (error: any) {
     console.error('Favorites fetch error:', error);
+    // Prisma 에러 상세 로깅
+    if (error.code) {
+      console.error('Prisma Error Code:', error.code);
+      console.error('Prisma Error Message:', error.message);
+      console.error('Prisma Error Meta:', error.meta);
+    }
     res.status(500).json({
       error: '찜 목록 조회에 실패했습니다.',
       message: error instanceof Error ? error.message : 'Unknown error',
+      code: error.code || 'UNKNOWN',
     });
   }
 });
@@ -593,11 +600,18 @@ router.get('/received-by-agency', ...requireAuth, async (req: Request, res: Resp
       profiles: profilesWithFavorites,
       agencyRole: user.agency.role,
     });
-  } catch (error) {
+  } catch (error: any) {
     console.error('Received favorites by agency fetch error:', error);
+    // Prisma 에러 상세 로깅
+    if (error.code) {
+      console.error('Prisma Error Code:', error.code);
+      console.error('Prisma Error Message:', error.message);
+      console.error('Prisma Error Meta:', error.meta);
+    }
     res.status(500).json({
       error: '찜받은 목록 조회에 실패했습니다.',
       message: error instanceof Error ? error.message : 'Unknown error',
+      code: error.code || 'UNKNOWN',
     });
   }
 });
@@ -1024,11 +1038,18 @@ router.get('/matches-overview', ...requireAuth, async (req: Request, res: Respon
         unmatched: unmatchedCount,
       },
     });
-  } catch (error) {
+  } catch (error: any) {
     console.error('Favorite matches overview fetch error:', error);
+    // Prisma 에러 상세 로깅
+    if (error.code) {
+      console.error('Prisma Error Code:', error.code);
+      console.error('Prisma Error Message:', error.message);
+      console.error('Prisma Error Meta:', error.meta);
+    }
     res.status(500).json({
       error: '찜 매칭 현황 조회에 실패했습니다.',
       message: error instanceof Error ? error.message : 'Unknown error',
+      code: error.code || 'UNKNOWN',
     });
   }
 });
