@@ -92,6 +92,7 @@ export interface User {
   username: string;
   name: string;
   email: string;
+  picture?: string | null; // Google OAuth 프로필 사진 URL
   role: UserRole;
   agencyId?: number;
   status: UserStatus;

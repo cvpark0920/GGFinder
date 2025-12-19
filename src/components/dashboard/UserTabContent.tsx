@@ -36,6 +36,7 @@ import {
   ShieldCheck,
   Pencil
 } from "lucide-react";
+import { Avatar, AvatarImage, AvatarFallback } from "../../components/ui/avatar";
 import { User, Agency, UserRole, UserStatus } from "../../types/dashboard";
 
 interface UserTabContentProps {
@@ -127,9 +128,17 @@ export function UserTabContent({
                   <span className="text-slate-500 font-medium">{index + 1}</span>
                 </TableCell>
                 <TableCell className="py-4">
-                  <div className="flex flex-col">
-                    <span className="font-semibold text-slate-900">{user.name}</span>
-                    <span className="text-xs text-slate-500 mt-0.5">{user.username}</span>
+                  <div className="flex items-center gap-3">
+                    <Avatar className="w-8 h-8 border border-slate-200">
+                      <AvatarImage src={user.picture || undefined} alt={user.name} />
+                      <AvatarFallback className="bg-slate-100 text-slate-500 text-xs">
+                        {user.name.slice(0, 1)}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div className="flex flex-col">
+                      <span className="font-semibold text-slate-900">{user.name}</span>
+                      <span className="text-xs text-slate-500 mt-0.5">{user.username}</span>
+                    </div>
                   </div>
                 </TableCell>
                 <TableCell className="py-4">{getRoleBadge(user.role)}</TableCell>
@@ -202,9 +211,12 @@ export function UserTabContent({
             <div key={user.id} className="bg-white border rounded-xl p-4 shadow-sm">
               <div className="flex justify-between items-start mb-3">
                 <div className="flex gap-3">
-                  <div className="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-500">
-                    <UserIcon className="w-5 h-5" />
-                  </div>
+                  <Avatar className="w-10 h-10 border border-slate-200">
+                    <AvatarImage src={user.picture || undefined} alt={user.name} />
+                    <AvatarFallback className="bg-slate-100 text-slate-500">
+                      <UserIcon className="w-5 h-5" />
+                    </AvatarFallback>
+                  </Avatar>
                   <div>
                     <div className="flex items-center gap-2">
                       <h3 className="font-semibold text-slate-900">{user.name}</h3>

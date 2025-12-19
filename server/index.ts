@@ -138,8 +138,9 @@ app.get('/health', async (req: Request, res: Response) => {
 // SPA routing: All other requests send back React's index.html file
 // Express 5 doesn't support wildcard routes with '*', so we use app.use() as fallback
 app.use((req: Request, res: Response, next: NextFunction) => {
-  // Skip API routes, uploads, and static files that were already handled
-  if (req.path.startsWith('/api') || req.path.startsWith('/uploads')) {
+  // Skip API routes - uploads and static files are already handled by express.static
+  // express.static will call next() if file not found, so we only skip /api here
+  if (req.path.startsWith('/api')) {
     return next();
   }
   // Serve index.html for all other routes (SPA fallback)

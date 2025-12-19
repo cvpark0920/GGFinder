@@ -46,6 +46,8 @@ services:
       # CORS 및 프론트엔드 URL 설정
       CORS_ORIGIN: ${CORS_ORIGIN:-http://localhost:4000}
       FRONTEND_URL: ${FRONTEND_URL:-http://localhost:4000}
+    volumes:
+      - ./uploads:/app/uploads
     depends_on:
       db:
         condition: service_healthy
