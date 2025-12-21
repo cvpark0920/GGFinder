@@ -84,17 +84,40 @@ jobs:
             # 4. Git 저장소 초기화 또는 업데이트
             if [ ! -d ".git" ]; then
               echo "🚀 Cloning repository for the first time..."
+              # 디렉토리가 비어있지 않은 경우 정리
+              if [ "$(ls -A . 2>/dev/null)" ]; then
+                echo "⚠️  Directory is not empty. Cleaning up..."
+                # docker-compose.yml과 .env 파일은 백업 후 제거
+                if [ -f "docker-compose.yml" ]; then
+                  mkdir -p ${CURRENT_BACKUP}
+                  cp docker-compose.yml .env* ${CURRENT_BACKUP}/ 2>/dev/null || true
+                fi
+                # Git 관련 파일 제외하고 정리
+                find . -mindepth 1 -maxdepth 1 ! -name '.git' -exec rm -rf {} + 2>/dev/null || true
+              fi
               # GitHub Deploy Key 또는 PAT 사용 권장
               GIT_SSH_COMMAND="ssh -o StrictHostKeyChecking=accept-new -o UserKnownHostsFile=~/.ssh/known_hosts" \
                 git clone -v git@github.com:${{ github.repository }}.git . || {
                   echo "❌ Git clone failed. Please ensure GitHub SSH key is configured."
+                  echo "💡 Tip: If this is the first deployment, you may need to:"
+                  echo "   1. Set up GitHub Deploy Key on the Droplet"
+                  echo "   2. Or configure SSH key in ~/.ssh/"
                   exit 1
                 }
             else
               echo "🔄 Updating existing repository..."
+              # 현재 브랜치 확인
+              CURRENT_BRANCH=$(git branch --show-current 2>/dev/null || echo "main")
               git fetch --all
-              git reset --hard origin/main
-              git clean -fd
+              # 원격 브랜치 확인
+              if git ls-remote --heads origin main | grep -q main; then
+                git reset --hard origin/main
+                git clean -fd
+              else
+                echo "⚠️  main branch not found, checking out current branch: ${CURRENT_BRANCH}"
+                git reset --hard origin/${CURRENT_BRANCH} || git reset --hard HEAD
+                git clean -fd
+              fi
             fi
             
             # 5. 현재 커밋 해시 저장 (롤백용)
