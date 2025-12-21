@@ -1,150 +1,59 @@
-name: Deploy to DigitalOcean
+name: Deploy to DigitalOcean Droplet
 
 on:
   push:
-    branches:
-      - main
+    branches: [ main ]
   workflow_dispatch:
 
-env:
-  NODE_VERSION: '20'
-
 jobs:
-  test:
-    name: Test and Build
-    runs-on: ubuntu-latest
-    
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-          cache: 'npm'
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Install Prisma
-        run: npm install prisma@6.1.0 @prisma/client@6.1.0 --save-dev --save-exact
-
-      - name: Generate Prisma Client
-        run: npx prisma@6.1.0 generate
-
-      - name: Validate Prisma schema
-        run: npx prisma@6.1.0 validate
-        env:
-          # CI 환경에서는 실제 데이터베이스 연결이 필요하지 않으므로 더미 URL 사용
-          DATABASE_URL: "postgresql://user:password@localhost:5432/db?schema=public"
-
-      - name: Build frontend
-        run: npm run build
-        env:
-          VITE_API_BASE_URL: ${{ secrets.VITE_API_BASE_URL || 'http://localhost:4000' }}
-
-      - name: Build server
-        run: npm run build:server
-
-      - name: Check for build errors
-        run: |
-          if [ ! -d "build" ]; then
-            echo "❌ Frontend build directory not found"
-            exit 1
-          fi
-          if [ ! -d "server/dist" ]; then
-            echo "❌ Server build directory not found"
-            exit 1
-          fi
-          echo "✅ Build completed successfully"
-
-  docker-build-verify:
-    name: Docker Build Verification
-    runs-on: ubuntu-latest
-    needs: test
-    
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-
-      - name: Docker build verification
-        uses: docker/build-push-action@v5
-        id: docker_build
-        with:
-          context: .
-          file: ./Dockerfile
-          push: false
-          load: true
-          tags: ggfinder:deploy-test
-          build-args: |
-            VITE_API_BASE_URL=${{ secrets.VITE_API_BASE_URL || 'https://your-app.ondigitalocean.app' }}
-            VITE_GOOGLE_CLIENT_ID=${{ secrets.VITE_GOOGLE_CLIENT_ID || 'ci-test-client-id-123456789' }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
-          outputs: type=docker,dest=/tmp/image.tar
-
-      - name: Load Docker image
-        run: |
-          echo "📥 Loading Docker image..."
-          docker load -i /tmp/image.tar
-          echo "✅ Docker image loaded"
-
-      - name: Verify Docker image structure
-        run: |
-          echo "🔍 Verifying Docker image structure..."
-          
-          # 이미지 정보 확인
-          docker images ggfinder:deploy-test
-          
-          # 필수 파일 확인
-          echo "📦 Checking required files in image..."
-          docker create --name temp-container ggfinder:deploy-test
-          docker cp temp-container:/app/build/index.html - > /dev/null 2>&1 && echo "✅ Frontend build found" || echo "❌ Frontend build missing"
-          docker cp temp-container:/app/server/dist/index.js - > /dev/null 2>&1 && echo "✅ Server build found" || echo "❌ Server build missing"
-          docker rm temp-container
-          
-          echo "✅ Docker image verification completed"
-
   deploy:
-    name: Deploy to DigitalOcean App Platform
-    needs: [test, docker-build-verify]
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main'
-    
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Setup doctl
-        uses: digitalocean/action-doctl@v2
+      - name: Deploy to Droplet via SSH
+        uses: appleboy/ssh-action@v1.0.3
         with:
-          token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
+          host: ${{ secrets.DROPLET_IP }}
+          username: ${{ secrets.SSH_USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            # 앱 디렉토리 설정
+            APP_DIR="/app/ggfinder"
+            mkdir -p $APP_DIR
+            cd $APP_DIR
 
-      - name: Verify App ID
-        run: |
-          if [ -z "${{ secrets.DIGITALOCEAN_APP_ID }}" ]; then
-            echo "❌ DIGITALOCEAN_APP_ID secret is not set"
-            echo "Please set it in GitHub Secrets: Settings > Secrets and variables > Actions"
-            exit 1
-          fi
-          echo "✅ App ID is set"
+            # Git 저장소 초기화 또는 업데이트
+            if [ ! -d ".git" ]; then
+              git clone https://github.com/${{ github.repository }}.git .
+            else
+              git fetch --all
+              git reset --hard origin/main
+            fi
 
-      - name: Deploy to DigitalOcean App Platform
-        run: |
-          echo "🚀 Starting deployment to DigitalOcean..."
-          doctl apps create-deployment ${{ secrets.DIGITALOCEAN_APP_ID }} --wait
-          
-      - name: Get deployment status
-        run: |
-          echo "📊 Deployment Status:"
-          doctl apps list-deployments ${{ secrets.DIGITALOCEAN_APP_ID }} --format ID,Phase,Created,Updated
-          
-      - name: Deployment summary
-        if: success()
-        run: |
-          echo "✅ Deployment completed successfully!"
-          echo "Check your app at: https://cloud.digitalocean.com/apps/${{ secrets.DIGITALOCEAN_APP_ID }}"
+            # 운영 환경용 .env 파일 생성
+            # 주의: 보안을 위해 모든 민감 정보는 GitHub Secrets에서 가져옵니다.
+            echo "NODE_ENV=production" > .env
+            echo "PORT=4000" >> .env
+            echo "JWT_SECRET=${{ secrets.JWT_SECRET }}" >> .env
+            echo "GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }}" >> .env
+            echo "GOOGLE_CLIENT_SECRET=${{ secrets.GOOGLE_CLIENT_SECRET }}" >> .env
+            
+            # DB 및 API URL 설정 (Droplet IP 기반)
+            echo "POSTGRES_USER=app" >> .env
+            echo "POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD || 'ggfinder_secure_pass' }}" >> .env
+            echo "POSTGRES_DB=ggfinder" >> .env
+            echo "VITE_API_BASE_URL=http://${{ secrets.DROPLET_IP }}:4000" >> .env
+            echo "CORS_ORIGIN=http://${{ secrets.DROPLET_IP }}:4000" >> .env
+            echo "FRONTEND_URL=http://${{ secrets.DROPLET_IP }}:4000" >> .env
+
+            # Docker 컨테이너 실행
+            echo "🚀 Starting Docker containers..."
+            docker compose down
+            docker compose up -d --build
+
+            # 정리
+            docker image prune -f
+            echo "✅ Deployment completed successfully!"
+
