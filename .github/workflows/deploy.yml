@@ -5,6 +5,11 @@ on:
     branches: [ main ]
   workflow_dispatch:
 
+# 동일한 브랜치에 대한 동시 배포 방지
+concurrency:
+  group: deploy-${{ github.ref }}
+  cancel-in-progress: false  # 진행 중인 배포를 취소하지 않음 (안전한 배포)
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
@@ -72,16 +77,20 @@ jobs:
             
             echo "📂 Current Directory: $(pwd)"
             
-            # 3. 기존 배포 백업 (롤백을 위해)
+            # 3. 백업 디렉토리 미리 생성 (Git clone 전에 생성)
+            echo "💾 Preparing backup directory..."
+            mkdir -p ${CURRENT_BACKUP}
+            echo "✅ Backup directory ready: ${CURRENT_BACKUP}"
+            
+            # 4. 기존 배포 백업 (롤백을 위해)
             if [ -f "docker-compose.yml" ]; then
               echo "💾 Creating backup of current deployment..."
-              mkdir -p ${CURRENT_BACKUP}
               cp -r docker-compose.yml .env* ${CURRENT_BACKUP}/ 2>/dev/null || true
               docker compose ps --format json > ${CURRENT_BACKUP}/containers.json 2>/dev/null || true
               echo "✅ Backup created at ${CURRENT_BACKUP}"
             fi
             
-            # 4. Git 저장소 초기화 또는 업데이트
+            # 5. Git 저장소 초기화 또는 업데이트
             if [ ! -d ".git" ]; then
               echo "🚀 Cloning repository for the first time..."
               # 디렉토리가 비어있지 않은 경우 정리
@@ -120,12 +129,15 @@ jobs:
               fi
             fi
             
-            # 5. 현재 커밋 해시 저장 (롤백용)
+            # 6. 현재 커밋 해시 저장 (롤백용)
             COMMIT_HASH=$(git rev-parse HEAD)
             echo "📌 Deploying commit: ${COMMIT_HASH}"
+            # 백업 디렉토리가 존재하는지 다시 확인하고 생성
+            mkdir -p ${CURRENT_BACKUP}
             echo "${COMMIT_HASH}" > ${CURRENT_BACKUP}/commit_hash.txt
+            echo "✅ Commit hash saved: ${COMMIT_HASH}"
             
-            # 6. 운영 환경용 .env 파일 생성 (보안 강화)
+            # 7. 운영 환경용 .env 파일 생성 (보안 강화)
             echo "📝 Creating .env file..."
             cat <<EOF > .env
             NODE_ENV=production
@@ -146,16 +158,16 @@ jobs:
             # .env 파일 권한 설정 (보안)
             chmod 600 .env
             
-            # 7. Docker Compose 빌드 인자 설정
+            # 8. Docker Compose 빌드 인자 설정
             export VITE_API_BASE_URL="http://${{ secrets.DROPLET_IP }}:4000"
             export VITE_GOOGLE_CLIENT_ID="${{ secrets.GOOGLE_CLIENT_ID }}"
             export BUILD_VALIDATE_ENV="false"
             
-            # 8. 기존 컨테이너 중지 (graceful shutdown)
+            # 9. 기존 컨테이너 중지 (graceful shutdown)
             echo "🛑 Stopping existing containers..."
             docker compose down --timeout 30 --remove-orphans || true
             
-            # 9. Docker 이미지 빌드 및 실행
+            # 10. Docker 이미지 빌드 및 실행
             echo "🐳 Building and starting Docker containers..."
             docker compose build --no-cache || {
               echo "❌ Docker build failed"
@@ -181,7 +193,7 @@ jobs:
               exit 1
             }
             
-            # 10. 컨테이너 상태 확인
+            # 11. 컨테이너 상태 확인
             echo "⏳ Waiting for containers to be healthy..."
             sleep 10
             
@@ -209,11 +221,11 @@ jobs:
               exit 1
             fi
             
-            # 11. 오래된 이미지 정리 (디스크 공간 확보)
+            # 12. 오래된 이미지 정리 (디스크 공간 확보)
             echo "🧹 Cleaning up old Docker images..."
             docker image prune -af --filter "until=168h" || true  # 7일 이상 된 이미지 삭제
             
-            # 12. 오래된 백업 정리 (최근 5개만 유지)
+            # 13. 오래된 백업 정리 (최근 5개만 유지)
             echo "🧹 Cleaning up old backups..."
             ls -t ${BACKUP_DIR} | tail -n +6 | xargs -r -I {} rm -rf ${BACKUP_DIR}/{} || true
             
