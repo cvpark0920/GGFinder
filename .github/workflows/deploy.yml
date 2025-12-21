@@ -36,7 +36,8 @@ jobs:
             # 3. Git 저장소 초기화 또는 업데이트
             if [ ! -d ".git" ]; then
               echo "🚀 Cloning repository for the first time..."
-              git clone --debug git@github.com:${{ github.repository }}.git .
+              # SSH 인증을 위한 상세 로그 출력 설정
+              GIT_SSH_COMMAND="ssh -o StrictHostKeyChecking=no" git clone -v git@github.com:${{ github.repository }}.git .
             else
               echo "🔄 Updating existing repository..."
               git fetch --all
