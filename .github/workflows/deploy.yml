@@ -8,47 +8,101 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
+    
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # 전체 히스토리 필요 (롤백용)
+
+      - name: Validate secrets
+        run: |
+          if [ -z "${{ secrets.DROPLET_IP }}" ]; then
+            echo "❌ DROPLET_IP secret is missing"
+            exit 1
+          fi
+          if [ -z "${{ secrets.SSH_USERNAME }}" ]; then
+            echo "❌ SSH_USERNAME secret is missing"
+            exit 1
+          fi
+          if [ -z "${{ secrets.SSH_PRIVATE_KEY }}" ]; then
+            echo "❌ SSH_PRIVATE_KEY secret is missing"
+            exit 1
+          fi
+          if [ -z "${{ secrets.JWT_SECRET }}" ]; then
+            echo "❌ JWT_SECRET secret is missing"
+            exit 1
+          fi
+          echo "✅ All required secrets are present"
 
       - name: Deploy to Droplet via SSH
         uses: appleboy/ssh-action@v1.0.3
+        id: deploy
         with:
           host: ${{ secrets.DROPLET_IP }}
           username: ${{ secrets.SSH_USERNAME }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: ${{ secrets.SSH_PORT || 22 }}
+          timeout: 300s
           script: |
-            set -e # 에러 발생 시 즉시 중단
-
-            # 1. GitHub 호스트 키 등록 (최초 접속 시 대기 방지)
-            mkdir -p ~/.ssh
-            ssh-keyscan -t ed25519 github.com >> ~/.ssh/known_hosts 2>/dev/null || true
-
-            # 2. 앱 디렉토리 설정 및 권한 부여
+            set -euo pipefail  # 엄격한 에러 처리
+            
+            # 변수 설정
             APP_DIR="/app/ggfinder"
-            sudo mkdir -p $APP_DIR
-            sudo chown -R ${{ secrets.SSH_USERNAME }}:${{ secrets.SSH_USERNAME }} $APP_DIR
-            cd $APP_DIR
-
+            BACKUP_DIR="/app/ggfinder-backups"
+            TIMESTAMP=$(date +%Y%m%d_%H%M%S)
+            CURRENT_BACKUP="${BACKUP_DIR}/${TIMESTAMP}"
+            
+            echo "🚀 Starting deployment process..."
+            echo "📅 Timestamp: ${TIMESTAMP}"
+            
+            # 1. GitHub 호스트 키 등록 (보안 강화)
+            mkdir -p ~/.ssh
+            chmod 700 ~/.ssh
+            if ! grep -q "github.com" ~/.ssh/known_hosts 2>/dev/null; then
+              ssh-keyscan -t ed25519 github.com >> ~/.ssh/known_hosts 2>/dev/null || true
+              chmod 600 ~/.ssh/known_hosts
+            fi
+            
+            # 2. 디렉토리 설정 및 권한 부여
+            sudo mkdir -p ${APP_DIR} ${BACKUP_DIR}
+            sudo chown -R ${{ secrets.SSH_USERNAME }}:${{ secrets.SSH_USERNAME }} ${APP_DIR} ${BACKUP_DIR}
+            cd ${APP_DIR}
+            
             echo "📂 Current Directory: $(pwd)"
-
-            # 3. Git 저장소 초기화 또는 업데이트
+            
+            # 3. 기존 배포 백업 (롤백을 위해)
+            if [ -f "docker-compose.yml" ]; then
+              echo "💾 Creating backup of current deployment..."
+              mkdir -p ${CURRENT_BACKUP}
+              cp -r docker-compose.yml .env* ${CURRENT_BACKUP}/ 2>/dev/null || true
+              docker compose ps --format json > ${CURRENT_BACKUP}/containers.json 2>/dev/null || true
+              echo "✅ Backup created at ${CURRENT_BACKUP}"
+            fi
+            
+            # 4. Git 저장소 초기화 또는 업데이트
             if [ ! -d ".git" ]; then
               echo "🚀 Cloning repository for the first time..."
-              # SSH 인증을 위한 상세 로그 출력 설정
-              GIT_SSH_COMMAND="ssh -o StrictHostKeyChecking=no" git clone -v git@github.com:${{ github.repository }}.git .
+              # GitHub Deploy Key 또는 PAT 사용 권장
+              GIT_SSH_COMMAND="ssh -o StrictHostKeyChecking=accept-new -o UserKnownHostsFile=~/.ssh/known_hosts" \
+                git clone -v git@github.com:${{ github.repository }}.git . || {
+                  echo "❌ Git clone failed. Please ensure GitHub SSH key is configured."
+                  exit 1
+                }
             else
               echo "🔄 Updating existing repository..."
               git fetch --all
               git reset --hard origin/main
+              git clean -fd
             fi
-
-            # 4. 파일 확인 (디버깅용)
-            echo "📦 Files in directory:"
-            ls -la
-
-            # 5. 운영 환경용 .env 파일 생성
+            
+            # 5. 현재 커밋 해시 저장 (롤백용)
+            COMMIT_HASH=$(git rev-parse HEAD)
+            echo "📌 Deploying commit: ${COMMIT_HASH}"
+            echo "${COMMIT_HASH}" > ${CURRENT_BACKUP}/commit_hash.txt
+            
+            # 6. 운영 환경용 .env 파일 생성 (보안 강화)
             echo "📝 Creating .env file..."
             cat <<EOF > .env
             NODE_ENV=production
@@ -59,16 +113,135 @@ jobs:
             POSTGRES_USER=app
             POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD || 'ggfinder_secure_pass' }}
             POSTGRES_DB=ggfinder
+            POSTGRES_PORT=5432
+            DATABASE_URL=postgresql://app:${{ secrets.POSTGRES_PASSWORD || 'ggfinder_secure_pass' }}@db:5432/ggfinder?schema=public&sslmode=disable
             VITE_API_BASE_URL=http://${{ secrets.DROPLET_IP }}:4000
             CORS_ORIGIN=http://${{ secrets.DROPLET_IP }}:4000
             FRONTEND_URL=http://${{ secrets.DROPLET_IP }}:4000
             EOF
-
-            # 6. Docker 실행
-            echo "🐳 Starting Docker containers..."
-            docker compose down --remove-orphans
-            docker compose up -d --build
-
-            docker image prune -f
+            
+            # .env 파일 권한 설정 (보안)
+            chmod 600 .env
+            
+            # 7. Docker Compose 빌드 인자 설정
+            export VITE_API_BASE_URL="http://${{ secrets.DROPLET_IP }}:4000"
+            export VITE_GOOGLE_CLIENT_ID="${{ secrets.GOOGLE_CLIENT_ID }}"
+            export BUILD_VALIDATE_ENV="false"
+            
+            # 8. 기존 컨테이너 중지 (graceful shutdown)
+            echo "🛑 Stopping existing containers..."
+            docker compose down --timeout 30 --remove-orphans || true
+            
+            # 9. Docker 이미지 빌드 및 실행
+            echo "🐳 Building and starting Docker containers..."
+            docker compose build --no-cache || {
+              echo "❌ Docker build failed"
+              # 롤백 시도
+              if [ -d "${CURRENT_BACKUP}" ] && [ -f "${CURRENT_BACKUP}/docker-compose.yml" ]; then
+                echo "🔄 Attempting rollback..."
+                cp ${CURRENT_BACKUP}/docker-compose.yml .
+                cp ${CURRENT_BACKUP}/.env* . 2>/dev/null || true
+                docker compose up -d || true
+              fi
+              exit 1
+            }
+            
+            docker compose up -d || {
+              echo "❌ Docker compose up failed"
+              # 롤백 시도
+              if [ -d "${CURRENT_BACKUP}" ] && [ -f "${CURRENT_BACKUP}/docker-compose.yml" ]; then
+                echo "🔄 Attempting rollback..."
+                cp ${CURRENT_BACKUP}/docker-compose.yml .
+                cp ${CURRENT_BACKUP}/.env* . 2>/dev/null || true
+                docker compose up -d || true
+              fi
+              exit 1
+            }
+            
+            # 10. 컨테이너 상태 확인
+            echo "⏳ Waiting for containers to be healthy..."
+            sleep 10
+            
+            # 헬스체크 (최대 60초 대기)
+            MAX_WAIT=60
+            ELAPSED=0
+            while [ $ELAPSED -lt $MAX_WAIT ]; do
+              if docker compose ps | grep -q "healthy\|running"; then
+                HEALTH_STATUS=$(curl -sf http://localhost:4000/health || echo "unhealthy")
+                if echo "$HEALTH_STATUS" | grep -q "status.*ok\|healthy"; then
+                  echo "✅ Health check passed"
+                  break
+                fi
+              fi
+              echo "⏳ Waiting for health check... (${ELAPSED}s/${MAX_WAIT}s)"
+              sleep 5
+              ELAPSED=$((ELAPSED + 5))
+            done
+            
+            if [ $ELAPSED -ge $MAX_WAIT ]; then
+              echo "⚠️ Health check timeout. Checking container status..."
+              docker compose ps
+              docker compose logs --tail=50 app
+              echo "❌ Deployment may have issues. Please check logs."
+              exit 1
+            fi
+            
+            # 11. 오래된 이미지 정리 (디스크 공간 확보)
+            echo "🧹 Cleaning up old Docker images..."
+            docker image prune -af --filter "until=168h" || true  # 7일 이상 된 이미지 삭제
+            
+            # 12. 오래된 백업 정리 (최근 5개만 유지)
+            echo "🧹 Cleaning up old backups..."
+            ls -t ${BACKUP_DIR} | tail -n +6 | xargs -r -I {} rm -rf ${BACKUP_DIR}/{} || true
+            
             echo "✅ Deployment completed successfully!"
+            echo "📊 Container status:"
+            docker compose ps
+            echo "🔗 Application URL: http://${{ secrets.DROPLET_IP }}:4000"
+            echo "🏥 Health check: http://${{ secrets.DROPLET_IP }}:4000/health"
 
+      - name: Verify deployment
+        uses: appleboy/ssh-action@v1.0.3
+        if: success()
+        with:
+          host: ${{ secrets.DROPLET_IP }}
+          username: ${{ secrets.SSH_USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            echo "🔍 Verifying deployment..."
+            cd /app/ggfinder
+            
+            # 최종 헬스체크
+            HEALTH_RESPONSE=$(curl -sf http://localhost:4000/health || echo "failed")
+            if echo "$HEALTH_RESPONSE" | grep -q "status.*ok\|healthy"; then
+              echo "✅ Deployment verification successful"
+              echo "📋 Health check response:"
+              echo "$HEALTH_RESPONSE" | head -20
+            else
+              echo "❌ Deployment verification failed"
+              echo "📋 Health check response:"
+              echo "$HEALTH_RESPONSE"
+              docker compose logs --tail=30 app
+              exit 1
+            fi
+            
+            # 컨테이너 상태 확인
+            echo "📊 Container status:"
+            docker compose ps
+
+      - name: Deployment summary
+        if: always()
+        run: |
+          echo "## Deployment Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          if [ "${{ steps.deploy.outcome }}" == "success" ]; then
+            echo "✅ **Status**: Deployment Successful" >> $GITHUB_STEP_SUMMARY
+            echo "🔗 **URL**: http://${{ secrets.DROPLET_IP }}:4000" >> $GITHUB_STEP_SUMMARY
+            echo "🏥 **Health Check**: http://${{ secrets.DROPLET_IP }}:4000/health" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "❌ **Status**: Deployment Failed" >> $GITHUB_STEP_SUMMARY
+            echo "Please check the logs above for details." >> $GITHUB_STEP_SUMMARY
+          fi
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Commit**: ${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Branch**: ${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
