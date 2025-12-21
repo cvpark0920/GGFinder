@@ -16,10 +16,12 @@ ARG BUILD_VALIDATE_ENV=true
 # 빌드 시 .env 파일 생성 (Vite가 빌드 시 읽음)
 # ARG로 전달받은 값을 사용
 # 주의: ARG는 빌드 시에만 사용 가능하며, RUN 단계에서 $ARG_NAME으로 참조
+# ARG 값을 환경 변수로 설정하여 RUN 단계에서 사용
 RUN echo "=== Creating .env file for Vite build ===" && \
     echo "=== Build arguments ===" && \
     echo "VITE_API_BASE_URL=${VITE_API_BASE_URL:-NOT_SET}" && \
     echo "VITE_GOOGLE_CLIENT_ID=${VITE_GOOGLE_CLIENT_ID:-NOT_SET}" && \
+    echo "BUILD_VALIDATE_ENV=${BUILD_VALIDATE_ENV:-true}" && \
     echo "==========================================" && \
     echo "VITE_API_BASE_URL=${VITE_API_BASE_URL:-http://localhost:4000}" > .env && \
     echo "VITE_GOOGLE_CLIENT_ID=${VITE_GOOGLE_CLIENT_ID:-}" >> .env && \
@@ -37,7 +39,8 @@ RUN echo "=== Creating .env file for Vite build ===" && \
     fi && \
     if [ -z "${VITE_GOOGLE_CLIENT_ID:-}" ]; then \
       echo "⚠️ WARNING: VITE_GOOGLE_CLIENT_ID is not set!"; \
-      if [ "${BUILD_VALIDATE_ENV:-true}" = "true" ]; then \
+      VALIDATE_ENV="${BUILD_VALIDATE_ENV:-true}"; \
+      if [ "$VALIDATE_ENV" = "true" ]; then \
         echo "❌ ERROR: VITE_GOOGLE_CLIENT_ID is required for production builds!"; \
         echo "❌ Please ensure VITE_GOOGLE_CLIENT_ID is set as BUILD_TIME SECRET in DigitalOcean"; \
         echo "❌ Or set BUILD_VALIDATE_ENV=false to skip validation (for CI/test builds)"; \
