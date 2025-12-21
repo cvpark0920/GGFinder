@@ -19,41 +19,55 @@ jobs:
           username: ${{ secrets.SSH_USERNAME }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
-            # 앱 디렉토리 설정
+            set -e # 에러 발생 시 즉시 중단
+
+            # 1. GitHub 호스트 키 등록 (최초 접속 시 대기 방지)
+            mkdir -p ~/.ssh
+            ssh-keyscan -t ed25519 github.com >> ~/.ssh/known_hosts 2>/dev/null || true
+
+            # 2. 앱 디렉토리 설정 및 권한 부여
             APP_DIR="/app/ggfinder"
-            mkdir -p $APP_DIR
+            sudo mkdir -p $APP_DIR
+            sudo chown -R ${{ secrets.SSH_USERNAME }}:${{ secrets.SSH_USERNAME }} $APP_DIR
             cd $APP_DIR
 
-            # Git 저장소 초기화 또는 업데이트
+            echo "📂 Current Directory: $(pwd)"
+
+            # 3. Git 저장소 초기화 또는 업데이트
             if [ ! -d ".git" ]; then
-              git clone git@github.com:${{ github.repository }}.git .
+              echo "🚀 Cloning repository for the first time..."
+              git clone --debug git@github.com:${{ github.repository }}.git .
             else
+              echo "🔄 Updating existing repository..."
               git fetch --all
               git reset --hard origin/main
             fi
 
-            # 운영 환경용 .env 파일 생성
-            # 주의: 보안을 위해 모든 민감 정보는 GitHub Secrets에서 가져옵니다.
-            echo "NODE_ENV=production" > .env
-            echo "PORT=4000" >> .env
-            echo "JWT_SECRET=${{ secrets.JWT_SECRET }}" >> .env
-            echo "GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }}" >> .env
-            echo "GOOGLE_CLIENT_SECRET=${{ secrets.GOOGLE_CLIENT_SECRET }}" >> .env
-            
-            # DB 및 API URL 설정 (Droplet IP 기반)
-            echo "POSTGRES_USER=app" >> .env
-            echo "POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD || 'ggfinder_secure_pass' }}" >> .env
-            echo "POSTGRES_DB=ggfinder" >> .env
-            echo "VITE_API_BASE_URL=http://${{ secrets.DROPLET_IP }}:4000" >> .env
-            echo "CORS_ORIGIN=http://${{ secrets.DROPLET_IP }}:4000" >> .env
-            echo "FRONTEND_URL=http://${{ secrets.DROPLET_IP }}:4000" >> .env
+            # 4. 파일 확인 (디버깅용)
+            echo "📦 Files in directory:"
+            ls -la
 
-            # Docker 컨테이너 실행
-            echo "🚀 Starting Docker containers..."
-            docker compose down
+            # 5. 운영 환경용 .env 파일 생성
+            echo "📝 Creating .env file..."
+            cat <<EOF > .env
+            NODE_ENV=production
+            PORT=4000
+            JWT_SECRET=${{ secrets.JWT_SECRET }}
+            GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }}
+            GOOGLE_CLIENT_SECRET=${{ secrets.GOOGLE_CLIENT_SECRET }}
+            POSTGRES_USER=app
+            POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD || 'ggfinder_secure_pass' }}
+            POSTGRES_DB=ggfinder
+            VITE_API_BASE_URL=http://${{ secrets.DROPLET_IP }}:4000
+            CORS_ORIGIN=http://${{ secrets.DROPLET_IP }}:4000
+            FRONTEND_URL=http://${{ secrets.DROPLET_IP }}:4000
+            EOF
+
+            # 6. Docker 실행
+            echo "🐳 Starting Docker containers..."
+            docker compose down --remove-orphans
             docker compose up -d --build
 
-            # 정리
             docker image prune -f
             echo "✅ Deployment completed successfully!"
 
