@@ -70,9 +70,6 @@ export function CreateMatchSheet({
             <Heart className="w-6 h-6 text-rose-600" />
             {matchingClient?.name} {t('match.selectPartner')}
           </SheetTitle>
-          <SheetDescription className="text-slate-600">
-            {t('match.selectPartner')}
-          </SheetDescription>
         </SheetHeader>
 
         <div className="px-6 py-6 space-y-6">

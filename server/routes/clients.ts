@@ -775,6 +775,12 @@ router.delete('/:id', ...adminOnly, async (req: Request, res: Response) => {
       if (filePath) deleteFile(filePath);
     }
 
+    // 아바타 파일 삭제
+    if (client.avatarUrl) {
+      const filePath = getFilePathFromUrl(client.avatarUrl);
+      if (filePath) deleteFile(filePath);
+    }
+
     // 클라이언트 삭제 (CASCADE로 이미지/비디오 레코드도 자동 삭제됨)
     await prisma.client.delete({
       where: { id: clientId },
