@@ -84,7 +84,9 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
 # Run migrations and start server
 # 실패한 마이그레이션을 자동으로 해결한 후 마이그레이션 실행
 # 누락된 컬럼도 자동으로 추가 (마이그레이션 전에 확인)
-CMD sh -c "./scripts/fix-missing-columns.sh && \
+CMD sh -c "echo '🔄 Waiting for database to be ready...' && \
+  sleep 5 && \
+  ./scripts/fix-missing-columns.sh && \
   npx prisma@6.1.0 migrate resolve --applied 20251216090000_add_avatar_url 2>/dev/null || true && \
   echo '🔄 Running database migrations...' && \
   npx prisma@6.1.0 migrate deploy 2>&1 | tee /tmp/migrate.log || MIGRATE_FAILED=1; \
