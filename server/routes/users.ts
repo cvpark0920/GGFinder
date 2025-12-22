@@ -218,6 +218,15 @@ router.patch('/:id', authenticateToken, async (req: Request, res: Response) => {
     // 본인 정보 업데이트인지 확인
     const isSelfUpdate = req.user && req.user.id === userId;
     const isAdmin = req.user && (req.user.role === 'super_admin' || req.user.role === 'platform_admin');
+    const isSuperAdmin = req.user && req.user.role === 'super_admin';
+    const targetIsSuperAdmin = existingUser.role === 'super_admin';
+    
+    // 슈퍼 관리자 계정은 슈퍼 관리자만 수정 가능
+    if (targetIsSuperAdmin && !isSuperAdmin) {
+      return res.status(403).json({ 
+        error: '슈퍼 관리자 계정 정보는 슈퍼 관리자만 수정할 수 있습니다.' 
+      });
+    }
     
     // 본인 정보 업데이트인 경우, realName과 phone만 수정 가능
     if (isSelfUpdate && !isAdmin) {

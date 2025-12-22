@@ -600,6 +600,7 @@ export default function Dashboard() {
                 <UserForm
                   initialData={usersHook.editingUser}
                   agencies={agenciesHook.agencies}
+                  currentUser={user}
                   onSubmit={async (data) => {
                     await usersHook.handleUpdateUserSubmit(data);
                     dialogStateHook.setIsEditUserOpen(false);
@@ -691,6 +692,7 @@ export default function Dashboard() {
             <UserTabContent
               users={filteredUsersList}
               agencies={agenciesHook.agencies}
+              currentUser={user}
               onUpdateStatus={usersHook.handleUpdateUserStatus}
               onEdit={(user) => {
                 usersHook.handleOpenEditUser(user);

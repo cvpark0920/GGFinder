@@ -42,6 +42,7 @@ import { User, Agency, UserRole, UserStatus } from "../../types/dashboard";
 interface UserTabContentProps {
   users: User[];
   agencies: Agency[];
+  currentUser?: User | null;
   onUpdateStatus: (userId: number, newStatus: UserStatus) => void;
   onEdit: (user: User) => void;
   onDelete: (userId: number) => void;
@@ -50,10 +51,20 @@ interface UserTabContentProps {
 export function UserTabContent({
   users,
   agencies,
+  currentUser,
   onUpdateStatus,
   onEdit,
   onDelete,
 }: UserTabContentProps) {
+  const isSuperAdmin = currentUser?.role === 'super_admin';
+  
+  const canEditUser = (user: User) => {
+    // 슈퍼 관리자 계정은 슈퍼 관리자만 수정 가능
+    if (user.role === 'super_admin' && !isSuperAdmin) {
+      return false;
+    }
+    return true;
+  };
   const getAgencyName = (agencyId?: number) => {
     if (!agencyId) return "-";
     const agency = agencies.find((a) => a.id === agencyId);
@@ -169,9 +180,16 @@ export function UserTabContent({
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
                       <DropdownMenuLabel>상태 관리</DropdownMenuLabel>
-                      <DropdownMenuItem onClick={() => onEdit(user)}>
+                      <DropdownMenuItem 
+                        onClick={() => onEdit(user)}
+                        disabled={!canEditUser(user)}
+                        className={!canEditUser(user) ? "opacity-50 cursor-not-allowed" : ""}
+                      >
                         <Pencil className="mr-2 h-4 w-4" />
                         <span>사용자 정보 수정</span>
+                        {!canEditUser(user) && (
+                          <span className="ml-auto text-xs text-slate-400">권한 없음</span>
+                        )}
                       </DropdownMenuItem>
                       <DropdownMenuSeparator />
                       <DropdownMenuItem onClick={() => onUpdateStatus(user.id, "active")}>
@@ -236,8 +254,15 @@ export function UserTabContent({
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">
-                    <DropdownMenuItem onClick={() => onEdit(user)}>
+                    <DropdownMenuItem 
+                      onClick={() => onEdit(user)}
+                      disabled={!canEditUser(user)}
+                      className={!canEditUser(user) ? "opacity-50 cursor-not-allowed" : ""}
+                    >
                       사용자 정보 수정
+                      {!canEditUser(user) && (
+                        <span className="ml-auto text-xs text-slate-400">권한 없음</span>
+                      )}
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem onClick={() => onUpdateStatus(user.id, "active")}>

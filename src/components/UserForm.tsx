@@ -30,6 +30,7 @@ import {
 interface UserFormProps {
   initialData?: User | null;
   agencies: Agency[];
+  currentUser?: User | null;
   onSubmit: (data: Partial<User>) => Promise<void> | void;
   onCancel: () => void;
 }
@@ -37,9 +38,12 @@ interface UserFormProps {
 export function UserForm({
   initialData,
   agencies,
+  currentUser,
   onSubmit,
   onCancel,
 }: UserFormProps) {
+  const isSuperAdmin = currentUser?.role === 'super_admin';
+  const isEditingSuperAdmin = initialData?.role === 'super_admin';
   const [formData, setFormData] = useState<Partial<User>>({
     username: "",
     name: "",
@@ -169,12 +173,13 @@ export function UserForm({
               <Select
                 value={formData.role}
                 onValueChange={(value: UserRole) => handleChange("role", value)}
+                disabled={isEditingSuperAdmin && !isSuperAdmin}
               >
                 <SelectTrigger className={inputClassName}>
                   <SelectValue placeholder="역할 선택" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="super_admin">
+                  <SelectItem value="super_admin" disabled={isEditingSuperAdmin && !isSuperAdmin}>
                     <span className="font-medium">슈퍼관리자</span>
                     <span className="ml-2 text-xs text-slate-400">- 모든 권한</span>
                   </SelectItem>
@@ -188,6 +193,11 @@ export function UserForm({
                   </SelectItem>
                 </SelectContent>
               </Select>
+              {isEditingSuperAdmin && !isSuperAdmin && (
+                <p className="text-sm text-amber-600 mt-1">
+                  ⚠️ 슈퍼 관리자 계정의 역할은 슈퍼 관리자만 변경할 수 있습니다.
+                </p>
+              )}
               
               <div className="bg-slate-50 p-3 rounded-md border text-sm text-slate-600">
                 {formData.role === "super_admin" && (
