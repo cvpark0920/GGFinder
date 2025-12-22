@@ -79,15 +79,15 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
 
 # Run migrations and start server
 # 실패한 마이그레이션을 자동으로 해결한 후 마이그레이션 실행
-CMD ["sh", "-c", "echo '🔄 Running database migrations...' && \
+CMD sh -c "echo '🔄 Running database migrations...' && \
   npx prisma@6.1.0 migrate deploy 2>&1 | tee /tmp/migrate.log || MIGRATE_FAILED=1; \
-  if [ \"${MIGRATE_FAILED:-0}\" = \"1\" ] || grep -q 'failed migrations' /tmp/migrate.log || grep -q 'P3009' /tmp/migrate.log; then \
+  if [ \"\${MIGRATE_FAILED:-0}\" = \"1\" ] || grep -q 'failed migrations' /tmp/migrate.log || grep -q 'P3009' /tmp/migrate.log; then \
     echo '⚠️  Detected failed migrations, attempting to resolve...'; \
-    FAILED_MIG=$(grep 'The \`' /tmp/migrate.log | sed -n \"s/.*The \\\`\\([^\\\`]*\\)\\\`.*/\\1/p\" | head -1); \
-    if [ -n \"$FAILED_MIG\" ]; then \
-      echo \"  Resolving: $FAILED_MIG\"; \
-      npx prisma@6.1.0 migrate resolve --applied \"$FAILED_MIG\" 2>/dev/null || \
-      npx prisma@6.1.0 migrate resolve --rolled-back \"$FAILED_MIG\" 2>/dev/null || \
+    FAILED_MIG=\$(grep 'The \`' /tmp/migrate.log | sed -n 's/.*The \`\\([^\`]*\\)\`.*/\\1/p' | head -1); \
+    if [ -n \"\$FAILED_MIG\" ]; then \
+      echo \"  Resolving: \$FAILED_MIG\"; \
+      npx prisma@6.1.0 migrate resolve --applied \"\$FAILED_MIG\" 2>/dev/null || \
+      npx prisma@6.1.0 migrate resolve --rolled-back \"\$FAILED_MIG\" 2>/dev/null || \
       echo \"    Could not resolve automatically\"; \
       echo '🔄 Retrying migrations...'; \
       npx prisma@6.1.0 migrate deploy || exit 1; \
@@ -97,5 +97,5 @@ CMD ["sh", "-c", "echo '🔄 Running database migrations...' && \
     fi; \
   fi && \
   echo '✅ Migrations completed successfully' && \
-  node server/dist/index.js"]
+  node server/dist/index.js"
 
