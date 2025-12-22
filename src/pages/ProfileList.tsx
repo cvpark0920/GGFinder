@@ -490,9 +490,6 @@ export default function ProfileList({ type }: ProfileListProps) {
             <SheetContent side="bottom" className="h-[85vh] rounded-t-2xl">
               <SheetHeader>
                 <SheetTitle>{t('profile.filters.title')}</SheetTitle>
-                <SheetDescription>
-                    {t('profile.filters.title')}
-                </SheetDescription>
               </SheetHeader>
               <div className="mt-6 h-[calc(85vh-8rem)] overflow-y-auto pr-4 pb-20">
                 <ProfileFilters 
