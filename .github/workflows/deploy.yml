@@ -167,19 +167,31 @@ jobs:
             echo "🛑 Stopping existing containers..."
             docker compose down --timeout 30 --remove-orphans || true
             
-            # 10. Docker 이미지 빌드 및 실행
+            # 10. Docker 빌드 캐시 정리 및 이미지 빌드
+            echo "🐳 Cleaning Docker build cache..."
+            docker builder prune -af --filter "until=24h" || true
+            
             echo "🐳 Building and starting Docker containers..."
-            docker compose build --no-cache || {
-              echo "❌ Docker build failed"
-              # 롤백 시도
-              if [ -d "${CURRENT_BACKUP}" ] && [ -f "${CURRENT_BACKUP}/docker-compose.yml" ]; then
-                echo "🔄 Attempting rollback..."
-                cp ${CURRENT_BACKUP}/docker-compose.yml .
-                cp ${CURRENT_BACKUP}/.env* . 2>/dev/null || true
-                docker compose up -d || true
+            # 첫 번째 빌드 시도
+            if ! docker compose build --no-cache --pull 2>&1 | tee /tmp/build.log; then
+              echo "⚠️  First build attempt failed, cleaning cache and retrying..."
+              # 빌드 캐시 완전 정리
+              docker builder prune -af || true
+              docker system prune -af --volumes || true
+              
+              # 두 번째 빌드 시도
+              if ! docker compose build --no-cache --pull; then
+                echo "❌ Docker build failed after retry"
+                # 롤백 시도
+                if [ -d "${CURRENT_BACKUP}" ] && [ -f "${CURRENT_BACKUP}/docker-compose.yml" ]; then
+                  echo "🔄 Attempting rollback..."
+                  cp ${CURRENT_BACKUP}/docker-compose.yml .
+                  cp ${CURRENT_BACKUP}/.env* . 2>/dev/null || true
+                  docker compose up -d || true
+                fi
+                exit 1
               fi
-              exit 1
-            }
+            fi
             
             docker compose up -d || {
               echo "❌ Docker compose up failed"
