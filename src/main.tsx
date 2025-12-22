@@ -37,6 +37,7 @@ console.log('[DEBUG] Browser Environment Detection:', browserInfo);
 
 console.log('[DEBUG] Google OAuth Configuration:', {
   clientId: googleClientId ? `${googleClientId.substring(0, 20)}...` : 'NOT SET',
+  clientIdLength: googleClientId ? googleClientId.length : 0,
   origin: currentOrigin,
   host: currentHost,
   protocol: currentProtocol,
@@ -44,6 +45,7 @@ console.log('[DEBUG] Google OAuth Configuration:', {
   coopMetaTag: coopHeader ? coopHeader.getAttribute('content') : 'NOT SET',
   windowOpener: window.opener ? 'EXISTS' : 'NULL',
   browserInfo: browserInfo,
+  envVar: import.meta.env.VITE_GOOGLE_CLIENT_ID ? 'SET' : 'NOT SET',
 });
 
 // Google OAuth가 사용할 origin 확인
