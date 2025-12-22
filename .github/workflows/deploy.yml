@@ -162,6 +162,19 @@ jobs:
               sed -i "s|\${VITE_API_BASE_URL:-https://finder.ggacademy.top}|${VITE_API_BASE_URL}|g" .env
               sed -i "s|\${CORS_ORIGIN:-https://finder.ggacademy.top}|${CORS_ORIGIN}|g" .env
               sed -i "s|\${FRONTEND_URL:-https://finder.ggacademy.top}|${FRONTEND_URL}|g" .env
+              
+              # localhost를 HTTPS 도메인으로 교체 (하드코딩된 localhost 제거)
+              echo "🔄 localhost를 HTTPS 도메인으로 교체 중..."
+              sed -i "s|http://localhost:4000|https://finder.ggacademy.top|g" .env
+              sed -i "s|http://152.42.193.71:4000|https://finder.ggacademy.top|g" .env
+              
+              # GOOGLE_REDIRECT_URI가 localhost로 되어 있으면 교체
+              if grep -q "GOOGLE_REDIRECT_URI=http://localhost" .env; then
+                GOOGLE_REDIRECT_URI_FIXED="${FRONTEND_URL}/api/auth/google/callback"
+                sed -i "s|GOOGLE_REDIRECT_URI=.*|GOOGLE_REDIRECT_URI=${GOOGLE_REDIRECT_URI_FIXED}|g" .env
+                echo "✅ GOOGLE_REDIRECT_URI 수정: ${GOOGLE_REDIRECT_URI_FIXED}"
+              fi
+              
               echo "✅ .env 파일 환경 변수 교체 완료"
             else
               echo "📝 .env 파일이 없어서 새로 생성합니다..."
