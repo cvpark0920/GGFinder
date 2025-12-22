@@ -109,7 +109,6 @@
   "profile": {
     "detail": "Chi tiết hồ sơ",
     "list": "Danh sách hồ sơ",
-    "filters": "Bộ lọc",
     "favorites": "Danh sách yêu thích",
     "favorite": "Yêu thích",
     "unfavorite": "Bỏ yêu thích",
@@ -151,7 +150,48 @@
     "selectProfileDesc": "Vui lòng chọn hồ sơ {{type}} để yêu thích",
     "noProfilesToSelect": "Không có hồ sơ {{type}} nào để chọn",
     "select": "Chọn",
-    "profileId": "ID hồ sơ"
+    "profileId": "ID hồ sơ",
+    "filters": {
+      "title": "Bộ lọc",
+      "reset": "Đặt lại",
+      "status": "Trạng thái",
+      "allStatuses": "Tất cả trạng thái",
+      "age": "Tuổi",
+      "weight": "Cân nặng",
+      "education": "Học vấn",
+      "job": "Nghề nghiệp",
+      "tattoo": "Hình xăm",
+      "children": "Con cái",
+      "currentAddress": "Địa chỉ hiện tại",
+      "monthlyIncome": "Thu nhập hàng tháng",
+      "guarantee": "Bảo lãnh",
+      "residence": "Nơi cư trú",
+      "annualIncome": "Thu nhập hàng năm",
+      "drinking": "Uống rượu",
+      "smoking": "Hút thuốc",
+      "religion": "Tôn giáo",
+      "any": "Tất cả",
+      "yes": "Có",
+      "no": "Không",
+      "hasTattoo": "Có hình xăm",
+      "noTattoo": "Không có hình xăm",
+      "hasGuarantor": "Có người bảo lãnh",
+      "firstMarriage": "Kết hôn lần đầu",
+      "remarriage": "Tái hôn",
+      "consulting": "Đang tư vấn",
+      "matched": "Đã kết đôi",
+      "inactive": "Không hoạt động",
+      "anyDestination": "Tất cả",
+      "korea": "Hàn Quốc",
+      "taiwan": "Đài Loan",
+      "nonSmoker": "Không hút thuốc",
+      "smoker": "Hút thuốc",
+      "noReligion": "Không tôn giáo",
+      "buddhism": "Phật giáo",
+      "christianity": "Cơ đốc giáo",
+      "catholicism": "Công giáo",
+      "other": "Khác"
+    }
   },
   "form": {
     "labels": {
@@ -185,7 +225,16 @@
       "address": "Nhập địa chỉ",
       "phone": "Nhập số điện thoại",
       "email": "Nhập email",
-      "memo": "Nhập ghi chú"
+      "memo": "Nhập ghi chú",
+      "searchName": "Tìm kiếm theo tên...",
+      "searchEducation": "Tìm kiếm học vấn...",
+      "searchJob": "Tìm kiếm nghề nghiệp...",
+      "searchChildren": "Tìm kiếm thông tin con cái...",
+      "searchAddress": "Tìm kiếm địa chỉ...",
+      "searchIncome": "Tìm kiếm thu nhập...",
+      "searchResidence": "Tìm kiếm nơi cư trú...",
+      "searchReligion": "Tìm kiếm tôn giáo...",
+      "searchDrinking": "Tìm kiếm thông tin uống rượu..."
     },
     "errors": {
       "required": "Trường bắt buộc",
@@ -299,6 +348,23 @@
     "title": "Dịch vụ đang được chuẩn bị",
     "description": "Dịch vụ chat chỉ dành cho quản trị viên.",
     "confirm": "Xác nhận"
+  },
+  "bride": {
+    "destination": "Quốc gia mong muốn"
+  },
+  "groom": {},
+  "label": {
+    "name": "Tên",
+    "dob": "Ngày sinh",
+    "height": "Chiều cao",
+    "weight": "Cân nặng",
+    "maritalStatus": "Tình trạng hôn nhân",
+    "education": "Học vấn",
+    "job": "Nghề nghiệp",
+    "income": "Thu nhập",
+    "religion": "Tôn giáo",
+    "tattoo": "Hình xăm",
+    "address": "Địa chỉ"
   }
 }
 

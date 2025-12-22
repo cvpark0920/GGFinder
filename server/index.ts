@@ -62,12 +62,28 @@ const PORT = parseInt(process.env.PORT || '4000', 10);
 app.set('trust proxy', true);
 
 // Middleware
-// CORS 설정: FRONTEND_URL 또는 CORS_ORIGIN 환경 변수 사용
+// CORS 설정: 개발 환경에서는 localhost의 모든 포트 허용, 프로덕션에서는 지정된 origin만 허용
 // #region agent log
 const corsOrigin = process.env.CORS_ORIGIN;
 const frontendUrl = process.env.FRONTEND_URL;
-const allowedOrigin = corsOrigin || frontendUrl || 'http://localhost:4001';
-fetch('http://127.0.0.1:7243/ingest/1ea1dcfc-80be-42cc-9332-f848c10e9a0f',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'server/index.ts:62',message:'CORS origin configuration',data:{corsOrigin:corsOrigin||'NOT_SET',frontendUrl:frontendUrl||'NOT_SET',allowedOrigin:allowedOrigin},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'B'})}).catch(()=>{});
+const isDevelopment = process.env.NODE_ENV !== 'production';
+
+// 개발 환경에서는 localhost의 모든 포트를 허용
+let allowedOrigin: string | string[] | ((origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) => void);
+if (isDevelopment) {
+  // 개발 환경: localhost의 모든 포트 허용
+  allowedOrigin = (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) => {
+    if (!origin || origin.startsWith('http://localhost:') || origin.startsWith('http://127.0.0.1:')) {
+      callback(null, true);
+    } else {
+      callback(null, false);
+    }
+  };
+} else {
+  // 프로덕션 환경: 지정된 origin만 허용
+  allowedOrigin = corsOrigin || frontendUrl || 'http://localhost:4001';
+}
+fetch('http://127.0.0.1:7243/ingest/1ea1dcfc-80be-42cc-9332-f848c10e9a0f',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'server/index.ts:62',message:'CORS origin configuration',data:{corsOrigin:corsOrigin||'NOT_SET',frontendUrl:frontendUrl||'NOT_SET',allowedOrigin:isDevelopment?'localhost:*':allowedOrigin,isDevelopment},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'B'})}).catch(()=>{});
 // #endregion
 app.use(cors({
   origin: allowedOrigin,

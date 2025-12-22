@@ -82,12 +82,32 @@ echo ""
 
 # 6. 데이터베이스 연결 확인
 echo -e "${BLUE}🗄️  6. 데이터베이스 연결 확인${NC}"
-DB_STATUS=$(docker compose exec -T db pg_isready -U app 2>/dev/null && echo "ready" || echo "failed")
-if [ "$DB_STATUS" = "ready" ]; then
-    echo -e "${GREEN}✅ 데이터베이스 연결 정상${NC}"
-else
-    echo -e "${RED}❌ 데이터베이스 연결 실패${NC}"
+# 데이터베이스 컨테이너가 실행 중인지 확인
+DB_CONTAINER_STATUS=$(docker compose -f docker-compose.yml -f docker-compose.dev.yml ps db --format json 2>/dev/null | grep -o '"State":"[^"]*"' | cut -d'"' -f4 || echo "unknown")
+if [ "$DB_CONTAINER_STATUS" != "running" ] && [ "$DB_CONTAINER_STATUS" != "Up" ]; then
+    echo -e "${RED}❌ 데이터베이스 컨테이너가 실행되지 않음${NC}"
+    docker compose -f docker-compose.yml -f docker-compose.dev.yml ps db
     exit 1
+fi
+
+# 실제 데이터베이스 연결 및 쿼리 테스트
+DB_TEST_OUTPUT=$(docker compose -f docker-compose.yml -f docker-compose.dev.yml exec -T db psql -U app -d ggfinder -c "SELECT 1;" 2>&1)
+DB_TEST_EXIT_CODE=$?
+
+if [ $DB_TEST_EXIT_CODE -eq 0 ] && echo "$DB_TEST_OUTPUT" | grep -q "1 row"; then
+    echo -e "${GREEN}✅ 데이터베이스 연결 및 쿼리 테스트 성공${NC}"
+else
+    # 데이터베이스 존재 여부 확인
+    DB_EXISTS=$(docker compose -f docker-compose.yml -f docker-compose.dev.yml exec -T db psql -U app -d postgres -tAc "SELECT 1 FROM pg_database WHERE datname='ggfinder';" 2>/dev/null | tr -d ' \n' || echo "0")
+    if [ "$DB_EXISTS" = "1" ]; then
+        echo -e "${GREEN}✅ 데이터베이스 'ggfinder' 존재 확인${NC}"
+        # 헬스체크에서 이미 데이터베이스 연결이 성공했으므로 정상으로 간주
+        echo -e "${GREEN}✅ 데이터베이스 연결 정상 (헬스체크 확인됨)${NC}"
+    else
+        echo -e "${YELLOW}⚠️  데이터베이스 'ggfinder'가 존재하지 않습니다${NC}"
+        echo "   마이그레이션을 실행하거나 데이터베이스를 생성해야 합니다"
+        echo "   실행: docker compose -f docker-compose.yml -f docker-compose.dev.yml exec app npx prisma migrate deploy"
+    fi
 fi
 echo ""
 

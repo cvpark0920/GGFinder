@@ -12,7 +12,8 @@ services:
     environment:
       # 로컬 개발용 런타임 환경 변수
       NODE_ENV: ${NODE_ENV:-development}
-      CORS_ORIGIN: ${CORS_ORIGIN:-http://localhost:4000}
+      # 개발 환경에서는 CORS_ORIGIN을 설정하지 않으면 코드에서 localhost의 모든 포트를 허용함
+      # CORS_ORIGIN: ${CORS_ORIGIN:-http://localhost:4000}
       FRONTEND_URL: ${FRONTEND_URL:-http://localhost:4000}
       GOOGLE_REDIRECT_URI: ${GOOGLE_REDIRECT_URI:-http://localhost:4000/api/auth/google/callback}
     # 개발 모드에서는 볼륨 마운트로 소스 코드 변경 감지 가능

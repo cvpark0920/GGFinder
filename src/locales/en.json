@@ -109,7 +109,6 @@
   "profile": {
     "detail": "Profile Details",
     "list": "Profile List",
-    "filters": "Filters",
     "favorites": "Favorites",
     "favorite": "Favorite",
     "unfavorite": "Unfavorite",
@@ -151,7 +150,48 @@
     "selectProfileDesc": "Please select a {{type}} profile to favorite",
     "noProfilesToSelect": "No {{type}} profiles available to select",
     "select": "Select",
-    "profileId": "Profile ID"
+    "profileId": "Profile ID",
+    "filters": {
+      "title": "Filters",
+      "reset": "Reset",
+      "status": "Status",
+      "allStatuses": "All Statuses",
+      "age": "Age",
+      "weight": "Weight",
+      "education": "Education",
+      "job": "Job",
+      "tattoo": "Tattoo",
+      "children": "Children",
+      "currentAddress": "Current Address",
+      "monthlyIncome": "Monthly Income",
+      "guarantee": "Guarantee",
+      "residence": "Residence",
+      "annualIncome": "Annual Income",
+      "drinking": "Drinking",
+      "smoking": "Smoking",
+      "religion": "Religion",
+      "any": "Any",
+      "yes": "Yes",
+      "no": "No",
+      "hasTattoo": "Has Tattoo",
+      "noTattoo": "No Tattoo",
+      "hasGuarantor": "Has Guarantor",
+      "firstMarriage": "First Marriage",
+      "remarriage": "Remarriage",
+      "consulting": "Consulting",
+      "matched": "Matched",
+      "inactive": "Inactive",
+      "anyDestination": "Any Destination",
+      "korea": "Korea",
+      "taiwan": "Taiwan",
+      "nonSmoker": "Non-smoker",
+      "smoker": "Smoker",
+      "noReligion": "No Religion",
+      "buddhism": "Buddhism",
+      "christianity": "Christianity",
+      "catholicism": "Catholicism",
+      "other": "Other"
+    }
   },
   "form": {
     "labels": {
@@ -185,7 +225,16 @@
       "address": "Enter address",
       "phone": "Enter phone number",
       "email": "Enter email",
-      "memo": "Enter memo"
+      "memo": "Enter memo",
+      "searchName": "Search by name...",
+      "searchEducation": "Search education...",
+      "searchJob": "Search job...",
+      "searchChildren": "Search children info...",
+      "searchAddress": "Search address...",
+      "searchIncome": "Search income...",
+      "searchResidence": "Search residence...",
+      "searchReligion": "Search religion...",
+      "searchDrinking": "Search drinking info..."
     },
     "errors": {
       "required": "Required field",
@@ -299,6 +348,23 @@
     "title": "Service Under Preparation",
     "description": "Chat service is only available for administrators.",
     "confirm": "Confirm"
+  },
+  "bride": {
+    "destination": "Desired Country"
+  },
+  "groom": {},
+  "label": {
+    "name": "Name",
+    "dob": "Date of Birth",
+    "height": "Height",
+    "weight": "Weight",
+    "maritalStatus": "Marital Status",
+    "education": "Education",
+    "job": "Job",
+    "income": "Income",
+    "religion": "Religion",
+    "tattoo": "Tattoo",
+    "address": "Address"
   }
 }
 

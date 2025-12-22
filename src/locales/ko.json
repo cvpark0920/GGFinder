@@ -109,7 +109,6 @@
   "profile": {
     "detail": "프로필 상세",
     "list": "프로필 목록",
-    "filters": "필터",
     "favorites": "찜 목록",
     "favorite": "찜하기",
     "unfavorite": "찜 해제",
@@ -151,7 +150,48 @@
     "selectProfileDesc": "찜하기를 위해 {{type}} 프로필을 선택해주세요.",
     "noProfilesToSelect": "선택할 수 있는 {{type}} 프로필이 없습니다.",
     "select": "선택",
-    "profileId": "프로필 ID"
+    "profileId": "프로필 ID",
+    "filters": {
+      "title": "필터",
+      "reset": "초기화",
+      "status": "상태",
+      "allStatuses": "모든 상태",
+      "age": "나이",
+      "weight": "몸무게",
+      "education": "학력",
+      "job": "직업",
+      "tattoo": "문신",
+      "children": "자녀",
+      "currentAddress": "현재 주소",
+      "monthlyIncome": "월 소득",
+      "guarantee": "보증",
+      "residence": "거주지",
+      "annualIncome": "연 수입",
+      "drinking": "음주",
+      "smoking": "흡연",
+      "religion": "종교",
+      "any": "전체",
+      "yes": "예",
+      "no": "아니오",
+      "hasTattoo": "문신 있음",
+      "noTattoo": "문신 없음",
+      "hasGuarantor": "보증인 있음",
+      "firstMarriage": "초혼",
+      "remarriage": "재혼",
+      "consulting": "상담중",
+      "matched": "매칭완료",
+      "inactive": "비활성",
+      "anyDestination": "전체",
+      "korea": "한국",
+      "taiwan": "대만",
+      "nonSmoker": "비흡연",
+      "smoker": "흡연",
+      "noReligion": "무교",
+      "buddhism": "불교",
+      "christianity": "기독교",
+      "catholicism": "천주교",
+      "other": "기타"
+    }
   },
   "form": {
     "labels": {
@@ -185,7 +225,16 @@
       "address": "주소를 입력하세요",
       "phone": "전화번호를 입력하세요",
       "email": "이메일을 입력하세요",
-      "memo": "메모를 입력하세요"
+      "memo": "메모를 입력하세요",
+      "searchName": "이름으로 검색...",
+      "searchEducation": "학력으로 검색...",
+      "searchJob": "직업으로 검색...",
+      "searchChildren": "자녀 정보로 검색...",
+      "searchAddress": "주소로 검색...",
+      "searchIncome": "소득으로 검색...",
+      "searchResidence": "거주지로 검색...",
+      "searchReligion": "종교로 검색...",
+      "searchDrinking": "음주 정보로 검색..."
     },
     "errors": {
       "required": "필수 입력 항목입니다",
@@ -299,6 +348,23 @@
     "title": "서비스 준비 중입니다",
     "description": "채팅 서비스는 관리자만 이용할 수 있습니다.",
     "confirm": "확인"
+  },
+  "bride": {
+    "destination": "희망 국가"
+  },
+  "groom": {},
+  "label": {
+    "name": "이름",
+    "dob": "생년월일",
+    "height": "키",
+    "weight": "몸무게",
+    "maritalStatus": "결혼 상태",
+    "education": "학력",
+    "job": "직업",
+    "income": "소득",
+    "religion": "종교",
+    "tattoo": "문신",
+    "address": "거주지"
   }
 }
 

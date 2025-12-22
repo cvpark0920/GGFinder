@@ -22,24 +22,22 @@ export interface FilterState {
   heightRange: [number, number];
   weightRange: [number, number];
   
-  maritalStatus: string;
-  education: string;
+  maritalStatus: string; // 'all', '초혼', '재혼'
+  education: string; // Groom only (text search)
+  educationRange: [number, number]; // Bride only (0-12)
   job: string;
-  tattoo: string;
+  tattoo: string; // 'all', '없음', '있음'
   
   // Bride Specific
   location: string; // Current Address
   children: string;
-  monthlyIncome: string;
-  destination: string;
-  guarantee: string; // 'all', 'yes', 'no'
+  religion: string; // Religion filter (used by both bride and groom)
   
   // Groom Specific
   residence: string;
-  annualIncome: string;
-  smoking: string;
-  drinking: string;
-  religion: string;
+  annualIncomeRange: [number, number]; // Annual Income Range (e.g., 0-100000000)
+  smoking: string; // 'all', '비흡연', '흡연'
+  drinking: string; // Text search (e.g., "소주 1병", "안 함")
 }
 
 interface ProfileFiltersProps {
@@ -56,21 +54,19 @@ export const INITIAL_FILTERS: FilterState = {
   heightRange: [140, 190],
   weightRange: [40, 120],
   maritalStatus: 'all',
-  education: '',
+  education: '', // Groom only
+  educationRange: [0, 12], // Bride only
   job: '',
   tattoo: 'all',
   
   location: '',
   children: '',
-  monthlyIncome: '',
-  destination: 'all',
-  guarantee: 'all',
+  religion: '', // Religion (used by both bride and groom)
   
   residence: '',
-  annualIncome: '',
+  annualIncomeRange: [0, 100000000], // Annual Income Range (0원 ~ 1억원)
   smoking: 'all',
   drinking: 'all',
-  religion: '',
 };
 
 export function ProfileFilters({ type, filters, setFilters, className }: ProfileFiltersProps) {
@@ -93,7 +89,7 @@ export function ProfileFilters({ type, filters, setFilters, className }: Profile
     <div className="space-y-2">
       <Label>{t('label.name')}</Label>
       <Input 
-        placeholder="Search by name..." 
+        placeholder={t('form.placeholders.searchName')} 
         value={filters.search}
         onChange={(e) => handleTextChange('search', e.target.value)}
       />
@@ -102,20 +98,20 @@ export function ProfileFilters({ type, filters, setFilters, className }: Profile
 
   const StatusSelect = () => (
     <div className="space-y-2">
-      <Label>Status</Label>
+      <Label>{t('common.status')}</Label>
       <Select 
         value={filters.status} 
         onValueChange={(val) => handleTextChange('status', val)}
       >
         <SelectTrigger>
-          <SelectValue placeholder="All Statuses" />
+          <SelectValue placeholder={t('profile.filters.allStatuses')} />
         </SelectTrigger>
         <SelectContent>
-          <SelectItem value="all">All Statuses</SelectItem>
-          <SelectItem value="active">Active</SelectItem>
-          <SelectItem value="consulting">Consulting</SelectItem>
-          <SelectItem value="matched">Matched</SelectItem>
-          <SelectItem value="inactive">Inactive</SelectItem>
+          <SelectItem value="all">{t('profile.filters.allStatuses')}</SelectItem>
+          <SelectItem value="active">{t('dashboard.status.active')}</SelectItem>
+          <SelectItem value="consulting">{t('profile.filters.consulting')}</SelectItem>
+          <SelectItem value="matched">{t('profile.filters.matched')}</SelectItem>
+          <SelectItem value="inactive">{t('profile.filters.inactive')}</SelectItem>
         </SelectContent>
       </Select>
     </div>
@@ -123,7 +119,7 @@ export function ProfileFilters({ type, filters, setFilters, className }: Profile
 
   const AgeSlider = () => (
     <div className="space-y-4">
-      <Label>Age</Label>
+      <Label>{t('common.age')}</Label>
       <div className="flex justify-between items-center">
         <div className="flex items-center gap-1 bg-slate-100 rounded-md p-0.5">
           <Button
@@ -257,7 +253,7 @@ export function ProfileFilters({ type, filters, setFilters, className }: Profile
 
   const WeightSlider = () => (
     <div className="space-y-4">
-      <Label>Weight</Label>
+      <Label>{t('common.weight')}</Label>
       <div className="flex justify-between items-center">
         <div className="flex items-center gap-1 bg-slate-100 rounded-md p-0.5">
           <Button
@@ -330,13 +326,12 @@ export function ProfileFilters({ type, filters, setFilters, className }: Profile
         onValueChange={(val) => handleTextChange('maritalStatus', val)}
       >
         <SelectTrigger>
-          <SelectValue placeholder="All Statuses" />
+          <SelectValue placeholder={t('profile.filters.allStatuses')} />
         </SelectTrigger>
         <SelectContent>
-          <SelectItem value="all">All Statuses</SelectItem>
-          <SelectItem value="single">Single (Never Married)</SelectItem>
-          <SelectItem value="divorced">Divorced</SelectItem>
-          <SelectItem value="widowed">Widowed</SelectItem>
+          <SelectItem value="all">{t('profile.filters.allStatuses')}</SelectItem>
+          <SelectItem value="초혼">{t('profile.filters.firstMarriage')}</SelectItem>
+          <SelectItem value="재혼">{t('profile.filters.remarriage')}</SelectItem>
         </SelectContent>
       </Select>
     </div>
@@ -344,20 +339,158 @@ export function ProfileFilters({ type, filters, setFilters, className }: Profile
 
   const EducationInput = () => (
     <div className="space-y-2">
-      <Label>Education</Label>
+      <Label>{t('profile.education')}</Label>
       <Input 
-        placeholder="Search education..." 
+        placeholder={t('form.placeholders.searchEducation')} 
         value={filters.education}
         onChange={(e) => handleTextChange('education', e.target.value)}
       />
     </div>
   );
 
+  const EducationRangeSlider = () => (
+    <div className="space-y-4">
+      <Label>{t('profile.education')}</Label>
+      <div className="flex justify-between items-center">
+        <div className="flex items-center gap-1 bg-slate-100 rounded-md p-0.5">
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-5 w-5 rounded-sm hover:bg-white hover:shadow-sm"
+            onClick={() => {
+              const [min, max] = filters.educationRange;
+              if (min > 0) handleRangeChange('educationRange', [min - 1, max]);
+            }}
+          >
+            <Minus className="h-3 w-3" />
+          </Button>
+          <span className="text-xs w-6 text-center font-medium">{filters.educationRange[0]}</span>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-5 w-5 rounded-sm hover:bg-white hover:shadow-sm"
+            onClick={() => {
+              const [min, max] = filters.educationRange;
+              if (min < filters.educationRange[1]) handleRangeChange('educationRange', [min + 1, max]);
+            }}
+          >
+            <Plus className="h-3 w-3" />
+          </Button>
+        </div>
+
+        <div className="flex items-center gap-1 bg-slate-100 rounded-md p-0.5">
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-5 w-5 rounded-sm hover:bg-white hover:shadow-sm"
+            onClick={() => {
+              const [min, max] = filters.educationRange;
+              if (max > filters.educationRange[0]) handleRangeChange('educationRange', [min, max - 1]);
+            }}
+          >
+            <Minus className="h-3 w-3" />
+          </Button>
+          <span className="text-xs w-6 text-center font-medium">{filters.educationRange[1]}</span>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-5 w-5 rounded-sm hover:bg-white hover:shadow-sm"
+            onClick={() => {
+              const [min, max] = filters.educationRange;
+              if (max < 12) handleRangeChange('educationRange', [min, max + 1]);
+            }}
+          >
+            <Plus className="h-3 w-3" />
+          </Button>
+        </div>
+      </div>
+      <Slider
+        defaultValue={[0, 12]}
+        value={[filters.educationRange[0], filters.educationRange[1]]}
+        min={0}
+        max={12}
+        step={1}
+        onValueChange={(val) => handleRangeChange('educationRange', val)}
+      />
+    </div>
+  );
+
+  const AnnualIncomeRangeSlider = () => (
+    <div className="space-y-4">
+      <Label>{t('profile.income')}</Label>
+      <div className="flex justify-between items-center">
+        <div className="flex items-center gap-1 bg-slate-100 rounded-md p-0.5">
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-5 w-5 rounded-sm hover:bg-white hover:shadow-sm"
+            onClick={() => {
+              const [min, max] = filters.annualIncomeRange;
+              if (min > 0) handleRangeChange('annualIncomeRange', [min - 1000000, max]);
+            }}
+          >
+            <Minus className="h-3 w-3" />
+          </Button>
+          <span className="text-xs w-12 text-center font-medium">
+            {Math.floor(filters.annualIncomeRange[0] / 10000)}만
+          </span>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-5 w-5 rounded-sm hover:bg-white hover:shadow-sm"
+            onClick={() => {
+              const [min, max] = filters.annualIncomeRange;
+              if (min < filters.annualIncomeRange[1]) handleRangeChange('annualIncomeRange', [min + 1000000, max]);
+            }}
+          >
+            <Plus className="h-3 w-3" />
+          </Button>
+        </div>
+
+        <div className="flex items-center gap-1 bg-slate-100 rounded-md p-0.5">
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-5 w-5 rounded-sm hover:bg-white hover:shadow-sm"
+            onClick={() => {
+              const [min, max] = filters.annualIncomeRange;
+              if (max > filters.annualIncomeRange[0]) handleRangeChange('annualIncomeRange', [min, max - 1000000]);
+            }}
+          >
+            <Minus className="h-3 w-3" />
+          </Button>
+          <span className="text-xs w-12 text-center font-medium">
+            {Math.floor(filters.annualIncomeRange[1] / 10000)}만
+          </span>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-5 w-5 rounded-sm hover:bg-white hover:shadow-sm"
+            onClick={() => {
+              const [min, max] = filters.annualIncomeRange;
+              if (max < 100000000) handleRangeChange('annualIncomeRange', [min, max + 1000000]);
+            }}
+          >
+            <Plus className="h-3 w-3" />
+          </Button>
+        </div>
+      </div>
+      <Slider
+        defaultValue={[0, 100000000]}
+        value={[filters.annualIncomeRange[0], filters.annualIncomeRange[1]]}
+        min={0}
+        max={100000000}
+        step={1000000}
+        onValueChange={(val) => handleRangeChange('annualIncomeRange', val)}
+      />
+    </div>
+  );
+
   const JobInput = () => (
     <div className="space-y-2">
-      <Label>Job</Label>
+      <Label>{t('profile.job')}</Label>
       <Input 
-        placeholder="Search job..." 
+        placeholder={t('form.placeholders.searchJob')} 
         value={filters.job}
         onChange={(e) => handleTextChange('job', e.target.value)}
       />
@@ -366,18 +499,18 @@ export function ProfileFilters({ type, filters, setFilters, className }: Profile
 
   const TattooSelect = () => (
     <div className="space-y-2">
-      <Label>Tattoo</Label>
+      <Label>{t('form.labels.tattoo')}</Label>
       <Select 
         value={filters.tattoo} 
         onValueChange={(val) => handleTextChange('tattoo', val)}
       >
         <SelectTrigger>
-          <SelectValue placeholder="Any" />
+          <SelectValue placeholder={t('profile.filters.any')} />
         </SelectTrigger>
         <SelectContent>
-          <SelectItem value="all">Any</SelectItem>
-          <SelectItem value="no">No Tattoo</SelectItem>
-          <SelectItem value="yes">Has Tattoo</SelectItem>
+          <SelectItem value="all">{t('profile.filters.any')}</SelectItem>
+          <SelectItem value="없음">{t('profile.filters.noTattoo')}</SelectItem>
+          <SelectItem value="있음">{t('profile.filters.hasTattoo')}</SelectItem>
         </SelectContent>
       </Select>
     </div>
@@ -387,9 +520,9 @@ export function ProfileFilters({ type, filters, setFilters, className }: Profile
   return (
     <div className={`space-y-6 p-4 border rounded-lg bg-white ${className}`}>
       <div className="flex items-center justify-between">
-        <h3 className="font-semibold text-lg">Filters</h3>
+        <h3 className="font-semibold text-lg">{t('profile.filters.title')}</h3>
         <Button variant="ghost" size="sm" onClick={resetFilters} className="text-slate-500 h-8 px-2">
-          Reset <X className="w-3 h-3 ml-1" />
+          {t('common.reset')} <X className="w-3 h-3 ml-1" />
         </Button>
       </div>
 
@@ -401,13 +534,13 @@ export function ProfileFilters({ type, filters, setFilters, className }: Profile
           <AgeSlider /> {/* Birth Date -> Age */}
           <HeightSlider /> {/* Height */}
           <WeightSlider /> {/* Weight */}
-          <EducationInput /> {/* Education */}
+          <EducationRangeSlider /> {/* Education Range (0-12) */}
           <MaritalStatusSelect /> {/* Marital Status */}
           
           <div className="space-y-2">
-            <Label>Children</Label>
+            <Label>{t('profile.children')}</Label>
             <Input 
-              placeholder="Search children info..." 
+              placeholder={t('form.placeholders.searchChildren')} 
               value={filters.children}
               onChange={(e) => handleTextChange('children', e.target.value)}
             />
@@ -416,55 +549,32 @@ export function ProfileFilters({ type, filters, setFilters, className }: Profile
           <JobInput /> {/* Job */}
 
           <div className="space-y-2">
-            <Label>Current Address (Location)</Label>
+            <Label>{t('profile.currentAddress')}</Label>
             <Input 
-              placeholder="Search address..." 
+              placeholder={t('form.placeholders.searchAddress')} 
               value={filters.location}
               onChange={(e) => handleTextChange('location', e.target.value)}
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label>Monthly Income</Label>
-            <Input 
-              placeholder="Search income..." 
-              value={filters.monthlyIncome}
-              onChange={(e) => handleTextChange('monthlyIncome', e.target.value)}
             />
           </div>
 
           <TattooSelect /> {/* Tattoo */}
 
           <div className="space-y-2">
-            <Label>{t('bride.destination')}</Label>
+            <Label>{t('profile.religion')}</Label>
             <Select 
-              value={filters.destination} 
-              onValueChange={(val) => handleTextChange('destination', val)}
+              value={filters.religion || 'all'} 
+              onValueChange={(val) => handleTextChange('religion', val === 'all' ? '' : val)}
             >
               <SelectTrigger>
-                <SelectValue placeholder="Any Destination" />
+                <SelectValue placeholder={t('profile.filters.any')} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">Any Destination</SelectItem>
-                <SelectItem value="korea">Korea</SelectItem>
-                <SelectItem value="taiwan">Taiwan</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div className="space-y-2">
-            <Label>Guarantee</Label>
-            <Select 
-              value={filters.guarantee} 
-              onValueChange={(val) => handleTextChange('guarantee', val)}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Any" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">Any</SelectItem>
-                <SelectItem value="yes">Yes (Has Guarantor)</SelectItem>
-                <SelectItem value="no">No</SelectItem>
+                <SelectItem value="all">{t('profile.filters.any')}</SelectItem>
+                <SelectItem value="무교">{t('profile.filters.noReligion')}</SelectItem>
+                <SelectItem value="불교">{t('profile.filters.buddhism')}</SelectItem>
+                <SelectItem value="기독교">{t('profile.filters.christianity')}</SelectItem>
+                <SelectItem value="천주교">{t('profile.filters.catholicism')}</SelectItem>
+                <SelectItem value="기타">{t('profile.filters.other')}</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -476,9 +586,9 @@ export function ProfileFilters({ type, filters, setFilters, className }: Profile
           <StatusSelect /> {/* Profile Status */}
           
           <div className="space-y-2">
-            <Label>{t('label.address')} (Residence)</Label>
+            <Label>{t('profile.residence')}</Label>
             <Input 
-              placeholder="Search residence..." 
+              placeholder={t('form.placeholders.searchResidence')} 
               value={filters.residence}
               onChange={(e) => handleTextChange('residence', e.target.value)}
             />
@@ -490,59 +600,54 @@ export function ProfileFilters({ type, filters, setFilters, className }: Profile
           <WeightSlider /> {/* Weight */}
           <MaritalStatusSelect /> {/* Marital Status */}
           <JobInput /> {/* Job */}
-
-          <div className="space-y-2">
-            <Label>Annual Income</Label>
-            <Input 
-              placeholder="Search income..." 
-              value={filters.annualIncome}
-              onChange={(e) => handleTextChange('annualIncome', e.target.value)}
-            />
-          </div>
+          <AnnualIncomeRangeSlider /> {/* Annual Income Range */}
 
 
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label>Drinking</Label>
-              <Select 
-                value={filters.drinking} 
-                onValueChange={(val) => handleTextChange('drinking', val)}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Any" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">Any</SelectItem>
-                  <SelectItem value="no">No</SelectItem>
-                  <SelectItem value="yes">Yes</SelectItem>
-                </SelectContent>
-              </Select>
+              <Label>{t('profile.drinking')}</Label>
+              <Input 
+                placeholder={t('form.placeholders.searchDrinking')} 
+                value={filters.drinking === 'all' ? '' : filters.drinking}
+                onChange={(e) => handleTextChange('drinking', e.target.value || 'all')}
+              />
             </div>
             <div className="space-y-2">
-              <Label>Smoking</Label>
+              <Label>{t('profile.smoking')}</Label>
               <Select 
                 value={filters.smoking} 
                 onValueChange={(val) => handleTextChange('smoking', val)}
               >
                 <SelectTrigger>
-                  <SelectValue placeholder="Any" />
+                  <SelectValue placeholder={t('profile.filters.any')} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">Any</SelectItem>
-                  <SelectItem value="no">No</SelectItem>
-                  <SelectItem value="yes">Yes</SelectItem>
+                  <SelectItem value="all">{t('profile.filters.any')}</SelectItem>
+                  <SelectItem value="비흡연">{t('profile.filters.nonSmoker')}</SelectItem>
+                  <SelectItem value="흡연">{t('profile.filters.smoker')}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
           </div>
 
           <div className="space-y-2">
-            <Label>Religion</Label>
-            <Input 
-              placeholder="Search religion..." 
-              value={filters.religion}
-              onChange={(e) => handleTextChange('religion', e.target.value)}
-            />
+            <Label>{t('profile.religion')}</Label>
+            <Select 
+              value={filters.religion || 'all'} 
+              onValueChange={(val) => handleTextChange('religion', val === 'all' ? '' : val)}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder={t('profile.filters.any')} />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">{t('profile.filters.any')}</SelectItem>
+                <SelectItem value="무교">{t('profile.filters.noReligion')}</SelectItem>
+                <SelectItem value="불교">{t('profile.filters.buddhism')}</SelectItem>
+                <SelectItem value="기독교">{t('profile.filters.christianity')}</SelectItem>
+                <SelectItem value="천주교">{t('profile.filters.catholicism')}</SelectItem>
+                <SelectItem value="기타">{t('profile.filters.other')}</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
         </>
       )}

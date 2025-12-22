@@ -273,22 +273,26 @@ export default function ProfileList({ type }: ProfileListProps) {
 
       // 5. Marital Status (Common)
       if (filters.maritalStatus !== 'all') {
-        const status = profile.maritalStatus.toLowerCase();
-        const filter = filters.maritalStatus;
-        
-        if (filter === 'single') {
-           if (!status.includes('미혼') && !status.includes('single') && !status.includes('độc thân')) return false;
-        } else if (filter === 'divorced') {
-           if (!status.includes('이혼') && !status.includes('divorced') && !status.includes('ly hôn')) return false;
-        } else if (filter === 'widowed') {
-           if (!status.includes('사별') && !status.includes('widowed') && !status.includes('góa')) return false;
+        if (profile.maritalStatus !== filters.maritalStatus) {
+          return false;
         }
       }
 
-      // 6. Education (Common)
-      if (filters.education) {
-        const edu = (isBride ? (profile as BrideProfile).education : (profile as GroomProfile).education).toLowerCase();
-        if (!edu.includes(filters.education.toLowerCase())) return false;
+      // 6. Education (Type-specific)
+      if (isBride) {
+        // Bride: Education Range (0-12)
+        const brideProfile = profile as BrideProfile;
+        const educationValue = parseInt(brideProfile.education) || 0;
+        if (educationValue < filters.educationRange[0] || educationValue > filters.educationRange[1]) {
+          return false;
+        }
+      } else {
+        // Groom: Education Text Search
+        const groomProfile = profile as GroomProfile;
+        if (filters.education) {
+          const edu = groomProfile.education.toLowerCase();
+          if (!edu.includes(filters.education.toLowerCase())) return false;
+        }
       }
 
       // 7. Job (Common)
@@ -299,11 +303,8 @@ export default function ProfileList({ type }: ProfileListProps) {
       
       // 8. Tattoo (Common)
       if (filters.tattoo !== 'all') {
-        const tattoo = profile.tattoo.toLowerCase();
-        if (filters.tattoo === 'no') {
-           if (!tattoo.includes('없음') && !tattoo.includes('không') && !tattoo.includes('no')) return false;
-        } else if (filters.tattoo === 'yes') {
-           if (tattoo.includes('없음') || tattoo.includes('không') || tattoo.includes('no')) return false;
+        if (profile.tattoo !== filters.tattoo) {
+          return false;
         }
       }
 
@@ -311,35 +312,25 @@ export default function ProfileList({ type }: ProfileListProps) {
       if (isBride) {
         const p = profile as BrideProfile;
         
-        // Destination
-        if (filters.destination && filters.destination !== 'all') {
-           const dest = p.desiredDestination.toLowerCase();
-           if (filters.destination === 'korea' && !dest.includes('한국') && !dest.includes('korea')) return false;
-           if (filters.destination === 'taiwan' && !dest.includes('대만') && !dest.includes('taiwan')) return false;
-        }
-        
-        // Location (Current Address)
+        // Location (Current Address or loc)
         if (filters.location) {
-           const loc = p.currentAddress.toLowerCase();
-           if (!loc.includes(filters.location.toLowerCase())) return false;
+           const loc = (p.currentAddress || '').toLowerCase();
+           const locField = (p as any).loc ? String((p as any).loc).toLowerCase() : '';
+           const searchTerm = filters.location.toLowerCase();
+           if (!loc.includes(searchTerm) && !locField.includes(searchTerm)) return false;
         }
         
-        // Monthly Income
-        if (filters.monthlyIncome) {
-           const inc = p.monthlyIncome.toLowerCase();
-           if (!inc.includes(filters.monthlyIncome.toLowerCase())) return false;
+        // Religion
+        if (filters.religion) {
+          if (p.religion !== filters.religion) {
+            return false;
+          }
         }
         
         // Children
         if (filters.children) {
            const children = p.children.toLowerCase();
            if (!children.includes(filters.children.toLowerCase())) return false;
-        }
-
-        // Guarantee
-        if (filters.guarantee !== 'all') {
-           if (filters.guarantee === 'yes' && !p.guarantee) return false;
-           if (filters.guarantee === 'no' && p.guarantee) return false;
         }
 
       } else {
@@ -350,37 +341,52 @@ export default function ProfileList({ type }: ProfileListProps) {
           return false;
         }
         
-        // Annual Income
-        if (filters.annualIncome) {
-           const inc = p.income.toLowerCase();
-           if (!inc.includes(filters.annualIncome.toLowerCase())) return false;
+        // Annual Income Range Filter (Groom)
+        if (filters.annualIncomeRange[0] !== 0 || filters.annualIncomeRange[1] !== 100000000) {
+          // income 문자열에서 숫자 추출 (예: "3000만원" -> 30000000)
+          const incomeStr = p.income || '';
+          // 숫자만 추출 (만원, 억원 등 단위 제거)
+          const incomeMatch = incomeStr.match(/(\d+(?:\.\d+)?)/);
+          let incomeValue = 0;
+          
+          if (incomeMatch) {
+            const num = parseFloat(incomeMatch[1]);
+            // "만원" 단위인지 "억원" 단위인지 확인
+            if (incomeStr.includes('억') || incomeStr.includes('억원')) {
+              incomeValue = num * 100000000; // 억원 -> 원
+            } else if (incomeStr.includes('만') || incomeStr.includes('만원')) {
+              incomeValue = num * 10000; // 만원 -> 원
+            } else {
+              // 단위가 없으면 그대로 사용 (원 단위로 가정)
+              incomeValue = num;
+            }
+          }
+          
+          if (incomeValue < filters.annualIncomeRange[0] || incomeValue > filters.annualIncomeRange[1]) {
+            return false;
+          }
         }
         
         
         // Smoking
         if (filters.smoking !== 'all') {
-           const smoking = p.smoking.toLowerCase();
-           if (filters.smoking === 'no') {
-              if (!smoking.includes('안 함') && !smoking.includes('없음') && !smoking.includes('không') && !smoking.includes('no')) return false;
-           } else {
-              if (smoking.includes('안 함') || smoking.includes('없음') || smoking.includes('không') || smoking.includes('no')) return false;
-           }
+          if (p.smoking !== filters.smoking) {
+            return false;
+          }
         }
         
-        // Drinking
-        if (filters.drinking !== 'all') {
-           const drinking = p.drinking.toLowerCase();
-           if (filters.drinking === 'no') {
-              if (!drinking.includes('안 함') && !drinking.includes('없음') && !drinking.includes('không') && !drinking.includes('no') && !drinking.includes('hiếm')) return false;
-           } else {
-              if (drinking.includes('안 함') || drinking.includes('없음') || drinking.includes('không') || drinking.includes('no')) return false;
-           }
+        // Drinking (Text search)
+        if (filters.drinking && filters.drinking !== 'all') {
+          const drinking = p.drinking.toLowerCase();
+          const searchTerm = filters.drinking.toLowerCase();
+          if (!drinking.includes(searchTerm)) return false;
         }
         
-        // Religion
+        // Religion (exact match)
         if (filters.religion) {
-           const rel = p.religion.toLowerCase();
-           if (!rel.includes(filters.religion.toLowerCase())) return false;
+          if (p.religion !== filters.religion) {
+            return false;
+          }
         }
       }
 
@@ -483,9 +489,9 @@ export default function ProfileList({ type }: ProfileListProps) {
             </SheetTrigger>
             <SheetContent side="bottom" className="h-[85vh] rounded-t-2xl">
               <SheetHeader>
-                <SheetTitle>{t('profile.filters')}</SheetTitle>
+                <SheetTitle>{t('profile.filters.title')}</SheetTitle>
                 <SheetDescription>
-                    {t('profile.filters')}
+                    {t('profile.filters.title')}
                 </SheetDescription>
               </SheetHeader>
               <div className="mt-6 h-[calc(85vh-8rem)] overflow-y-auto pr-4 pb-20">
