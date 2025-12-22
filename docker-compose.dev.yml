@@ -1,0 +1,24 @@
+# 로컬 개발 환경용 Docker Compose 오버라이드
+# 사용법: docker-compose -f docker-compose.yml -f docker-compose.dev.yml up
+
+services:
+  app:
+    build:
+      args:
+        # 로컬 개발용 빌드 타임 환경 변수
+        VITE_API_BASE_URL: ${VITE_API_BASE_URL:-http://localhost:4000}
+        VITE_GOOGLE_CLIENT_ID: ${VITE_GOOGLE_CLIENT_ID:-${GOOGLE_CLIENT_ID:-}}
+        BUILD_VALIDATE_ENV: ${BUILD_VALIDATE_ENV:-false}
+    environment:
+      # 로컬 개발용 런타임 환경 변수
+      NODE_ENV: ${NODE_ENV:-development}
+      CORS_ORIGIN: ${CORS_ORIGIN:-http://localhost:4000}
+      FRONTEND_URL: ${FRONTEND_URL:-http://localhost:4000}
+      GOOGLE_REDIRECT_URI: ${GOOGLE_REDIRECT_URI:-http://localhost:4000/api/auth/google/callback}
+    # 개발 모드에서는 볼륨 마운트로 소스 코드 변경 감지 가능
+    volumes:
+      - ./uploads:/app/uploads
+      # 필요시 소스 코드도 마운트 가능 (빠른 개발용)
+      # - ./src:/app/src:ro
+      # - ./server:/app/server:ro
+

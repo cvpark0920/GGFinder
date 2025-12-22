@@ -81,12 +81,21 @@
             "migrate:deploy": "prisma migrate deploy",
             "migrate:dev": "prisma migrate dev",
             "prisma:generate": "prisma generate",
+            "create-super-admin": "tsx server/scripts/create-super-admin.ts",
+            "setup:env:local": "bash scripts/setup-env-local.sh",
+            "setup:env:production": "bash scripts/setup-env-production.sh",
             "docker:build": "docker-compose build",
             "docker:up": "docker-compose up -d",
             "docker:down": "docker-compose down",
             "docker:logs": "docker-compose logs -f",
             "docker:restart": "docker-compose restart",
             "docker:clean": "docker-compose down -v",
-            "create-super-admin": "tsx server/scripts/create-super-admin.ts"
+            "docker:dev": "bash -c 'if [ ! -f .env.local ]; then npm run setup:env:local; fi && docker-compose -f docker-compose.yml -f docker-compose.dev.yml --env-file .env.local build --no-cache && docker-compose -f docker-compose.yml -f docker-compose.dev.yml --env-file .env.local up -d'",
+            "docker:dev:down": "docker-compose -f docker-compose.yml -f docker-compose.dev.yml down",
+            "docker:dev:logs": "docker-compose -f docker-compose.yml -f docker-compose.dev.yml logs -f",
+            "docker:dev:restart": "docker-compose -f docker-compose.yml -f docker-compose.dev.yml restart",
+            "docker:dev:clean": "docker-compose -f docker-compose.yml -f docker-compose.dev.yml down -v",
+            "test:local": "bash scripts/test-local.sh",
+            "deploy:check": "bash scripts/deploy-check.sh"
       }
 }

@@ -58,6 +58,11 @@ export function UserTabContent({
 }: UserTabContentProps) {
   const isSuperAdmin = currentUser?.role === 'super_admin';
   
+  // 슈퍼 관리자가 아닌 경우 슈퍼 관리자 계정을 목록에서 제외
+  const filteredUsers = isSuperAdmin 
+    ? users 
+    : users.filter(user => user.role !== 'super_admin');
+  
   const canEditUser = (user: User) => {
     // 슈퍼 관리자 계정은 슈퍼 관리자만 수정 가능
     if (user.role === 'super_admin' && !isSuperAdmin) {
@@ -130,7 +135,7 @@ export function UserTabContent({
             </TableRow>
           </TableHeader>
           <TableBody>
-            {users.map((user, index) => (
+            {filteredUsers.map((user, index) => (
               <TableRow 
                 key={user.id}
                 className="hover:bg-gradient-to-r hover:from-rose-50/30 hover:via-white hover:to-rose-50/30 transition-all duration-150 border-b border-slate-100 group"
@@ -192,25 +197,46 @@ export function UserTabContent({
                         )}
                       </DropdownMenuItem>
                       <DropdownMenuSeparator />
-                      <DropdownMenuItem onClick={() => onUpdateStatus(user.id, "active")}>
+                      <DropdownMenuItem 
+                        onClick={() => onUpdateStatus(user.id, "active")}
+                        disabled={!canEditUser(user)}
+                        className={!canEditUser(user) ? "opacity-50 cursor-not-allowed" : ""}
+                      >
                         <CheckCircle2 className="mr-2 h-4 w-4 text-green-600" />
                         <span>활동 승인 / 활성화</span>
+                        {!canEditUser(user) && (
+                          <span className="ml-auto text-xs text-slate-400">권한 없음</span>
+                        )}
                       </DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => onUpdateStatus(user.id, "suspended")}>
+                      <DropdownMenuItem 
+                        onClick={() => onUpdateStatus(user.id, "suspended")}
+                        disabled={!canEditUser(user)}
+                        className={!canEditUser(user) ? "opacity-50 cursor-not-allowed" : ""}
+                      >
                         <XCircle className="mr-2 h-4 w-4 text-red-600" />
                         <span>계정 정지</span>
+                        {!canEditUser(user) && (
+                          <span className="ml-auto text-xs text-slate-400">권한 없음</span>
+                        )}
                       </DropdownMenuItem>
                       <DropdownMenuSeparator />
-                      <DropdownMenuItem className="text-red-600" onClick={() => onDelete(user.id)}>
+                      <DropdownMenuItem 
+                        className={`text-red-600 ${!canEditUser(user) ? "opacity-50 cursor-not-allowed" : ""}`}
+                        onClick={() => onDelete(user.id)}
+                        disabled={!canEditUser(user)}
+                      >
                         <UserIcon className="mr-2 h-4 w-4" />
                         <span>사용자 삭제</span>
+                        {!canEditUser(user) && (
+                          <span className="ml-auto text-xs text-slate-400">권한 없음</span>
+                        )}
                       </DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
                 </TableCell>
               </TableRow>
             ))}
-            {users.length === 0 && (
+            {filteredUsers.length === 0 && (
               <TableRow>
                 <TableCell colSpan={8} className="text-center py-12 text-slate-500 bg-slate-50/50">
                   <div className="flex flex-col items-center gap-2">
@@ -225,7 +251,7 @@ export function UserTabContent({
 
       {/* Mobile View: Cards */}
       <div className="space-y-3 md:hidden">
-          {users.map((user) => (
+          {filteredUsers.map((user) => (
             <div key={user.id} className="bg-white border rounded-xl p-4 shadow-sm">
               <div className="flex justify-between items-start mb-3">
                 <div className="flex gap-3">
@@ -265,15 +291,36 @@ export function UserTabContent({
                       )}
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
-                    <DropdownMenuItem onClick={() => onUpdateStatus(user.id, "active")}>
+                    <DropdownMenuItem 
+                      onClick={() => onUpdateStatus(user.id, "active")}
+                      disabled={!canEditUser(user)}
+                      className={!canEditUser(user) ? "opacity-50 cursor-not-allowed" : ""}
+                    >
                       승인 / 활성화
+                      {!canEditUser(user) && (
+                        <span className="ml-auto text-xs text-slate-400">권한 없음</span>
+                      )}
                     </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => onUpdateStatus(user.id, "suspended")}>
+                    <DropdownMenuItem 
+                      onClick={() => onUpdateStatus(user.id, "suspended")}
+                      disabled={!canEditUser(user)}
+                      className={!canEditUser(user) ? "opacity-50 cursor-not-allowed" : ""}
+                    >
                       계정 정지
+                      {!canEditUser(user) && (
+                        <span className="ml-auto text-xs text-slate-400">권한 없음</span>
+                      )}
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
-                    <DropdownMenuItem className="text-red-600" onClick={() => onDelete(user.id)}>
+                    <DropdownMenuItem 
+                      className={`text-red-600 ${!canEditUser(user) ? "opacity-50 cursor-not-allowed" : ""}`}
+                      onClick={() => onDelete(user.id)}
+                      disabled={!canEditUser(user)}
+                    >
                       사용자 삭제
+                      {!canEditUser(user) && (
+                        <span className="ml-auto text-xs text-slate-400">권한 없음</span>
+                      )}
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
@@ -297,7 +344,7 @@ export function UserTabContent({
               </div>
             </div>
           ))}
-          {users.length === 0 && (
+          {filteredUsers.length === 0 && (
             <div className="text-center py-10 text-slate-500 bg-white rounded-xl border border-dashed">
               등록된 사용자가 없습니다.
             </div>

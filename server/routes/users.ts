@@ -13,7 +13,19 @@ const adminOnly = [authenticateToken, requireRole('super_admin', 'platform_admin
  */
 router.get('/', ...adminOnly, async (req: Request, res: Response) => {
   try {
+    const isSuperAdmin = req.user && req.user.role === 'super_admin';
+    
+    // 슈퍼 관리자가 아닌 경우 슈퍼 관리자 계정 제외
+    const whereClause = isSuperAdmin 
+      ? undefined 
+      : { 
+          role: { 
+            not: 'super_admin' as const 
+          } 
+        };
+    
     const users = await prisma.user.findMany({
+      where: whereClause,
       include: {
         agency: true,
       },
@@ -228,6 +240,13 @@ router.patch('/:id', authenticateToken, async (req: Request, res: Response) => {
       });
     }
     
+    // 슈퍼 관리자 계정의 상태 변경도 슈퍼 관리자만 가능
+    if (targetIsSuperAdmin && !isSuperAdmin && status !== undefined) {
+      return res.status(403).json({ 
+        error: '슈퍼 관리자 계정의 상태는 슈퍼 관리자만 변경할 수 있습니다.' 
+      });
+    }
+    
     // 본인 정보 업데이트인 경우, realName과 phone만 수정 가능
     if (isSelfUpdate && !isAdmin) {
       const allowedFields = ['realName', 'phone'];
@@ -357,6 +376,16 @@ router.delete('/:id', ...adminOnly, async (req: Request, res: Response) => {
 
     if (!user) {
       return res.status(404).json({ error: '사용자를 찾을 수 없습니다.' });
+    }
+
+    // 슈퍼 관리자 계정은 슈퍼 관리자만 삭제 가능
+    const isSuperAdmin = req.user && req.user.role === 'super_admin';
+    const targetIsSuperAdmin = user.role === 'super_admin';
+    
+    if (targetIsSuperAdmin && !isSuperAdmin) {
+      return res.status(403).json({ 
+        error: '슈퍼 관리자 계정은 슈퍼 관리자만 삭제할 수 있습니다.' 
+      });
     }
 
     // 사용자 삭제
