@@ -69,11 +69,15 @@ export function mapClientToFrontend(client: any) {
 
   try {
     const mappedImages = client.images?.map((img: any) => {
-      if (!img || !img.url) return '';
+      if (!img || !img.url) return null;
       const imagePath = img.url.startsWith('/uploads/') ? img.url : `/uploads/images/${path.basename(img.url)}`;
       const absoluteUrl = getAbsoluteUrl(imagePath);
-      return absoluteUrl;
-    }).filter((url: string) => url !== '') || [];
+      return {
+        id: img.id,
+        url: absoluteUrl,
+        order: img.order || 0,
+      };
+    }).filter((img: any) => img !== null) || [];
     
     const mappedVideo = client.video && client.video.url ? (() => {
       const videoPath = client.video.url.startsWith('/uploads/') ? client.video.url : `/uploads/videos/${path.basename(client.video.url)}`;
@@ -791,6 +795,110 @@ router.delete('/:id', ...adminOnly, async (req: Request, res: Response) => {
     console.error('Client deletion error:', error);
     res.status(500).json({
       error: '클라이언트 삭제에 실패했습니다.',
+      message: error instanceof Error ? error.message : 'Unknown error',
+    });
+  }
+});
+
+/**
+ * 클라이언트 이미지 순서 변경 (대표 이미지 설정)
+ * PATCH /api/clients/:id/image-order
+ */
+router.patch('/:id/image-order', ...adminOnly, async (req: Request, res: Response) => {
+  try {
+    const clientId = parseInt(req.params.id);
+    const { imageId } = req.body;
+
+    if (isNaN(clientId)) {
+      return res.status(400).json({ error: '유효하지 않은 클라이언트 ID입니다.' });
+    }
+
+    if (!imageId || typeof imageId !== 'number') {
+      return res.status(400).json({ error: '유효하지 않은 이미지 ID입니다.' });
+    }
+
+    // 클라이언트와 이미지 조회
+    const client = await prisma.client.findUnique({
+      where: { id: clientId },
+      include: {
+        images: {
+          orderBy: {
+            order: 'asc',
+          },
+        },
+      },
+    });
+
+    if (!client) {
+      return res.status(404).json({ error: '클라이언트를 찾을 수 없습니다.' });
+    }
+
+    // 이미지가 해당 클라이언트에 속하는지 확인
+    const targetImage = client.images.find(img => img.id === imageId);
+    if (!targetImage) {
+      return res.status(404).json({ error: '이미지를 찾을 수 없습니다.' });
+    }
+
+    // 이미 첫 번째 이미지인 경우 변경 불필요
+    if (targetImage.order === 0) {
+      return res.json({ message: '이미 대표 이미지로 설정되어 있습니다.' });
+    }
+
+    // 트랜잭션으로 순서 변경
+    await prisma.$transaction(async (tx) => {
+      // 기존 order=0인 이미지의 order를 targetImage.order로 변경
+      const currentFirstImage = client.images.find(img => img.order === 0);
+      if (currentFirstImage) {
+        await tx.clientImage.update({
+          where: { id: currentFirstImage.id },
+          data: { order: targetImage.order },
+        });
+      }
+
+      // targetImage를 order=0으로 설정
+      await tx.clientImage.update({
+        where: { id: imageId },
+        data: { order: 0 },
+      });
+
+      // 나머지 이미지들의 order 재정렬
+      const remainingImages = client.images
+        .filter(img => img.id !== imageId && img.id !== currentFirstImage?.id)
+        .sort((a, b) => a.order - b.order);
+
+      for (let i = 0; i < remainingImages.length; i++) {
+        const newOrder = i + 1;
+        if (remainingImages[i].order !== newOrder) {
+          await tx.clientImage.update({
+            where: { id: remainingImages[i].id },
+            data: { order: newOrder },
+          });
+        }
+      }
+    });
+
+    // 업데이트된 클라이언트 조회
+    const updatedClient = await prisma.client.findUnique({
+      where: { id: clientId },
+      include: {
+        images: {
+          orderBy: {
+            order: 'asc',
+          },
+        },
+        video: true,
+        agency: true,
+      },
+    });
+
+    res.json({
+      message: '대표 이미지가 변경되었습니다.',
+      client: mapClientToFrontend(updatedClient!),
+    });
+  } catch (error) {
+    console.error('Image order update error:', error);
+    res.status(500).json({
+      error: '이미지 순서 변경에 실패했습니다.',
       message: error instanceof Error ? error.message : 'Unknown error',
     });
   }

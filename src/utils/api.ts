@@ -331,6 +331,17 @@ export async function updateClientStatus(id: number, status: string): Promise<Cl
 }
 
 /**
+ * 클라이언트 이미지 순서 변경 (대표 이미지 설정)
+ */
+export async function updateClientImageOrder(clientId: number, imageId: number): Promise<Client> {
+  const data = await apiCall<{ client: Client }>(`/api/clients/${clientId}/image-order`, {
+    method: 'PATCH',
+    body: JSON.stringify({ imageId }),
+  });
+  return data.client;
+}
+
+/**
  * 찜 목록 조회
  */
 export async function fetchFavorites(): Promise<{ id: number; clientId: number; createdAt: string; client: Client }[]> {

@@ -37,6 +37,10 @@ import {
 import { AvatarCropDialog } from "../AvatarCropDialog";
 import { Avatar, AvatarImage, AvatarFallback } from "../ui/avatar";
 import { useState, useEffect } from "react";
+import { toast } from "sonner";
+import { updateClientImageOrder, fetchClient } from "../../utils/api";
+import { Badge } from "../ui/badge";
+import { Star } from "lucide-react";
 
 interface EditGroomSheetProps {
   open: boolean;
@@ -111,6 +115,53 @@ export function EditGroomSheet({
       onAvatarChange(null);
     }
     setAvatarPreview(null);
+  };
+
+  // 이미지가 객체인지 문자열인지 확인하는 헬퍼 함수
+  const getImageUrl = (img: string | { id: number; url: string; order: number } | undefined): string => {
+    if (!img) return '';
+    return typeof img === 'string' ? img : img.url;
+  };
+
+  const getImageId = (img: string | { id: number; url: string; order: number } | undefined): number | null => {
+    if (!img || typeof img === 'string') return null;
+    return img.id;
+  };
+
+  const getImageOrder = (img: string | { id: number; url: string; order: number } | undefined): number => {
+    if (!img || typeof img === 'string') return 999; // 새로 업로드한 이미지는 큰 값
+    return img.order || 999;
+  };
+
+  // 기존 이미지와 새로 업로드한 이미지를 합쳐서 정렬
+  const allImages = [
+    ...(editingClient?.images || []).map((img, index) => ({
+      id: getImageId(img),
+      url: getImageUrl(img),
+      order: getImageOrder(img),
+      isNew: false,
+      newIndex: null as number | null,
+    })),
+    ...photoPreviewUrls.map((url, index) => ({
+      id: null as number | null,
+      url,
+      order: 999 + index,
+      isNew: true,
+      newIndex: index,
+    })),
+  ].sort((a, b) => a.order - b.order);
+
+  const handleSetPrimaryImage = async (imageId: number) => {
+    if (!editingClient) return;
+
+    try {
+      const updatedClient = await updateClientImageOrder(editingClient.id, imageId);
+      setEditingClient(updatedClient);
+      toast.success('대표 이미지가 변경되었습니다.');
+    } catch (error) {
+      console.error('Failed to update image order:', error);
+      toast.error('대표 이미지 변경에 실패했습니다.');
+    }
   };
 
   if (!editingClient) return null;

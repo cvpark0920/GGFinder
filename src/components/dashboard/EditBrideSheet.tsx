@@ -36,6 +36,10 @@ import {
 import { AvatarCropDialog } from "../AvatarCropDialog";
 import { Avatar, AvatarImage, AvatarFallback } from "../ui/avatar";
 import { useState, useEffect } from "react";
+import { toast } from "sonner";
+import { updateClientImageOrder, fetchClient } from "../../utils/api";
+import { Badge } from "../ui/badge";
+import { Star } from "lucide-react";
 
 interface EditBrideSheetProps {
   open: boolean;
@@ -111,6 +115,54 @@ export function EditBrideSheet({
     }
     setAvatarPreview(null);
   };
+
+  // 이미지가 객체인지 문자열인지 확인하는 헬퍼 함수
+  const getImageUrl = (img: string | { id: number; url: string; order: number } | undefined): string => {
+    if (!img) return '';
+    return typeof img === 'string' ? img : img.url;
+  };
+
+  const getImageId = (img: string | { id: number; url: string; order: number } | undefined): number | null => {
+    if (!img || typeof img === 'string') return null;
+    return img.id;
+  };
+
+  const getImageOrder = (img: string | { id: number; url: string; order: number } | undefined): number => {
+    if (!img || typeof img === 'string') return 999; // 새로 업로드한 이미지는 큰 값
+    return img.order || 999;
+  };
+
+  // 기존 이미지와 새로 업로드한 이미지를 합쳐서 정렬
+  const allImages = [
+    ...(editingClient?.images || []).map((img, index) => ({
+      id: getImageId(img),
+      url: getImageUrl(img),
+      order: getImageOrder(img),
+      isNew: false,
+      newIndex: null as number | null,
+    })),
+    ...photoPreviewUrls.map((url, index) => ({
+      id: null as number | null,
+      url,
+      order: 999 + index,
+      isNew: true,
+      newIndex: index,
+    })),
+  ].sort((a, b) => a.order - b.order);
+
+  const handleSetPrimaryImage = async (imageId: number) => {
+    if (!editingClient) return;
+
+    try {
+      const updatedClient = await updateClientImageOrder(editingClient.id, imageId);
+      setEditingClient(updatedClient);
+      toast.success('대표 이미지가 변경되었습니다.');
+    } catch (error) {
+      console.error('Failed to update image order:', error);
+      toast.error('대표 이미지 변경에 실패했습니다.');
+    }
+  };
+
   if (!editingClient) return null;
 
   return (
@@ -541,25 +593,65 @@ export function EditBrideSheet({
                     </span>
                   )}
                 </div>
-                {photoPreviewUrls.length > 0 && (
+                {(allImages.length > 0 || photoPreviewUrls.length > 0) && (
                   <div className="grid grid-cols-3 gap-3 mt-2">
-                    {photoPreviewUrls.map((url, index) => (
-                      <div key={index} className="relative group">
-                        <img
-                          src={url}
-                          alt={`Uploaded photo ${index + 1}`}
-                          className="w-full h-24 object-cover rounded-lg border-2 border-slate-200"
-                        />
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="absolute top-1 right-1 h-7 w-7 bg-white/95 hover:bg-white shadow-sm opacity-0 group-hover:opacity-100 transition-opacity"
-                          onClick={() => handleRemovePhoto(index)}
-                        >
-                          <X className="w-4 h-4 text-red-500" />
-                        </Button>
-                      </div>
-                    ))}
+                    {allImages.map((img, index) => {
+                      const isPrimary = index === 0;
+                      const canSetPrimary = !isPrimary && img.id !== null;
+
+                      return (
+                        <div key={img.id || `new-${img.newIndex}`} className="relative group">
+                          <img
+                            src={img.url}
+                            alt={`Photo ${index + 1}`}
+                            className={`w-full h-24 object-cover rounded-lg border-2 ${
+                              isPrimary ? 'border-rose-500 ring-2 ring-rose-200' : 'border-slate-200'
+                            }`}
+                          />
+                          {isPrimary && (
+                            <Badge className="absolute top-1 left-1 bg-rose-500 text-white text-xs px-2 py-0.5">
+                              <Star className="w-3 h-3 mr-1" />
+                              대표
+                            </Badge>
+                          )}
+                          {canSetPrimary && (
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className="absolute bottom-1 left-1 right-1 h-7 bg-white/95 hover:bg-white text-xs px-2 opacity-0 group-hover:opacity-100 transition-opacity"
+                              onClick={() => img.id && handleSetPrimaryImage(img.id)}
+                            >
+                              <Star className="w-3 h-3 mr-1" />
+                              대표로 설정
+                            </Button>
+                          )}
+                          {img.isNew && img.newIndex !== null && (
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="absolute top-1 right-1 h-7 w-7 bg-white/95 hover:bg-white shadow-sm opacity-0 group-hover:opacity-100 transition-opacity"
+                              onClick={() => handleRemovePhoto(img.newIndex!)}
+                            >
+                              <X className="w-4 h-4 text-red-500" />
+                            </Button>
+                          )}
+                          {!img.isNew && (
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="absolute top-1 right-1 h-7 w-7 bg-white/95 hover:bg-white shadow-sm opacity-0 group-hover:opacity-100 transition-opacity"
+                              onClick={() => {
+                                // 기존 이미지 삭제는 저장 시 처리되므로 여기서는 비활성화
+                                toast.info('기존 이미지는 저장 시 삭제할 수 있습니다.');
+                              }}
+                              disabled
+                            >
+                              <X className="w-4 h-4 text-slate-400" />
+                            </Button>
+                          )}
+                        </div>
+                      );
+                    })}
                   </div>
                 )}
               </div>

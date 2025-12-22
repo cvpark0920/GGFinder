@@ -89,7 +89,9 @@ export function mapClientToBrideProfile(client: Client & any): BrideProfile {
     healthIssues: client.healthIssues || '',
     desiredDestination: client.desiredDestination || '',
     guarantee: client.guarantee || false,
-    images: client.images || [],
+    images: Array.isArray(client.images) 
+      ? client.images.map((img: any) => typeof img === 'string' ? img : img.url || img)
+      : [],
     videoUrl: client.video,
     avatarUrl: client.avatarUrl,
   };
@@ -131,7 +133,9 @@ export function mapClientToGroomProfile(client: Client & any): GroomProfile {
     features: client.features || '',
     religion: client.religion || '',
     idealType: parseIdealType(client.idealType),
-    images: client.images || [],
+    images: Array.isArray(client.images) 
+      ? client.images.map((img: any) => typeof img === 'string' ? img : img.url || img)
+      : [],
     videoUrl: client.video,
     avatarUrl: client.avatarUrl,
   };

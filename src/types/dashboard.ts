@@ -45,7 +45,7 @@ export interface Client {
   features?: string;
   religion?: string;
   // 미디어
-  images?: string[];
+  images?: string[] | Array<{ id: number; url: string; order: number }>;
   video?: string;
   avatarUrl?: string; // 아바타 이미지 URL
 }

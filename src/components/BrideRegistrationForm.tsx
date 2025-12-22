@@ -28,6 +28,8 @@ import { Avatar, AvatarImage, AvatarFallback } from "./ui/avatar";
 import { useState, useEffect } from "react";
 import { AgencySelector } from "./AgencySelector";
 import { MemoTextarea } from "./MemoTextarea";
+import { Badge } from "./ui/badge";
+import { Star } from "lucide-react";
 import {
   SheetHeader,
   SheetTitle,
@@ -599,23 +601,34 @@ export function BrideRegistrationForm({
               </div>
               {photoPreviewUrls.length > 0 && (
                 <div className="grid grid-cols-3 gap-3 mt-2">
-                  {photoPreviewUrls.map((url, index) => (
-                    <div key={index} className="relative group">
-                      <img
-                        src={url}
-                        alt={`Uploaded photo ${index + 1}`}
-                        className="w-full h-24 object-cover rounded-lg border-2 border-slate-200"
-                      />
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="absolute top-1 right-1 h-7 w-7 bg-white/95 hover:bg-white shadow-sm opacity-0 group-hover:opacity-100 transition-opacity"
-                        onClick={() => handleRemovePhoto(index)}
-                      >
-                        <X className="w-4 h-4 text-red-500" />
-                      </Button>
-                    </div>
-                  ))}
+                  {photoPreviewUrls.map((url, index) => {
+                    const isPrimary = index === 0;
+                    return (
+                      <div key={index} className="relative group">
+                        <img
+                          src={url}
+                          alt={`Uploaded photo ${index + 1}`}
+                          className={`w-full h-24 object-cover rounded-lg border-2 ${
+                            isPrimary ? 'border-rose-500 ring-2 ring-rose-200' : 'border-slate-200'
+                          }`}
+                        />
+                        {isPrimary && (
+                          <Badge className="absolute top-1 left-1 bg-rose-500 text-white text-xs px-2 py-0.5">
+                            <Star className="w-3 h-3 mr-1" />
+                            대표
+                          </Badge>
+                        )}
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="absolute top-1 right-1 h-7 w-7 bg-white/95 hover:bg-white shadow-sm opacity-0 group-hover:opacity-100 transition-opacity"
+                          onClick={() => handleRemovePhoto(index)}
+                        >
+                          <X className="w-4 h-4 text-red-500" />
+                        </Button>
+                      </div>
+                    );
+                  })}
                 </div>
               )}
             </div>
