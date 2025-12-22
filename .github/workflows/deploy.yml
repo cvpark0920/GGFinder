@@ -298,7 +298,9 @@ jobs:
               # 마이그레이션 실패 확인
               if docker compose logs app 2>&1 | grep -q "failed migrations\|P3009"; then
                 echo "🔧 Detected failed migration. Attempting to resolve..."
-                docker compose exec -T app npx prisma@6.1.0 migrate resolve --applied 20251215234033_add_father_mother_age 2>/dev/null || {
+                # 누락된 마이그레이션 자동 해결
+                docker compose exec -T app npx prisma@6.1.0 migrate resolve --applied 20251215234033_add_father_mother_age 2>/dev/null || true
+                docker compose exec -T app npx prisma@6.1.0 migrate resolve --applied 20251216090000_add_avatar_url 2>/dev/null || {
                   echo "⚠️  Could not resolve migration automatically. Manual intervention may be required."
                 }
                 echo "🔄 Restarting container after migration resolution..."
