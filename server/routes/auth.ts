@@ -22,7 +22,19 @@ if (!process.env.GOOGLE_CLIENT_SECRET) {
 
 const googleClientId = process.env.GOOGLE_CLIENT_ID;
 const googleClientSecret = process.env.GOOGLE_CLIENT_SECRET;
-const googleRedirectUri = process.env.GOOGLE_REDIRECT_URI || 'http://localhost:4000/api/auth/google/callback';
+// GOOGLE_REDIRECT_URI가 없으면 FRONTEND_URL 기반으로 생성
+const frontendBaseUrl = process.env.FRONTEND_URL || process.env.CORS_ORIGIN || 'http://localhost:4000';
+const googleRedirectUri = process.env.GOOGLE_REDIRECT_URI || `${frontendBaseUrl}/api/auth/google/callback`;
+
+// 디버깅: Google OAuth 설정 로그
+console.log('[Google OAuth Config]', {
+  GOOGLE_CLIENT_ID: googleClientId ? `${googleClientId.substring(0, 20)}...` : 'NOT SET',
+  GOOGLE_CLIENT_SECRET: googleClientSecret ? 'SET' : 'NOT SET',
+  GOOGLE_REDIRECT_URI: googleRedirectUri,
+  FRONTEND_URL: process.env.FRONTEND_URL,
+  CORS_ORIGIN: process.env.CORS_ORIGIN,
+  frontendBaseUrl,
+});
 
 if (!googleClientId || !googleClientSecret) {
   console.error('⚠️ CRITICAL: Google OAuth credentials are missing!');

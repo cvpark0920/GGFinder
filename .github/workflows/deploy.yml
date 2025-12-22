@@ -165,13 +165,17 @@ jobs:
               echo "✅ .env 파일 환경 변수 교체 완료"
             else
               echo "📝 .env 파일이 없어서 새로 생성합니다..."
-              # .env 파일 생성 (GitHub Secrets 우선 사용)
-              cat <<EOF > .env
+            # Google OAuth 리디렉션 URI 생성
+            GOOGLE_REDIRECT_URI="${{ secrets.GOOGLE_REDIRECT_URI || format('{0}/api/auth/google/callback', secrets.FRONTEND_URL || 'https://finder.ggacademy.top') }}"
+            
+            # .env 파일 생성 (GitHub Secrets 우선 사용)
+            cat <<EOF > .env
             NODE_ENV=production
             PORT=4000
             JWT_SECRET=${{ secrets.JWT_SECRET }}
             GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }}
             GOOGLE_CLIENT_SECRET=${{ secrets.GOOGLE_CLIENT_SECRET }}
+            GOOGLE_REDIRECT_URI=${GOOGLE_REDIRECT_URI}
             POSTGRES_USER=app
             POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD || 'ggfinder_secure_pass' }}
             POSTGRES_DB=ggfinder
