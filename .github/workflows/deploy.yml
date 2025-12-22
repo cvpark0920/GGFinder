@@ -303,6 +303,8 @@ jobs:
                 docker compose exec -T app npx prisma@6.1.0 migrate resolve --applied 20251216090000_add_avatar_url 2>/dev/null || true
                 # 누락된 컬럼 직접 추가 시도
                 docker compose exec -T db psql -U app -d ggfinder -c "ALTER TABLE \"clients\" ADD COLUMN IF NOT EXISTS \"avatarUrl\" TEXT;" 2>/dev/null || true
+                docker compose exec -T db psql -U app -d ggfinder -c "ALTER TABLE \"favorites\" ADD COLUMN IF NOT EXISTS \"fromClientId\" INTEGER;" 2>/dev/null || true
+                docker compose exec -T db psql -U app -d ggfinder -c "CREATE INDEX IF NOT EXISTS \"favorites_fromClientId_idx\" ON \"favorites\"(\"fromClientId\");" 2>/dev/null || true
                 echo "🔄 Restarting container after migration resolution..."
                 docker compose restart app
                 sleep 10

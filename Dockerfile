@@ -82,6 +82,10 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
 # 누락된 컬럼도 자동으로 추가 (마이그레이션 전에 확인)
 CMD sh -c "echo '🔄 Checking for missing columns...' && \
   npx prisma@6.1.0 migrate resolve --applied 20251216090000_add_avatar_url 2>/dev/null || true && \
+  npx prisma@6.1.0 db execute --stdin <<EOF 2>/dev/null || true
+  ALTER TABLE \"favorites\" ADD COLUMN IF NOT EXISTS \"fromClientId\" INTEGER;
+  CREATE INDEX IF NOT EXISTS \"favorites_fromClientId_idx\" ON \"favorites\"(\"fromClientId\");
+EOF
   echo '🔄 Running database migrations...' && \
   npx prisma@6.1.0 migrate deploy 2>&1 | tee /tmp/migrate.log || MIGRATE_FAILED=1; \
   if [ \"\${MIGRATE_FAILED:-0}\" = \"1\" ] || grep -q 'failed migrations' /tmp/migrate.log || grep -q 'P3009' /tmp/migrate.log; then \
