@@ -166,7 +166,13 @@ jobs:
             else
               echo "📝 .env 파일이 없어서 새로 생성합니다..."
             # Google OAuth 리디렉션 URI 생성
-            GOOGLE_REDIRECT_URI="${{ secrets.GOOGLE_REDIRECT_URI || format('{0}/api/auth/google/callback', secrets.FRONTEND_URL || 'https://finder.ggacademy.top') }}"
+            FRONTEND_DOMAIN_FOR_REDIRECT="${{ secrets.FRONTEND_URL || 'https://finder.ggacademy.top' }}"
+            if [ -n "${{ secrets.GOOGLE_REDIRECT_URI }}" ]; then
+              GOOGLE_REDIRECT_URI="${{ secrets.GOOGLE_REDIRECT_URI }}"
+            else
+              GOOGLE_REDIRECT_URI="${FRONTEND_DOMAIN_FOR_REDIRECT}/api/auth/google/callback"
+            fi
+            echo "🔧 GOOGLE_REDIRECT_URI: ${GOOGLE_REDIRECT_URI}"
             
             # .env 파일 생성 (GitHub Secrets 우선 사용)
             cat <<EOF > .env
