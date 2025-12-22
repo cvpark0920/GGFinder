@@ -137,26 +137,36 @@ jobs:
             echo "${COMMIT_HASH}" > ${CURRENT_BACKUP}/commit_hash.txt
             echo "✅ Commit hash saved: ${COMMIT_HASH}"
             
-            # 7. 운영 환경용 .env 파일 생성 (보안 강화)
-            echo "📝 Creating .env file..."
+            # 7. 운영 환경용 .env 파일 생성 (GitHub에 포함된 .env 파일 사용)
+            echo "📝 Processing .env file..."
             
             # 프론트엔드 URL (HTTPS 도메인 또는 기본값)
             FRONTEND_URL="${{ secrets.FRONTEND_URL || 'https://finder.ggacademy.top' }}"
             VITE_API_BASE_URL="${{ secrets.VITE_API_BASE_URL || secrets.FRONTEND_URL || 'https://finder.ggacademy.top' }}"
             CORS_ORIGIN="${{ secrets.CORS_ORIGIN || secrets.FRONTEND_URL || 'https://finder.ggacademy.top' }}"
             
-            # .env.example 파일이 있으면 기존 .env와 병합, 없으면 새로 생성
-            if [ -f ".env.example" ]; then
-              echo "📋 .env.example 파일을 기반으로 .env 파일 생성..."
-              # 기존 .env 파일이 있으면 백업
-              if [ -f ".env" ]; then
-                cp .env .env.backup.$(date +%Y%m%d_%H%M%S) || true
-                echo "💾 기존 .env 파일 백업 완료"
-              fi
+            # 기존 .env 파일 백업
+            if [ -f ".env" ]; then
+              cp .env .env.backup.$(date +%Y%m%d_%H%M%S) || true
+              echo "💾 기존 .env 파일 백업 완료"
             fi
             
-            # .env 파일 생성 (GitHub Secrets 우선 사용)
-            cat <<EOF > .env
+            # GitHub에 포함된 .env 파일이 있으면 사용, 없으면 새로 생성
+            if [ -f ".env" ]; then
+              echo "📋 GitHub에 포함된 .env 파일 발견, 환경 변수 교체 중..."
+              # 환경 변수 교체 (sed를 사용하여 ${VAR} 또는 ${VAR:-default} 형식 처리)
+              sed -i "s|\${JWT_SECRET}|${{ secrets.JWT_SECRET }}|g" .env
+              sed -i "s|\${GOOGLE_CLIENT_ID}|${{ secrets.GOOGLE_CLIENT_ID }}|g" .env
+              sed -i "s|\${GOOGLE_CLIENT_SECRET}|${{ secrets.GOOGLE_CLIENT_SECRET }}|g" .env
+              sed -i "s|\${POSTGRES_PASSWORD}|${{ secrets.POSTGRES_PASSWORD || 'ggfinder_secure_pass' }}|g" .env
+              sed -i "s|\${VITE_API_BASE_URL:-https://finder.ggacademy.top}|${VITE_API_BASE_URL}|g" .env
+              sed -i "s|\${CORS_ORIGIN:-https://finder.ggacademy.top}|${CORS_ORIGIN}|g" .env
+              sed -i "s|\${FRONTEND_URL:-https://finder.ggacademy.top}|${FRONTEND_URL}|g" .env
+              echo "✅ .env 파일 환경 변수 교체 완료"
+            else
+              echo "📝 .env 파일이 없어서 새로 생성합니다..."
+              # .env 파일 생성 (GitHub Secrets 우선 사용)
+              cat <<EOF > .env
             NODE_ENV=production
             PORT=4000
             JWT_SECRET=${{ secrets.JWT_SECRET }}
@@ -173,10 +183,15 @@ jobs:
             CORS_ORIGIN=${CORS_ORIGIN}
             FRONTEND_URL=${FRONTEND_URL}
             EOF
+              echo "✅ .env 파일 생성 완료"
+            fi
             
             # .env 파일 권한 설정 (보안)
             chmod 600 .env
-            echo "✅ .env 파일 생성 완료"
+            
+            # 최종 .env 파일 내용 확인 (민감한 정보는 마스킹)
+            echo "📋 .env 파일 내용 확인 (민감한 정보 마스킹):"
+            sed 's/\(.*SECRET.*=\).*/\1***/' .env | sed 's/\(.*PASSWORD.*=\).*/\1***/' | head -20 || true
             
             # 8. Docker Compose 빌드 인자 설정
             # HTTPS 도메인 우선 사용, 없으면 IP 사용
