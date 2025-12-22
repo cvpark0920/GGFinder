@@ -428,9 +428,11 @@ export default function Dashboard() {
               </SheetTrigger>
               <SheetContent
                 side="bottom"
-                className="h-[90vh] overflow-y-auto p-0 rounded-t-2xl"
+                className="h-[80vh] max-h-[80vh] rounded-t-2xl flex flex-col overflow-hidden p-0"
+                style={{ height: '80vh', maxHeight: '80vh' }}
               >
-                <GroomRegistrationForm
+                <div className="flex-1 overflow-y-auto">
+                  <GroomRegistrationForm
                   newClient={clientsHook.newClient}
                   setNewClient={clientsHook.setNewClient}
                   selectedPhotos={fileUploadHook.selectedPhotos}
@@ -450,6 +452,7 @@ export default function Dashboard() {
                   selectedAvatar={selectedAvatar}
                   onAvatarChange={setSelectedAvatar}
                 />
+                </div>
               </SheetContent>
             </Sheet>
           )}
@@ -467,9 +470,11 @@ export default function Dashboard() {
               </SheetTrigger>
               <SheetContent
                 side="bottom"
-                className="h-[90vh] overflow-y-auto p-0 rounded-t-2xl"
+                className="h-[80vh] max-h-[80vh] rounded-t-2xl flex flex-col overflow-hidden p-0"
+                style={{ height: '80vh', maxHeight: '80vh' }}
               >
-                <BrideRegistrationForm
+                <div className="flex-1 overflow-y-auto">
+                  <BrideRegistrationForm
                   newClient={clientsHook.newClient as any}
                   setNewClient={clientsHook.setNewClient}
                   selectedPhotos={fileUploadHook.selectedPhotos}
@@ -489,6 +494,7 @@ export default function Dashboard() {
                   selectedAvatar={selectedAvatar}
                   onAvatarChange={setSelectedAvatar}
                 />
+                </div>
               </SheetContent>
             </Sheet>
           )}
@@ -506,16 +512,19 @@ export default function Dashboard() {
               </SheetTrigger>
               <SheetContent
                 side="bottom"
-                className="h-[90vh] overflow-y-auto p-0 rounded-t-2xl"
+                className="h-[80vh] max-h-[80vh] rounded-t-2xl flex flex-col overflow-hidden p-0"
+                style={{ height: '80vh', maxHeight: '80vh' }}
               >
-                <UserForm
-                  agencies={agenciesHook.agencies}
-                  onSubmit={async (data) => {
-                    await usersHook.handleAddUser(data);
-                    dialogStateHook.setIsAddUserOpen(false);
-                  }}
-                  onCancel={() => dialogStateHook.setIsAddUserOpen(false)}
-                />
+                <div className="flex-1 overflow-y-auto">
+                  <UserForm
+                    agencies={agenciesHook.agencies}
+                    onSubmit={async (data) => {
+                      await usersHook.handleAddUser(data);
+                      dialogStateHook.setIsAddUserOpen(false);
+                    }}
+                    onCancel={() => dialogStateHook.setIsAddUserOpen(false)}
+                  />
+                </div>
               </SheetContent>
             </Sheet>
           )}
@@ -533,9 +542,11 @@ export default function Dashboard() {
               </SheetTrigger>
               <SheetContent
                 side="bottom"
-                className="h-[90vh] overflow-y-auto p-0 rounded-t-2xl"
+                className="h-[80vh] max-h-[80vh] rounded-t-2xl flex flex-col overflow-hidden p-0"
+                style={{ height: '80vh', maxHeight: '80vh' }}
               >
-                <AgencyRegistrationForm
+                <div className="flex-1 overflow-y-auto">
+                  <AgencyRegistrationForm
                   newAgency={agenciesHook.newAgency}
                   setNewAgency={agenciesHook.setNewAgency}
                   onClose={() => dialogStateHook.setIsAddAgencyOpen(false)}
@@ -548,6 +559,7 @@ export default function Dashboard() {
                     }
                   }}
                 />
+                </div>
               </SheetContent>
             </Sheet>
           )}
@@ -568,9 +580,11 @@ export default function Dashboard() {
               </SheetTrigger>
               <SheetContent
                 side="bottom"
-                className="h-[90vh] overflow-y-auto p-0 rounded-t-2xl"
+                className="h-[80vh] max-h-[80vh] rounded-t-2xl flex flex-col overflow-hidden p-0"
+                style={{ height: '80vh', maxHeight: '80vh' }}
               >
-                <YouTubeRegistrationForm
+                <div className="flex-1 overflow-y-auto">
+                  <YouTubeRegistrationForm
                   initialData={videosHook.editingVideo || undefined}
                   onSubmit={async (data) => {
                     const success = await videosHook.handleAddVideo(data);
@@ -584,6 +598,7 @@ export default function Dashboard() {
                     videosHook.resetEditingVideo();
                   }}
                 />
+                </div>
               </SheetContent>
             </Sheet>
           )}
@@ -594,10 +609,12 @@ export default function Dashboard() {
           >
             <SheetContent
               side="bottom"
-              className="h-[90vh] overflow-y-auto p-0 rounded-t-2xl"
+              className="h-[80vh] max-h-[80vh] rounded-t-2xl flex flex-col overflow-hidden p-0"
+              style={{ height: '80vh', maxHeight: '80vh' }}
             >
-              {usersHook.editingUser && (
-                <UserForm
+              <div className="flex-1 overflow-y-auto">
+                {usersHook.editingUser && (
+                  <UserForm
                   initialData={usersHook.editingUser}
                   agencies={agenciesHook.agencies}
                   currentUser={user}
@@ -607,7 +624,8 @@ export default function Dashboard() {
                   }}
                   onCancel={() => dialogStateHook.setIsEditUserOpen(false)}
                 />
-              )}
+                )}
+              </div>
             </SheetContent>
           </Sheet>
         </div>
@@ -833,10 +851,10 @@ export default function Dashboard() {
 
       {/* Profile Detail Sheet */}
       <Sheet open={profileDetailOpen} onOpenChange={setProfileDetailOpen}>
-        <SheetContent side="bottom" className="h-[90vh] overflow-hidden flex flex-col p-0 rounded-t-2xl">
+        <SheetContent side="bottom" className="h-[80vh] max-h-[80vh] overflow-hidden flex flex-col p-0 rounded-t-2xl" style={{ height: '80vh', maxHeight: '80vh' }}>
           {selectedProfile && (
             <>
-              <SheetHeader className="px-6 py-4 border-b bg-white sticky top-0 z-10 shadow-sm rounded-t-2xl">
+              <SheetHeader className="px-6 py-4 border-b bg-white sticky top-0 z-10 shadow-sm rounded-t-2xl flex-shrink-0">
                 <SheetTitle className="flex items-center gap-3">
                   <Avatar className="w-10 h-10 border-2 border-slate-200 shadow-md">
                     {selectedProfile.avatarUrl ? (

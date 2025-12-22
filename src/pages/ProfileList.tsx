@@ -22,7 +22,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import { Badge } from '../components/ui/badge';
 import { Button } from '../components/ui/button';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle, CardDescription } from '../components/ui/card';
-import { Sheet, SheetContent, SheetTrigger, SheetHeader, SheetTitle, SheetDescription } from '../components/ui/sheet';
+import { Sheet, SheetContent, SheetTrigger, SheetHeader, SheetTitle } from '../components/ui/sheet';
 import {
   Select,
   SelectContent,
@@ -39,7 +39,6 @@ import { mapClientToBrideProfile, mapClientToGroomProfile } from '../utils/dashb
 import { getProfileDisplayName } from '../utils/profileUtils';
 import { useAuth } from '../components/AuthContext';
 import { toast } from 'sonner';
-import { Avatar, AvatarImage, AvatarFallback } from '../components/ui/avatar';
 import { useNavigate } from 'react-router-dom';
 import { ProfileSelectDialog } from '../components/ProfileSelectDialog';
 
@@ -487,11 +486,11 @@ export default function ProfileList({ type }: ProfileListProps) {
                 {t('common.filter')}
               </Button>
             </SheetTrigger>
-            <SheetContent side="bottom" className="h-[85vh] rounded-t-2xl">
-              <SheetHeader>
+            <SheetContent side="bottom" className="h-[80vh] max-h-[80vh] rounded-t-2xl flex flex-col overflow-hidden p-0" style={{ height: '80vh', maxHeight: '80vh' }}>
+              <SheetHeader className="px-6 pt-6 pb-4 flex-shrink-0">
                 <SheetTitle>{t('profile.filters.title')}</SheetTitle>
               </SheetHeader>
-              <div className="mt-6 h-[calc(85vh-8rem)] overflow-y-auto pr-4 pb-20">
+              <div className="flex-1 overflow-y-auto px-6 pb-6">
                 <ProfileFilters 
                   type={type} 
                   filters={filters} 
@@ -527,355 +526,328 @@ export default function ProfileList({ type }: ProfileListProps) {
               <p className="text-sm text-slate-500 mt-1">{error}</p>
             </div>
           ) : sortedProfiles.length > 0 ? (
-            sortedProfiles.map((profile) => (
-              <div key={profile.id} className="group h-full">
-                <Sheet>
-                  <SheetTrigger asChild>
-                    <div className="h-full cursor-pointer">
-                      <Card className="overflow-hidden border-0 shadow-sm hover:shadow-lg transition-all duration-300 h-full flex flex-col bg-gradient-to-br from-white to-slate-50/30">
-                        {/* Accent bar */}
-                        <div className="absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-rose-400 to-pink-500 opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                        
-                        <div className="aspect-[3/4] relative overflow-hidden bg-slate-100">
-                          {/* Main Image Only */}
-                          <img 
-                            src={profile.images[0]} 
-                            alt={getProfileDisplayName(profile)}
-                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                          />
-                          
-                          {/* Status Badge */}
-                          <div className="absolute top-3 right-3 z-10">
-                            <Badge className={`${STATUS_COLORS[profile.status]} text-white border-0 shadow-md`}>
-                              {STATUS_LABELS[profile.status]}
-                            </Badge>
-                          </div>
-
-                          {/* Age Badge */}
-                          <div className="absolute top-3 left-3 z-10">
-                            <Badge variant="secondary" className="bg-white/90 backdrop-blur-sm text-slate-800 border-0 shadow-md">
-                              {getAge(profile)}세
-                            </Badge>
-                          </div>
-
-                          {/* 찜하기 버튼 - 프로필 목록 카드 사진 위 */}
-                          {((type === 'bride' && user?.agency?.role === 'groom') || (type === 'groom' && user?.agency?.role === 'bride')) && (
-                            <motion.button
-                              onClick={(e) => toggleFavorite(e, profile.id)}
-                              className="absolute bottom-3 right-3 z-10 w-12 h-12 rounded-full bg-white/90 backdrop-blur-sm shadow-lg flex items-center justify-center hover:bg-white transition-colors"
-                              whileTap={{ scale: 0.9 }}
-                              aria-label={favorites.has(profile.id) ? "찜 해제" : "찜하기"}
-                            >
-                              <Heart 
-                                className={`w-6 h-6 transition-colors ${
-                                  favorites.has(profile.id) 
-                                    ? 'fill-rose-500 text-rose-500' 
-                                    : 'text-slate-400'
-                                }`}
-                              />
-                            </motion.button>
-                          )}
-
-                        </div>
-                        
-                        <CardContent className="p-4 flex-1">
-                          <h3 className="font-bold text-lg text-slate-900 mb-1 truncate">{getProfileDisplayName(profile)}</h3>
-                          <div className="space-y-2 text-sm text-slate-600 mt-3">
-                            {((profile.height && profile.height > 0) || (profile.weight && profile.weight > 0)) && (
-                              <div className="flex items-center gap-2">
-                                <Ruler className="w-4 h-4 text-slate-400" />
-                                <span>
-                                  {profile.height && profile.height > 0 ? `${profile.height}cm` : ''}
-                                  {(profile.height && profile.height > 0) && (profile.weight && profile.weight > 0) ? ' / ' : ''}
-                                  {profile.weight && profile.weight > 0 ? `${profile.weight}kg` : ''}
-                                </span>
-                              </div>
-                            )}
-                            {profile.job && (
-                              <div className="flex items-center gap-2">
-                                <Briefcase className="w-4 h-4 text-slate-400" />
-                                <span className="truncate">{profile.job}</span>
-                              </div>
-                            )}
-                            {(type === 'bride' ? (profile as any).currentAddress : (profile as any).residence) && (
-                              <div className="flex items-center gap-2">
-                                <MapPin className="w-4 h-4 text-slate-400" />
-                                <span className="truncate">
-                                  {type === 'bride' ? (profile as any).currentAddress : (profile as any).residence}
-                                </span>
-                              </div>
-                            )}
-                          </div>
-                        </CardContent>
-                      </Card>
-                    </div>
-                  </SheetTrigger>
-
-                  <SheetContent side="bottom" className="h-[90vh] overflow-hidden flex flex-col p-0 rounded-t-2xl">
-                    <SheetHeader className="px-6 py-4 border-b bg-white sticky top-0 z-10 shadow-sm rounded-t-2xl">
-                      <div className="flex items-start justify-between gap-4">
-                        <SheetTitle className="flex items-center gap-3 flex-1">
-                          <Avatar className="w-10 h-10 border-2 border-slate-200 shadow-md">
-                            {profile.avatarUrl ? (
-                              <AvatarImage src={profile.avatarUrl} alt={getProfileDisplayName(profile)} />
-                            ) : profile.images && profile.images.length > 0 ? (
-                              <AvatarImage src={profile.images[0]} alt={getProfileDisplayName(profile)} />
-                            ) : (
-                              <AvatarFallback className={`${profile.type === 'bride' ? 'bg-gradient-to-br from-rose-400 to-pink-500' : 'bg-gradient-to-br from-indigo-400 to-indigo-600'} text-white font-bold`}>
-                                {profile.type === 'bride' ? '여' : '남'}
-                              </AvatarFallback>
-                            )}
-                          </Avatar>
-                          <div className="flex-1">
-                            <div className="flex items-center gap-2">
-                              <span className="font-bold text-lg">{getProfileDisplayName(profile)}</span>
-                              <Badge className={`${STATUS_COLORS[profile.status]} text-white border-0`}>
-                                {STATUS_LABELS[profile.status]}
-                              </Badge>
-                            </div>
-                            <p className="text-sm text-slate-500 mt-0.5">{getAge(profile)}세 · {profile.job}</p>
-                          </div>
-                        </SheetTitle>
-                        {/* 찜하기 버튼 - 헤더에 표시 */}
-                        {((type === 'bride' && user?.agency?.role === 'groom') || (type === 'groom' && user?.agency?.role === 'bride')) && (
-                          <button
-                            onClick={(e) => toggleFavorite(e, profile.id)}
-                            className="w-10 h-10 rounded-full bg-white border-2 border-slate-200 shadow-md flex items-center justify-center hover:bg-slate-50 transition-colors flex-shrink-0"
-                            aria-label={favorites.has(profile.id) ? "찜 해제" : "찜하기"}
-                          >
-                            <Heart 
-                              className={`w-5 h-5 transition-colors ${
-                                favorites.has(profile.id) 
-                                  ? 'fill-rose-500 text-rose-500' 
-                                  : 'text-slate-400'
-                              }`}
-                            />
-                          </button>
-                        )}
-                      </div>
-                      <SheetDescription className="sr-only">
-                        {getProfileDisplayName(profile)} 프로필 상세 정보 및 사진
-                      </SheetDescription>
-                    </SheetHeader>
-
-                    <div className="flex-1 overflow-y-auto">
-                      {/* Image Slider - Full Width */}
-                      <div className="relative bg-slate-100 h-[60vh]">
+            sortedProfiles.map((profile) => {
+              const isExpanded = expandedProfileId === profile.id;
+              return (
+                <div key={profile.id} className="group">
+                  <Card className="overflow-visible border-0 shadow-sm hover:shadow-lg transition-all duration-300 flex flex-col bg-gradient-to-br from-white to-slate-50/30">
+                    {/* Accent bar */}
+                    <div className="absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-rose-400 to-pink-500 opacity-0 group-hover:opacity-100 transition-opacity z-10"></div>
+                    
+                    {/* 갤러리 영역 - 항상 표시 */}
+                    <div className="aspect-[3/4] relative overflow-hidden bg-slate-100">
+                      {profile.images.length > 1 || profile.videoUrl ? (
                         <ProfileImageSlider 
                           images={profile.images} 
                           name={getProfileDisplayName(profile)}
                           videoUrl={profile.videoUrl}
                         />
+                      ) : (
+                        <img 
+                          src={profile.images[0]} 
+                          alt={getProfileDisplayName(profile)}
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                        />
+                      )}
+                      
+                      {/* Age and Status Badges */}
+                      <div className="absolute top-3 left-3 z-10 flex items-center gap-2">
+                        <Badge variant="secondary" className="bg-white/90 backdrop-blur-sm text-slate-800 border-0 shadow-md">
+                          {getAge(profile)}세
+                        </Badge>
+                        <Badge className={`${STATUS_COLORS[profile.status]} text-white border-0 shadow-md`}>
+                          {STATUS_LABELS[profile.status]}
+                        </Badge>
                       </div>
 
-                      {/* Profile Details - Settings Style */}
-                      <div className="max-w-2xl mx-auto space-y-4 p-6 pb-20">
-                        {/* Basic Info Card */}
-                        <Card>
-                          <CardHeader>
-                            <div className="flex items-center gap-2">
-                              <User className="w-5 h-5 text-rose-600" />
-                              <CardTitle>{t('profile.basicInfo')}</CardTitle>
-                            </div>
-                          </CardHeader>
-                          <CardContent className="space-y-4">
-                            {((profile.height && profile.height > 0) || (profile.weight && profile.weight > 0)) && (
-                              <div className="flex items-center justify-between">
-                                <div className="space-y-0.5">
-                                  <div className="flex items-center gap-2">
-                                    <Ruler className="w-4 h-4 text-slate-400" />
-                                    <span className="text-sm text-slate-500">{t('profile.heightWeight')}</span>
-                                  </div>
-                                  <p className="font-medium">
-                                    {profile.height && profile.height > 0 ? `${profile.height}cm` : ''}
-                                    {(profile.height && profile.height > 0) && (profile.weight && profile.weight > 0) ? ' / ' : ''}
-                                    {profile.weight && profile.weight > 0 ? `${profile.weight}kg` : ''}
-                                  </p>
-                                </div>
-                              </div>
-                            )}
+                      {/* 찜하기 버튼 - 프로필 목록 카드 사진 위 */}
+                      {((type === 'bride' && user?.agency?.role === 'groom') || (type === 'groom' && user?.agency?.role === 'bride')) && (
+                        <motion.button
+                          onClick={(e) => toggleFavorite(e, profile.id)}
+                          className="absolute bottom-3 right-3 z-10 w-12 h-12 rounded-full bg-white/90 backdrop-blur-sm shadow-lg flex items-center justify-center hover:bg-white transition-colors"
+                          whileTap={{ scale: 0.9 }}
+                          aria-label={favorites.has(profile.id) ? "찜 해제" : "찜하기"}
+                        >
+                          <Heart 
+                            className={`w-6 h-6 transition-colors ${
+                              favorites.has(profile.id) 
+                                ? 'fill-rose-500 text-rose-500' 
+                                : 'text-slate-400'
+                            }`}
+                          />
+                        </motion.button>
+                      )}
+                    </div>
+                    
+                    {/* 기본 정보 - 항상 표시 */}
+                    <CardContent className="px-4 pt-4 pb-2 flex-1">
+                      <h3 className="font-bold text-lg text-slate-900 mb-1 truncate">{getProfileDisplayName(profile)}</h3>
+                      <div className="space-y-2 text-sm text-slate-600 mt-3">
+                        {((profile.height && profile.height > 0) || (profile.weight && profile.weight > 0)) && (
+                          <div className="flex items-center gap-2">
+                            <Ruler className="w-4 h-4 text-slate-400" />
+                            <span>
+                              {profile.height && profile.height > 0 ? `${profile.height}cm` : ''}
+                              {(profile.height && profile.height > 0) && (profile.weight && profile.weight > 0) ? ' / ' : ''}
+                              {profile.weight && profile.weight > 0 ? `${profile.weight}kg` : ''}
+                            </span>
+                          </div>
+                        )}
+                        {profile.job && (
+                          <div className="flex items-center gap-2">
+                            <Briefcase className="w-4 h-4 text-slate-400" />
+                            <span className="truncate">{profile.job}</span>
+                          </div>
+                        )}
+                        {(type === 'bride' ? (profile as any).currentAddress : (profile as any).residence) && (
+                          <div className="flex items-center gap-2">
+                            <MapPin className="w-4 h-4 text-slate-400" />
+                            <span className="truncate">
+                              {type === 'bride' ? (profile as any).currentAddress : (profile as any).residence}
+                            </span>
+                          </div>
+                        )}
+                      </div>
+                    </CardContent>
 
-                            {(type === 'bride' ? (profile as any).currentAddress : (profile as any).residence) && (
-                              <div className="flex items-center justify-between">
-                                <div className="space-y-0.5">
-                                  <div className="flex items-center gap-2">
-                                    <MapPin className="w-4 h-4 text-slate-400" />
-                                    <span className="text-sm text-slate-500">{t('profile.residence')}</span>
-                                  </div>
-                                  <p className="font-medium">{type === 'bride' ? (profile as any).currentAddress : (profile as any).residence}</p>
-                                </div>
-                              </div>
-                            )}
+                    {/* 확장 버튼 */}
+                    <CardFooter className="px-4 pb-4 pt-2">
+                      <Button 
+                        variant="outline" 
+                        className="w-full gap-2"
+                        onClick={() => toggleProfile(profile.id)}
+                      >
+                        {isExpanded ? (
+                          <>
+                            <ChevronUp className="w-4 h-4" />
+                            접기
+                          </>
+                        ) : (
+                          <>
+                            <ChevronDown className="w-4 h-4" />
+                            상세보기
+                          </>
+                        )}
+                      </Button>
+                    </CardFooter>
 
-                            {profile.job && (
-                              <div className="flex items-center justify-between">
-                                <div className="space-y-0.5">
-                                  <div className="flex items-center gap-2">
-                                    <Briefcase className="w-4 h-4 text-slate-400" />
-                                    <span className="text-sm text-slate-500">{t('profile.job')}</span>
-                                  </div>
-                                  <p className="font-medium">{profile.job}</p>
+                    {/* 상세 정보 - 확장 시에만 표시 */}
+                    <AnimatePresence>
+                      {isExpanded && (
+                        <motion.div
+                          initial={{ height: 0, opacity: 0 }}
+                          animate={{ height: 'auto', opacity: 1 }}
+                          exit={{ height: 0, opacity: 0 }}
+                          transition={{ duration: 0.3 }}
+                          className="overflow-hidden"
+                        >
+                          <div className="px-4 pb-4 space-y-4">
+                            {/* Basic Info Card */}
+                            <Card>
+                              <CardHeader>
+                                <div className="flex items-center gap-2">
+                                  <User className="w-5 h-5 text-rose-600" />
+                                  <CardTitle>{t('profile.basicInfo')}</CardTitle>
                                 </div>
-                              </div>
-                            )}
-
-                            {profile.maritalStatus && (
-                              <div className="flex items-center justify-between">
-                                <div className="space-y-0.5">
-                                  <div className="flex items-center gap-2">
-                                    <Heart className="w-4 h-4 text-slate-400" />
-                                    <span className="text-sm text-slate-500">{t('profile.maritalStatus')}</span>
-                                  </div>
-                                  <p className="font-medium">{profile.maritalStatus}</p>
-                                </div>
-                              </div>
-                            )}
-                          </CardContent>
-                        </Card>
-
-                        {/* Detailed Info Card */}
-                        <Card>
-                          <CardHeader>
-                            <div className="flex items-center gap-2">
-                              <GraduationCap className="w-5 h-5 text-rose-600" />
-                              <CardTitle>{t('profile.detailedInfo')}</CardTitle>
-                            </div>
-                          </CardHeader>
-                          <CardContent className="space-y-4">
-                            {profile.type === 'bride' ? (
-                              <>
-                                <div className="flex items-center justify-between">
-                                  <div className="space-y-0.5">
-                                    <div className="flex items-center gap-2">
-                                      <GraduationCap className="w-4 h-4 text-slate-400" />
-                                      <span className="text-sm text-slate-500">학력</span>
-                                    </div>
-                                    <p className="font-medium">{(profile as BrideProfile).education}</p>
-                                  </div>
-                                </div>
-
-                                {(profile as BrideProfile).family && (
+                              </CardHeader>
+                              <CardContent className="space-y-4">
+                                {((profile.height && profile.height > 0) || (profile.weight && profile.weight > 0)) && (
                                   <div className="flex items-center justify-between">
                                     <div className="space-y-0.5">
                                       <div className="flex items-center gap-2">
-                                        <Users className="w-4 h-4 text-slate-400" />
-                                        <span className="text-sm text-slate-500">{t('profile.family')}</span>
-                                      </div>
-                                      <p className="font-medium">{(profile as BrideProfile).family}</p>
-                                    </div>
-                                  </div>
-                                )}
-
-                                {((profile as BrideProfile).fatherAge || (profile as BrideProfile).motherAge) && (
-                                  <div className="flex items-center justify-between">
-                                    <div className="space-y-0.5">
-                                      <div className="flex items-center gap-2">
-                                        <Users className="w-4 h-4 text-slate-400" />
-                                        <span className="text-sm text-slate-500">{t('profile.parentsAge')}</span>
+                                        <Ruler className="w-4 h-4 text-slate-400" />
+                                        <span className="text-sm text-slate-500">{t('profile.heightWeight')}</span>
                                       </div>
                                       <p className="font-medium">
-                                        {[(profile as BrideProfile).fatherAge && `아빠 ${(profile as BrideProfile).fatherAge}세`, 
-                                          (profile as BrideProfile).motherAge && `엄마 ${(profile as BrideProfile).motherAge}세`]
-                                          .filter(Boolean).join(', ')}
+                                        {profile.height && profile.height > 0 ? `${profile.height}cm` : ''}
+                                        {(profile.height && profile.height > 0) && (profile.weight && profile.weight > 0) ? ' / ' : ''}
+                                        {profile.weight && profile.weight > 0 ? `${profile.weight}kg` : ''}
                                       </p>
                                     </div>
                                   </div>
                                 )}
 
-                                {(profile as BrideProfile).parentsPhone && (
-                                  <div className="pt-3 border-t">
-                                    <div className="flex items-center justify-between">
-                                      <div className="space-y-0.5">
-                                        <div className="flex items-center gap-2">
-                                          <Phone className="w-4 h-4 text-slate-400" />
-                                          <span className="text-sm text-slate-500">{t('profile.parentsPhone')}</span>
-                                        </div>
-                                        <p className="font-medium">{(profile as BrideProfile).parentsPhone}</p>
-                                      </div>
-                                    </div>
-                                  </div>
-                                )}
-                              </>
-                            ) : (
-                              <>
-                                <div className="flex items-center justify-between">
-                                  <div className="space-y-0.5">
-                                    <div className="flex items-center gap-2">
-                                      <GraduationCap className="w-4 h-4 text-slate-400" />
-                                      <span className="text-sm text-slate-500">학력</span>
-                                    </div>
-                                    <p className="font-medium">{(profile as GroomProfile).education}</p>
-                                  </div>
-                                </div>
-
-                                <div className="flex items-center justify-between">
-                                  <div className="space-y-0.5">
-                                    <div className="flex items-center gap-2">
-                                      <DollarSign className="w-4 h-4 text-slate-400" />
-                                      <span className="text-sm text-slate-500">{t('profile.income')}</span>
-                                    </div>
-                                    <p className="font-medium">{(profile as GroomProfile).income}</p>
-                                  </div>
-                                </div>
-
-
-                                <div className="pt-3 border-t grid grid-cols-2 gap-4">
-                                  <div className="space-y-0.5">
-                                    <div className="flex items-center gap-2">
-                                      <Wine className="w-4 h-4 text-slate-400" />
-                                      <span className="text-sm text-slate-500">{t('profile.drinking')}</span>
-                                    </div>
-                                    <p className="font-medium">{(profile as GroomProfile).drinking}</p>
-                                  </div>
-                                  <div className="space-y-0.5">
-                                    <div className="flex items-center gap-2">
-                                      <Cigarette className="w-4 h-4 text-slate-400" />
-                                      <span className="text-sm text-slate-500">{t('profile.smoking')}</span>
-                                    </div>
-                                    <p className="font-medium">{(profile as GroomProfile).smoking}</p>
-                                  </div>
-                                </div>
-
-                                {(profile as GroomProfile).religion && (
+                                {(type === 'bride' ? (profile as any).currentAddress : (profile as any).residence) && (
                                   <div className="flex items-center justify-between">
                                     <div className="space-y-0.5">
                                       <div className="flex items-center gap-2">
-                                        <Church className="w-4 h-4 text-slate-400" />
-                                        <span className="text-sm text-slate-500">{t('profile.religion')}</span>
+                                        <MapPin className="w-4 h-4 text-slate-400" />
+                                        <span className="text-sm text-slate-500">{t('profile.residence')}</span>
                                       </div>
-                                      <p className="font-medium">{(profile as GroomProfile).religion}</p>
+                                      <p className="font-medium">{type === 'bride' ? (profile as any).currentAddress : (profile as any).residence}</p>
                                     </div>
                                   </div>
                                 )}
-                              </>
+
+                                {profile.job && (
+                                  <div className="flex items-center justify-between">
+                                    <div className="space-y-0.5">
+                                      <div className="flex items-center gap-2">
+                                        <Briefcase className="w-4 h-4 text-slate-400" />
+                                        <span className="text-sm text-slate-500">{t('profile.job')}</span>
+                                      </div>
+                                      <p className="font-medium">{profile.job}</p>
+                                    </div>
+                                  </div>
+                                )}
+
+                                {profile.maritalStatus && (
+                                  <div className="flex items-center justify-between">
+                                    <div className="space-y-0.5">
+                                      <div className="flex items-center gap-2">
+                                        <Heart className="w-4 h-4 text-slate-400" />
+                                        <span className="text-sm text-slate-500">{t('profile.maritalStatus')}</span>
+                                      </div>
+                                      <p className="font-medium">{profile.maritalStatus}</p>
+                                    </div>
+                                  </div>
+                                )}
+                              </CardContent>
+                            </Card>
+
+                            {/* Detailed Info Card */}
+                            <Card>
+                              <CardHeader>
+                                <div className="flex items-center gap-2">
+                                  <GraduationCap className="w-5 h-5 text-rose-600" />
+                                  <CardTitle>{t('profile.detailedInfo')}</CardTitle>
+                                </div>
+                              </CardHeader>
+                              <CardContent className="space-y-4">
+                                {profile.type === 'bride' ? (
+                                  <>
+                                    <div className="flex items-center justify-between">
+                                      <div className="space-y-0.5">
+                                        <div className="flex items-center gap-2">
+                                          <GraduationCap className="w-4 h-4 text-slate-400" />
+                                          <span className="text-sm text-slate-500">학력</span>
+                                        </div>
+                                        <p className="font-medium">{(profile as BrideProfile).education}</p>
+                                      </div>
+                                    </div>
+
+                                    {(profile as BrideProfile).family && (
+                                      <div className="flex items-center justify-between">
+                                        <div className="space-y-0.5">
+                                          <div className="flex items-center gap-2">
+                                            <Users className="w-4 h-4 text-slate-400" />
+                                            <span className="text-sm text-slate-500">{t('profile.family')}</span>
+                                          </div>
+                                          <p className="font-medium">{(profile as BrideProfile).family}</p>
+                                        </div>
+                                      </div>
+                                    )}
+
+                                    {((profile as BrideProfile).fatherAge || (profile as BrideProfile).motherAge) && (
+                                      <div className="flex items-center justify-between">
+                                        <div className="space-y-0.5">
+                                          <div className="flex items-center gap-2">
+                                            <Users className="w-4 h-4 text-slate-400" />
+                                            <span className="text-sm text-slate-500">{t('profile.parentsAge')}</span>
+                                          </div>
+                                          <p className="font-medium">
+                                            {[(profile as BrideProfile).fatherAge && `아빠 ${(profile as BrideProfile).fatherAge}세`, 
+                                              (profile as BrideProfile).motherAge && `엄마 ${(profile as BrideProfile).motherAge}세`]
+                                              .filter(Boolean).join(', ')}
+                                          </p>
+                                        </div>
+                                      </div>
+                                    )}
+
+                                    {(profile as BrideProfile).parentsPhone && (
+                                      <div className="pt-3 border-t">
+                                        <div className="flex items-center justify-between">
+                                          <div className="space-y-0.5">
+                                            <div className="flex items-center gap-2">
+                                              <Phone className="w-4 h-4 text-slate-400" />
+                                              <span className="text-sm text-slate-500">{t('profile.parentsPhone')}</span>
+                                            </div>
+                                            <p className="font-medium">{(profile as BrideProfile).parentsPhone}</p>
+                                          </div>
+                                        </div>
+                                      </div>
+                                    )}
+                                  </>
+                                ) : (
+                                  <>
+                                    <div className="flex items-center justify-between">
+                                      <div className="space-y-0.5">
+                                        <div className="flex items-center gap-2">
+                                          <GraduationCap className="w-4 h-4 text-slate-400" />
+                                          <span className="text-sm text-slate-500">학력</span>
+                                        </div>
+                                        <p className="font-medium">{(profile as GroomProfile).education}</p>
+                                      </div>
+                                    </div>
+
+                                    <div className="flex items-center justify-between">
+                                      <div className="space-y-0.5">
+                                        <div className="flex items-center gap-2">
+                                          <DollarSign className="w-4 h-4 text-slate-400" />
+                                          <span className="text-sm text-slate-500">{t('profile.income')}</span>
+                                        </div>
+                                        <p className="font-medium">{(profile as GroomProfile).income}</p>
+                                      </div>
+                                    </div>
+
+                                    <div className="pt-3 border-t grid grid-cols-2 gap-4">
+                                      <div className="space-y-0.5">
+                                        <div className="flex items-center gap-2">
+                                          <Wine className="w-4 h-4 text-slate-400" />
+                                          <span className="text-sm text-slate-500">{t('profile.drinking')}</span>
+                                        </div>
+                                        <p className="font-medium">{(profile as GroomProfile).drinking}</p>
+                                      </div>
+                                      <div className="space-y-0.5">
+                                        <div className="flex items-center gap-2">
+                                          <Cigarette className="w-4 h-4 text-slate-400" />
+                                          <span className="text-sm text-slate-500">{t('profile.smoking')}</span>
+                                        </div>
+                                        <p className="font-medium">{(profile as GroomProfile).smoking}</p>
+                                      </div>
+                                    </div>
+
+                                    {(profile as GroomProfile).religion && (
+                                      <div className="flex items-center justify-between">
+                                        <div className="space-y-0.5">
+                                          <div className="flex items-center gap-2">
+                                            <Church className="w-4 h-4 text-slate-400" />
+                                            <span className="text-sm text-slate-500">{t('profile.religion')}</span>
+                                          </div>
+                                          <p className="font-medium">{(profile as GroomProfile).religion}</p>
+                                        </div>
+                                      </div>
+                                    )}
+                                  </>
+                                )}
+                              </CardContent>
+                            </Card>
+
+                            {/* Memo Card if exists */}
+                            {profile.memo && (
+                              <Card>
+                                <CardHeader>
+                                  <div className="flex items-center gap-2">
+                                    <FileEdit className="w-5 h-5 text-rose-600" />
+                                    <CardTitle>{t('profile.memo')}</CardTitle>
+                                  </div>
+                                  <CardDescription>{t('profile.additionalNotes')}</CardDescription>
+                                </CardHeader>
+                                <CardContent>
+                                  <div className="bg-slate-50 border border-slate-200 rounded-lg p-4">
+                                    <p className="text-sm text-slate-700 whitespace-pre-wrap leading-relaxed">{profile.memo}</p>
+                                  </div>
+                                </CardContent>
+                              </Card>
                             )}
-                          </CardContent>
-                        </Card>
-
-                        {/* Memo Card if exists */}
-                        {profile.memo && (
-                          <Card>
-                            <CardHeader>
-                              <div className="flex items-center gap-2">
-                                <FileEdit className="w-5 h-5 text-rose-600" />
-                                <CardTitle>{t('profile.memo')}</CardTitle>
-                              </div>
-                              <CardDescription>{t('profile.additionalNotes')}</CardDescription>
-                            </CardHeader>
-                            <CardContent>
-                              <div className="bg-slate-50 border border-slate-200 rounded-lg p-4">
-                                <p className="text-sm text-slate-700 whitespace-pre-wrap leading-relaxed">{profile.memo}</p>
-                              </div>
-                            </CardContent>
-                          </Card>
-                        )}
-
-                      </div>
-                    </div>
-                  </SheetContent>
-                </Sheet>
-              </div>
-            ))
+                          </div>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </Card>
+                </div>
+              );
+            })
           ) : (
             <div className="col-span-full text-center py-12 bg-slate-50 rounded-lg border border-dashed border-slate-200">
               <Filter className="w-8 h-8 text-slate-300 mx-auto mb-3" />

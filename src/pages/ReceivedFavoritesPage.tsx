@@ -394,8 +394,8 @@ export default function ReceivedFavoritesPage() {
       {/* Profile Detail Sheet */}
       {selectedProfile && (
         <Sheet open={isDetailSheetOpen} onOpenChange={setIsDetailSheetOpen}>
-          <SheetContent side="bottom" className="h-[90vh] overflow-hidden flex flex-col p-0 rounded-t-2xl">
-            <SheetHeader className="px-6 py-4 border-b bg-white sticky top-0 z-10 shadow-sm rounded-t-2xl">
+          <SheetContent side="bottom" className="h-[80vh] max-h-[80vh] overflow-hidden flex flex-col p-0 rounded-t-2xl" style={{ height: '80vh', maxHeight: '80vh' }}>
+            <SheetHeader className="px-6 py-4 border-b bg-white sticky top-0 z-10 shadow-sm rounded-t-2xl flex-shrink-0">
               <SheetTitle className="flex items-center gap-3">
                 <Avatar className="w-10 h-10 border-2 border-slate-200 shadow-md">
                   {selectedProfile.avatarUrl ? (

@@ -271,12 +271,14 @@ export default function Layout() {
                     {t('nav.login')}
                   </Button>
                 </SheetTrigger>
-                <SheetContent side="bottom" className="h-[90vh] rounded-t-2xl p-0 overflow-y-auto">
-                  <SheetHeader className="sr-only">
+                <SheetContent side="bottom" className="h-[80vh] max-h-[80vh] rounded-t-2xl flex flex-col overflow-hidden p-0" style={{ height: '80vh', maxHeight: '80vh' }}>
+                  <SheetHeader className="sr-only flex-shrink-0">
                     <SheetTitle>로그인</SheetTitle>
                     <SheetDescription>GGFinder에 로그인하세요</SheetDescription>
                   </SheetHeader>
-                  <Login onSuccess={() => setLoginSheetOpen(false)} />
+                  <div className="flex-1 overflow-y-auto">
+                    <Login onSuccess={() => setLoginSheetOpen(false)} />
+                  </div>
                 </SheetContent>
               </Sheet>
             )}
@@ -291,12 +293,12 @@ export default function Layout() {
 
       {/* Profile Sheet */}
       <Sheet open={profileSheetOpen} onOpenChange={setProfileSheetOpen}>
-        <SheetContent side="bottom" className="h-[90vh] rounded-t-2xl p-0 overflow-y-auto">
-          <SheetHeader className="sr-only">
+        <SheetContent side="bottom" className="h-[80vh] max-h-[80vh] rounded-t-2xl flex flex-col overflow-hidden p-0" style={{ height: '80vh', maxHeight: '80vh' }}>
+          <SheetHeader className="sr-only flex-shrink-0">
             <SheetTitle>프로필</SheetTitle>
             <SheetDescription>내 프로필 정보를 확인하세요</SheetDescription>
           </SheetHeader>
-          <div className="p-6">
+          <div className="flex-1 overflow-y-auto p-6">
             <Profile />
           </div>
         </SheetContent>

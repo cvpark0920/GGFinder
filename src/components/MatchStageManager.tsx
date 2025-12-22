@@ -142,8 +142,8 @@ export default function MatchStageManager({ match, open, onOpenChange, onUpdateM
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent side="bottom" className="h-[85vh] overflow-y-auto p-0 rounded-t-2xl">
-        <SheetHeader className="px-6 pt-6 pb-4 border-b bg-gradient-to-r from-rose-50 to-pink-50 rounded-t-2xl">
+      <SheetContent side="bottom" className="h-[80vh] max-h-[80vh] rounded-t-2xl flex flex-col overflow-hidden p-0" style={{ height: '80vh', maxHeight: '80vh' }}>
+        <SheetHeader className="px-6 pt-6 pb-4 border-b bg-gradient-to-r from-rose-50 to-pink-50 rounded-t-2xl flex-shrink-0">
           <SheetTitle className="flex items-center gap-2">
             <div className="flex -space-x-2">
               <div className="w-8 h-8 rounded-full bg-slate-200 border-2 border-white flex items-center justify-center text-xs font-bold">남</div>
@@ -156,7 +156,7 @@ export default function MatchStageManager({ match, open, onOpenChange, onUpdateM
           </SheetDescription>
         </SheetHeader>
 
-        <div className="py-6 px-6 space-y-6">
+        <div className="flex-1 overflow-y-auto py-6 px-6 space-y-6">
           {/* Overall Status */}
           <div className="bg-gradient-to-br from-rose-50 to-pink-50 border border-rose-100 rounded-xl p-5 space-y-3 shadow-sm">
             <div className="flex items-center justify-between">

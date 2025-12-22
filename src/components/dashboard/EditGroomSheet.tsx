@@ -168,8 +168,8 @@ export function EditGroomSheet({
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent side="bottom" className="h-[90vh] overflow-y-auto rounded-t-2xl">
-        <SheetHeader className="pb-4 border-b bg-white sticky top-0 z-10">
+      <SheetContent side="bottom" className="h-[80vh] max-h-[80vh] rounded-t-2xl flex flex-col overflow-hidden p-0" style={{ height: '80vh', maxHeight: '80vh' }}>
+        <SheetHeader className="pb-4 border-b bg-white sticky top-0 z-10 flex-shrink-0 px-6 pt-6">
           <div className="flex items-center gap-3">
             <div className="w-12 h-12 rounded-xl bg-indigo-100 flex items-center justify-center">
               <FileEdit className="w-6 h-6 text-indigo-600" />
@@ -183,7 +183,7 @@ export function EditGroomSheet({
           </div>
         </SheetHeader>
 
-        <div className="p-6 space-y-6">
+        <div className="flex-1 overflow-y-auto p-6 space-y-6">
           {/* 기본 정보 카드 */}
           <Card>
             <CardHeader>

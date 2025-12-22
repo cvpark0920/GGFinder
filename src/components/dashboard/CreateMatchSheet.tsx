@@ -64,15 +64,15 @@ export function CreateMatchSheet({
   
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent side="bottom" className="h-[90vh] overflow-y-auto p-0 rounded-t-2xl">
-        <SheetHeader className="px-6 pt-6 pb-4 border-b bg-gradient-to-r from-rose-50 to-pink-50">
+      <SheetContent side="bottom" className="h-[80vh] max-h-[80vh] rounded-t-2xl flex flex-col overflow-hidden p-0" style={{ height: '80vh', maxHeight: '80vh' }}>
+        <SheetHeader className="px-6 pt-6 pb-4 border-b bg-gradient-to-r from-rose-50 to-pink-50 flex-shrink-0">
           <SheetTitle className="flex items-center gap-2 text-xl">
             <Heart className="w-6 h-6 text-rose-600" />
             {matchingClient?.name} {t('match.selectPartner')}
           </SheetTitle>
         </SheetHeader>
 
-        <div className="px-6 py-6 space-y-6">
+        <div className="flex-1 overflow-y-auto px-6 py-6 space-y-6">
           {/* Partner Search */}
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />

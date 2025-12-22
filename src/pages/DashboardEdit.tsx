@@ -66,12 +66,12 @@ export function EditGroomSheet({
 
   return (
     <Sheet open={isOpen} onOpenChange={onClose}>
-      <SheetContent side="bottom" className="h-[90vh] overflow-y-auto">
-        <SheetHeader>
+      <SheetContent side="bottom" className="h-[80vh] max-h-[80vh] rounded-t-2xl flex flex-col overflow-hidden p-0" style={{ height: '80vh', maxHeight: '80vh' }}>
+        <SheetHeader className="flex-shrink-0 px-6 pt-6">
           <SheetTitle>신랑 정보 수정</SheetTitle>
           <SheetDescription>신랑 회원의 정보를 수정하세요.</SheetDescription>
         </SheetHeader>
-        <div className="grid gap-4 py-4 px-4">
+        <div className="flex-1 overflow-y-auto grid gap-4 py-4 px-4">
           <div className="grid grid-cols-2 gap-4">
             <div className="grid gap-2">
               <Label htmlFor="edit-g-name">이름</Label>

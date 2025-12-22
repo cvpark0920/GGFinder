@@ -682,12 +682,13 @@ export default function Messages() {
       <Sheet open={isChatOpen} onOpenChange={setIsChatOpen}>
         <SheetContent
           side="bottom"
-          className="h-[90vh] flex flex-col p-0 rounded-t-[32px] overflow-hidden"
+          className="h-[80vh] max-h-[80vh] flex flex-col p-0 rounded-t-[32px] overflow-hidden"
+          style={{ height: '80vh', maxHeight: '80vh' }}
         >
           {selectedRoom && (
             <>
               {/* Header */}
-              <SheetHeader className="px-4 py-3 border-b shrink-0 bg-white/80 backdrop-blur-md sticky top-0 z-50">
+              <SheetHeader className="px-4 py-3 border-b shrink-0 flex-shrink-0 bg-white/80 backdrop-blur-md sticky top-0 z-50">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-1 md:gap-3">
                     <Button

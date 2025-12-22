@@ -55,9 +55,10 @@ export function EditAgencySheet({
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent
         side="bottom"
-        className="h-[90vh] overflow-y-auto rounded-t-2xl px-6"
+        className="h-[80vh] max-h-[80vh] rounded-t-2xl flex flex-col overflow-hidden p-0"
+        style={{ height: '80vh', maxHeight: '80vh' }}
       >
-        <SheetHeader className="space-y-3 pb-6 border-b">
+        <SheetHeader className="space-y-3 pb-6 border-b flex-shrink-0 px-6 pt-6">
           <div className="flex items-center gap-3">
             <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-400 to-indigo-500 flex items-center justify-center">
               <Pencil className="w-6 h-6 text-white" />
@@ -69,7 +70,7 @@ export function EditAgencySheet({
           </div>
         </SheetHeader>
 
-        <div className="mt-6 space-y-6 pb-6">
+        <div className="flex-1 overflow-y-auto px-6 mt-6 space-y-6 pb-6">
           {/* 기본 정보 섹션 */}
           <div className="bg-slate-50 rounded-xl p-4 space-y-4">
             <div className="flex items-center gap-2 mb-3">
