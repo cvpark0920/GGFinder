@@ -190,15 +190,11 @@ export default function Layout() {
           <div className="flex items-center gap-3">
             {isAuthenticated && (user.status === 'active' || user.role === 'super_admin' || user.role === 'platform_admin') && (
               <div className="hidden md:flex gap-2 mr-2 border-r border-slate-200 pr-4">
-                {user.role === 'super_admin' || user.role === 'platform_admin' ? (
+                {user.role === 'super_admin' && (
                   <Button variant="ghost" size="icon" asChild className="text-slate-500">
                     <Link to="/messages">
                       <MessageCircle className="w-5 h-5" />
                     </Link>
-                  </Button>
-                ) : (
-                  <Button variant="ghost" size="icon" className="text-slate-500" onClick={handleMessagesClick}>
-                    <MessageCircle className="w-5 h-5" />
                   </Button>
                 )}
               </div>
@@ -336,19 +332,11 @@ export default function Layout() {
                   <span className="text-[10px] font-medium">{t('nav.dashboard')}</span>
                 </Link>
               )}
-              {user.role === 'super_admin' || user.role === 'platform_admin' ? (
+              {user.role === 'super_admin' && (
                 <Link to="/messages" className={`flex flex-col items-center gap-1 p-2 ${isActive('/messages') ? 'text-rose-600' : 'text-slate-400'}`}>
                   <MessageCircle className="w-5 h-5" />
                   <span className="text-[10px] font-medium">{t('nav.messages')}</span>
                 </Link>
-              ) : (
-                <button
-                  onClick={handleMessagesClick}
-                  className={`flex flex-col items-center gap-1 p-2 ${isActive('/messages') ? 'text-rose-600' : 'text-slate-400'}`}
-                >
-                  <MessageCircle className="w-5 h-5" />
-                  <span className="text-[10px] font-medium">{t('nav.messages')}</span>
-                </button>
               )}
             </>
           ) : (
@@ -368,21 +356,6 @@ export default function Layout() {
                 <LayoutDashboard className="w-5 h-5" />
                 <span className="text-[10px] font-medium">{t('nav.dashboard')}</span>
               </button>
-              <button
-                onClick={(e) => {
-                  e.preventDefault();
-                  // 메시지는 항상 관리자만 접근 가능
-                  if (!isAuthenticated || !user || (user.role !== 'super_admin' && user.role !== 'platform_admin')) {
-                    setServicePendingModalOpen(true);
-                  } else {
-                    navigate('/messages');
-                  }
-                }}
-                className={`flex flex-col items-center gap-1 p-2 ${isActive('/messages') ? 'text-rose-600' : 'text-slate-400'}`}
-              >
-                <MessageCircle className="w-5 h-5" />
-                <span className="text-[10px] font-medium">{t('nav.messages')}</span>
-              </button>
             </>
           )
         ) : (
@@ -400,21 +373,6 @@ export default function Layout() {
             >
               <LayoutDashboard className="w-5 h-5" />
               <span className="text-[10px] font-medium">{t('nav.dashboard')}</span>
-            </button>
-            <button
-              onClick={(e) => {
-                e.preventDefault();
-                // 메시지는 항상 관리자만 접근 가능
-                if (!isAuthenticated || !user || (user.role !== 'super_admin' && user.role !== 'platform_admin')) {
-                  setServicePendingModalOpen(true);
-                } else {
-                  navigate('/messages');
-                }
-              }}
-              className={`flex flex-col items-center gap-1 p-2 ${isActive('/messages') ? 'text-rose-600' : 'text-slate-400'}`}
-            >
-              <MessageCircle className="w-5 h-5" />
-              <span className="text-[10px] font-medium">{t('nav.messages')}</span>
             </button>
           </>
         )}
