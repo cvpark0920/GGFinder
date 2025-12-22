@@ -25,7 +25,7 @@ services:
       dockerfile: Dockerfile
       args:
         # 빌드 타임 환경 변수 (Dockerfile의 ARG로 전달)
-        VITE_API_BASE_URL: ${VITE_API_BASE_URL:-http://localhost:4000}
+        VITE_API_BASE_URL: ${VITE_API_BASE_URL:-https://finder.ggacademy.top}
         VITE_GOOGLE_CLIENT_ID: ${VITE_GOOGLE_CLIENT_ID:-${GOOGLE_CLIENT_ID:-}}
         BUILD_VALIDATE_ENV: ${BUILD_VALIDATE_ENV:-false}
     container_name: ggfinder_app
@@ -42,8 +42,9 @@ services:
       GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:-}
       GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET:-}
       # CORS 및 프론트엔드 URL 설정
-      CORS_ORIGIN: ${CORS_ORIGIN:-http://localhost:4000}
-      FRONTEND_URL: ${FRONTEND_URL:-http://localhost:4000}
+      CORS_ORIGIN: ${CORS_ORIGIN:-https://finder.ggacademy.top}
+      FRONTEND_URL: ${FRONTEND_URL:-https://finder.ggacademy.top}
+      GOOGLE_REDIRECT_URI: ${GOOGLE_REDIRECT_URI:-${FRONTEND_URL:-https://finder.ggacademy.top}/api/auth/google/callback}
     volumes:
       - ./uploads:/app/uploads
     depends_on:
