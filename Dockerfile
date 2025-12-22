@@ -63,6 +63,10 @@ RUN npm ci --only=production
 COPY --from=builder /app/build ./build
 COPY --from=builder /app/server/dist ./server/dist
 
+# Copy scripts for fixing missing columns
+COPY scripts/fix-missing-columns.sh ./scripts/fix-missing-columns.sh
+RUN chmod +x ./scripts/fix-missing-columns.sh
+
 # Generate Prisma Client for production (explicitly use Prisma 6.1.0)
 RUN npm install prisma@6.1.0 --save-dev && npx prisma@6.1.0 generate
 
