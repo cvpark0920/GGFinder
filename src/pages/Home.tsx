@@ -49,8 +49,8 @@ export default function Home() {
   return (
     <>
       <SEO
-        title="GGFinder - 국제 결혼 매칭 플랫폼"
-        description="GGFinder는 한국과 대만 간의 국제 결혼 매칭을 위한 전문 플랫폼입니다. 신랑과 신부 프로필을 확인하고 매칭을 시작하세요."
+        title="GGFinder - 한국과 동남아시아 국제 결혼 매칭 플랫폼"
+        description="GGFinder는 한국과 동남아시아 국가 간의 국제 결혼 매칭을 위한 전문 플랫폼입니다. 신랑과 신부 프로필을 확인하고 안전하고 신뢰할 수 있는 매칭을 시작하세요."
       />
       <div className="max-w-7xl mx-auto space-y-8 px-4 sm:px-6 lg:px-8 py-8">
       {/* Videos Section */}

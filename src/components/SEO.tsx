@@ -13,8 +13,8 @@ const BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://finder.ggacademy.
 const DEFAULT_IMAGE = `${BASE_URL}/og-image.png`;
 
 export function SEO({
-  title = 'GGFinder - 국제 결혼 매칭 플랫폼',
-  description = 'GGFinder는 한국과 대만 간의 국제 결혼 매칭을 위한 전문 플랫폼입니다. 신랑과 신부 프로필을 확인하고 매칭을 시작하세요.',
+  title = 'GGFinder - 한국과 동남아시아 국제 결혼 매칭 플랫폼',
+  description = 'GGFinder는 한국과 동남아시아 국가 간의 국제 결혼 매칭을 위한 전문 플랫폼입니다. 신랑과 신부 프로필을 확인하고 안전하고 신뢰할 수 있는 매칭을 시작하세요.',
   image = DEFAULT_IMAGE,
   url,
   type = 'website',
