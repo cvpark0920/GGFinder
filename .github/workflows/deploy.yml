@@ -139,6 +139,11 @@ jobs:
             
             # 7. 운영 환경용 .env 파일 생성 (보안 강화)
             echo "📝 Creating .env file..."
+            # 프론트엔드 URL (HTTPS 도메인 또는 기본값)
+            FRONTEND_URL="${{ secrets.FRONTEND_URL || 'https://finder.ggacademy.top' }}"
+            VITE_API_BASE_URL="${{ secrets.VITE_API_BASE_URL || secrets.FRONTEND_URL || 'https://finder.ggacademy.top' }}"
+            CORS_ORIGIN="${{ secrets.CORS_ORIGIN || secrets.FRONTEND_URL || 'https://finder.ggacademy.top' }}"
+            
             cat <<EOF > .env
             NODE_ENV=production
             PORT=4000
@@ -147,6 +152,10 @@ jobs:
             GOOGLE_CLIENT_SECRET=${{ secrets.GOOGLE_CLIENT_SECRET }}
             POSTGRES_USER=app
             POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD || 'ggfinder_secure_pass' }}
+            # 프론트엔드 및 API URL 설정 (빌드 타임 환경 변수 포함)
+            VITE_API_BASE_URL=${VITE_API_BASE_URL}
+            CORS_ORIGIN=${CORS_ORIGIN}
+            FRONTEND_URL=${FRONTEND_URL}
             POSTGRES_DB=ggfinder
             POSTGRES_PORT=5432
             DATABASE_URL=postgresql://app:${{ secrets.POSTGRES_PASSWORD || 'ggfinder_secure_pass' }}@db:5432/ggfinder?schema=public&sslmode=disable
@@ -159,9 +168,16 @@ jobs:
             chmod 600 .env
             
             # 8. Docker Compose 빌드 인자 설정
-            export VITE_API_BASE_URL="http://${{ secrets.DROPLET_IP }}:4000"
+            # HTTPS 도메인 우선 사용, 없으면 IP 사용
+            FRONTEND_DOMAIN="${{ secrets.FRONTEND_URL || secrets.VITE_API_BASE_URL || 'https://finder.ggacademy.top' }}"
+            # 도메인이 https://로 시작하지 않으면 추가
+            if [[ ! "$FRONTEND_DOMAIN" =~ ^https?:// ]]; then
+              FRONTEND_DOMAIN="https://${FRONTEND_DOMAIN}"
+            fi
+            export VITE_API_BASE_URL="${FRONTEND_DOMAIN}"
             export VITE_GOOGLE_CLIENT_ID="${{ secrets.GOOGLE_CLIENT_ID }}"
             export BUILD_VALIDATE_ENV="false"
+            echo "🔧 Build args: VITE_API_BASE_URL=${VITE_API_BASE_URL}"
             
             # 9. 기존 컨테이너 중지 (graceful shutdown)
             echo "🛑 Stopping existing containers..."
