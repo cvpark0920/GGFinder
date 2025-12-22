@@ -674,7 +674,6 @@ export default function ProfileList({ type }: ProfileListProps) {
                               <User className="w-5 h-5 text-rose-600" />
                               <CardTitle>{t('profile.basicInfo')}</CardTitle>
                             </div>
-                            <CardDescription>{t('profile.basicInfo')}</CardDescription>
                           </CardHeader>
                           <CardContent className="space-y-4">
                             {((profile.height && profile.height > 0) || (profile.weight && profile.weight > 0)) && (
@@ -738,7 +737,6 @@ export default function ProfileList({ type }: ProfileListProps) {
                               <GraduationCap className="w-5 h-5 text-rose-600" />
                               <CardTitle>{t('profile.detailedInfo')}</CardTitle>
                             </div>
-                            <CardDescription>{t('profile.detailedInfo')}</CardDescription>
                           </CardHeader>
                           <CardContent className="space-y-4">
                             {profile.type === 'bride' ? (

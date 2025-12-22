@@ -878,7 +878,6 @@ export default function Dashboard() {
                         <UserIcon className="w-5 h-5 text-rose-600" />
                         <CardTitle>기본 정보</CardTitle>
                       </div>
-                      <CardDescription>프로필 기본 정보</CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-4">
                       {(selectedProfile.height || selectedProfile.weight) && (
@@ -942,7 +941,6 @@ export default function Dashboard() {
                         <GraduationCap className="w-5 h-5 text-rose-600" />
                         <CardTitle>상세 정보</CardTitle>
                       </div>
-                      <CardDescription>{selectedProfile.type === 'bride' ? '학력 및 가족 정보' : '학력, 재산 및 라이프스타일'}</CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-4">
                       {selectedProfile.type === 'bride' ? (
