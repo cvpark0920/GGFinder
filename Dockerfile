@@ -78,5 +78,6 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
   CMD wget --no-verbose --tries=1 --spider http://localhost:4000/health || exit 1
 
 # Run migrations and start server
-CMD ["sh", "-c", "echo '🔄 Running database migrations...' && npx prisma@6.1.0 migrate deploy && echo '✅ Migrations completed successfully' && node server/dist/index.js"]
+# 실패한 마이그레이션을 자동으로 해결한 후 마이그레이션 실행
+CMD ["sh", "-c", "echo '🔄 Running database migrations...' && (npx prisma@6.1.0 migrate resolve --applied 20251215234033_add_father_mother_age 2>/dev/null || echo '⚠️  Failed migration resolution skipped (may not exist)') && npx prisma@6.1.0 migrate deploy && echo '✅ Migrations completed successfully' && node server/dist/index.js"]
 

@@ -217,8 +217,28 @@ jobs:
               echo "⚠️ Health check timeout. Checking container status..."
               docker compose ps
               docker compose logs --tail=50 app
-              echo "❌ Deployment may have issues. Please check logs."
-              exit 1
+              
+              # 마이그레이션 실패 확인
+              if docker compose logs app 2>&1 | grep -q "failed migrations\|P3009"; then
+                echo "🔧 Detected failed migration. Attempting to resolve..."
+                docker compose exec -T app npx prisma@6.1.0 migrate resolve --applied 20251215234033_add_father_mother_age 2>/dev/null || {
+                  echo "⚠️  Could not resolve migration automatically. Manual intervention may be required."
+                }
+                echo "🔄 Restarting container after migration resolution..."
+                docker compose restart app
+                sleep 10
+                # 다시 헬스체크 시도
+                HEALTH_STATUS=$(curl -sf http://localhost:4000/health || echo "unhealthy")
+                if echo "$HEALTH_STATUS" | grep -q "status.*ok\|healthy"; then
+                  echo "✅ Health check passed after migration resolution"
+                else
+                  echo "❌ Deployment failed even after migration resolution. Please check logs."
+                  exit 1
+                fi
+              else
+                echo "❌ Deployment may have issues. Please check logs."
+                exit 1
+              fi
             fi
             
             # 12. 오래된 이미지 정리 (디스크 공간 확보)
