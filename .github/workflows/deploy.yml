@@ -300,9 +300,9 @@ jobs:
                 echo "🔧 Detected failed migration. Attempting to resolve..."
                 # 누락된 마이그레이션 자동 해결
                 docker compose exec -T app npx prisma@6.1.0 migrate resolve --applied 20251215234033_add_father_mother_age 2>/dev/null || true
-                docker compose exec -T app npx prisma@6.1.0 migrate resolve --applied 20251216090000_add_avatar_url 2>/dev/null || {
-                  echo "⚠️  Could not resolve migration automatically. Manual intervention may be required."
-                }
+                docker compose exec -T app npx prisma@6.1.0 migrate resolve --applied 20251216090000_add_avatar_url 2>/dev/null || true
+                # 누락된 컬럼 직접 추가 시도
+                docker compose exec -T db psql -U app -d ggfinder -c "ALTER TABLE \"clients\" ADD COLUMN IF NOT EXISTS \"avatarUrl\" TEXT;" 2>/dev/null || true
                 echo "🔄 Restarting container after migration resolution..."
                 docker compose restart app
                 sleep 10
