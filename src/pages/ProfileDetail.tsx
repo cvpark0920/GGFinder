@@ -21,6 +21,7 @@ import { getProfileDisplayName } from '../utils/profileUtils';
 import { useAuth } from '../components/AuthContext';
 import { toast } from 'sonner';
 import { ProfileSelectDialog } from '../components/ProfileSelectDialog';
+import { SEO } from '../components/SEO';
 
 export default function ProfileDetail() {
   const { id } = useParams();
@@ -195,8 +196,27 @@ export default function ProfileDetail() {
     );
   };
 
+  // SEO 메타 태그 설정
+  const profileName = getProfileDisplayName(profile);
+  const profileType = isBride ? '신부' : '신랑';
+  const profileDescription = `${profileName} (${age}세, ${profileType}) 프로필 - ${isBride ? (profile as BrideProfile).currentAddress : (profile as GroomProfile).residence}`;
+  const profileImage = profile.images && profile.images.length > 0 
+    ? profile.images[0].startsWith('http') 
+      ? profile.images[0] 
+      : `${import.meta.env.VITE_API_BASE_URL || 'https://finder.ggacademy.top'}${profile.images[0]}`
+    : undefined;
+  const profileUrl = `${window.location.origin}/profile/${id}`;
+
   return (
-    <div className="max-w-4xl mx-auto pb-12">
+    <>
+      <SEO
+        title={`${profileName} - ${profileType} 프로필 | GGFinder`}
+        description={profileDescription}
+        image={profileImage}
+        url={profileUrl}
+        type="profile"
+      />
+      <div className="max-w-4xl mx-auto pb-12">
       {/* Header */}
       <div className="flex items-center gap-4 mb-6">
         <Button variant="ghost" size="icon" onClick={() => navigate(-1)}>
@@ -403,5 +423,6 @@ export default function ProfileDetail() {
         />
       )}
     </div>
+    </>
   );
 }

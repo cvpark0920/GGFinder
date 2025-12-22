@@ -1,4 +1,5 @@
 import { createRoot } from "react-dom/client";
+import { HelmetProvider } from "react-helmet-async";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 import App from "./App.tsx";
 import "./index.css";
@@ -66,8 +67,10 @@ if (!googleClientId) {
 }
 
 createRoot(document.getElementById("root")!).render(
-  <GoogleOAuthProvider clientId={googleClientId || ""}>
-    <App />
-  </GoogleOAuthProvider>
+  <HelmetProvider>
+    <GoogleOAuthProvider clientId={googleClientId || ""}>
+      <App />
+    </GoogleOAuthProvider>
+  </HelmetProvider>
 );
   

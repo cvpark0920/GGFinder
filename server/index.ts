@@ -3,7 +3,7 @@ import express, { Request, Response, NextFunction } from 'express';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import path from 'path';
-import { appendFileSync } from 'fs';
+import { appendFileSync, readFileSync } from 'fs';
 import { join } from 'path';
 import { errorHandler, notFoundHandler } from './middleware/errorHandler';
 // Import API routes after server setup to avoid early Prisma initialization errors
@@ -137,13 +137,108 @@ app.get('/health', async (req: Request, res: Response) => {
 
 // SPA routing: All other requests send back React's index.html file
 // Express 5 doesn't support wildcard routes with '*', so we use app.use() as fallback
-app.use((req: Request, res: Response, next: NextFunction) => {
+app.use(async (req: Request, res: Response, next: NextFunction) => {
   // Skip API routes - uploads and static files are already handled by express.static
   // express.static will call next() if file not found, so we only skip /api here
   if (req.path.startsWith('/api')) {
     return next();
   }
-  // Serve index.html for all other routes (SPA fallback)
+
+  // 동적 메타 태그 생성 (프로필 상세 페이지)
+  if (req.path.startsWith('/profile/')) {
+    const profileIdMatch = req.path.match(/^\/profile\/(\d+)$/);
+    if (profileIdMatch) {
+      try {
+        const profileId = parseInt(profileIdMatch[1]);
+        const client = await prisma.client.findUnique({
+          where: { id: profileId },
+          include: {
+            images: { orderBy: { order: 'asc' }, take: 1 },
+            agency: true,
+          },
+        });
+
+        if (client) {
+          const frontendUrl = process.env.FRONTEND_URL || process.env.CORS_ORIGIN || `https://${req.get('host')}`;
+          const protocol = req.protocol || 'https';
+          const host = req.get('host') || 'finder.ggacademy.top';
+          const baseUrl = `${protocol}://${host}`;
+          
+          const profileName = client.name;
+          const profileType = client.type === 'bride' ? '신부' : '신랑';
+          const age = client.birthYear ? new Date().getFullYear() - client.birthYear : null;
+          const location = client.type === 'bride' ? client.currentAddress : client.residence;
+          const description = `${profileName}${age ? ` (${age}세)` : ''}, ${profileType} 프로필${location ? ` - ${location}` : ''}`;
+          
+          const imageUrl = client.images && client.images.length > 0
+            ? client.images[0].url.startsWith('http')
+              ? client.images[0].url
+              : `${baseUrl}${client.images[0].url}`
+            : `${baseUrl}/og-image.png`;
+          
+          const profileUrl = `${baseUrl}${req.path}`;
+
+          // index.html 읽기 및 메타 태그 교체
+          const indexPath = path.join(buildPath, 'index.html');
+          let html = readFileSync(indexPath, 'utf-8');
+
+          // 메타 태그 교체
+          html = html.replace(
+            /<title>.*?<\/title>/,
+            `<title>${profileName} - ${profileType} 프로필 | GGFinder</title>`
+          );
+          html = html.replace(
+            /<meta\s+name="description"\s+content="[^"]*"/,
+            `<meta name="description" content="${description}"`
+          );
+          html = html.replace(
+            /<meta\s+property="og:title"\s+content="[^"]*"/,
+            `<meta property="og:title" content="${profileName} - ${profileType} 프로필 | GGFinder"`
+          );
+          html = html.replace(
+            /<meta\s+property="og:description"\s+content="[^"]*"/,
+            `<meta property="og:description" content="${description}"`
+          );
+          html = html.replace(
+            /<meta\s+property="og:url"\s+content="[^"]*"/,
+            `<meta property="og:url" content="${profileUrl}"`
+          );
+          html = html.replace(
+            /<meta\s+property="og:image"\s+content="[^"]*"/,
+            `<meta property="og:image" content="${imageUrl}"`
+          );
+          html = html.replace(
+            /<meta\s+property="og:type"\s+content="[^"]*"/,
+            `<meta property="og:type" content="profile"`
+          );
+          html = html.replace(
+            /<meta\s+name="twitter:title"\s+content="[^"]*"/,
+            `<meta name="twitter:title" content="${profileName} - ${profileType} 프로필 | GGFinder"`
+          );
+          html = html.replace(
+            /<meta\s+name="twitter:description"\s+content="[^"]*"/,
+            `<meta name="twitter:description" content="${description}"`
+          );
+          html = html.replace(
+            /<meta\s+name="twitter:image"\s+content="[^"]*"/,
+            `<meta name="twitter:image" content="${imageUrl}"`
+          );
+          html = html.replace(
+            /<link\s+rel="canonical"\s+href="[^"]*"/,
+            `<link rel="canonical" href="${profileUrl}"`
+          );
+
+          res.setHeader('Content-Type', 'text/html');
+          return res.send(html);
+        }
+      } catch (error) {
+        console.error('Failed to generate dynamic meta tags:', error);
+        // 에러 발생 시 기본 index.html 반환
+      }
+    }
+  }
+
+  // 기본 index.html 반환
   res.sendFile(path.join(buildPath, 'index.html'), (err) => {
     if (err) {
       next(err);

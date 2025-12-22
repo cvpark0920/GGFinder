@@ -5,6 +5,7 @@ import { Card, CardContent } from '../components/ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../components/ui/dialog';
 import { YouTubeVideo } from '../types/dashboard';
 import { fetchPublicYouTubeVideos } from '../utils/api';
+import { SEO } from '../components/SEO';
 
 export default function Home() {
   const { language, t } = useLanguage();
@@ -46,7 +47,12 @@ export default function Home() {
   };
 
   return (
-    <div className="max-w-7xl mx-auto space-y-8 px-4 sm:px-6 lg:px-8 py-8">
+    <>
+      <SEO
+        title="GGFinder - 국제 결혼 매칭 플랫폼"
+        description="GGFinder는 한국과 대만 간의 국제 결혼 매칭을 위한 전문 플랫폼입니다. 신랑과 신부 프로필을 확인하고 매칭을 시작하세요."
+      />
+      <div className="max-w-7xl mx-auto space-y-8 px-4 sm:px-6 lg:px-8 py-8">
       {/* Videos Section */}
       <div className="space-y-6">
         {/* Loading State */}
@@ -151,5 +157,6 @@ export default function Home() {
         </DialogContent>
       </Dialog>
     </div>
+    </>
   );
 }

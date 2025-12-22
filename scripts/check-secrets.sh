@@ -1,0 +1,25 @@
+#!/bin/bash
+# GitHub Secrets 확인 스크립트 (로컬에서 실행 불가, 참고용)
+
+echo "⚠️  이 스크립트는 GitHub Actions에서만 실행 가능합니다."
+echo ""
+echo "GitHub Secrets 확인 방법:"
+echo "1. GitHub 저장소 > Settings > Secrets and variables > Actions"
+echo "2. 다음 Secrets가 설정되어 있는지 확인:"
+echo ""
+echo "필수 Secrets:"
+echo "  - DROPLET_IP"
+echo "  - SSH_USERNAME"
+echo "  - SSH_PRIVATE_KEY"
+echo "  - JWT_SECRET"
+echo ""
+echo "선택적 Secrets:"
+echo "  - GOOGLE_CLIENT_ID"
+echo "  - GOOGLE_CLIENT_SECRET"
+echo "  - POSTGRES_PASSWORD"
+echo "  - SSH_PORT"
+echo ""
+echo "배포 실행 방법:"
+echo "1. GitHub Actions 탭 > Deploy to DigitalOcean Droplet > Run workflow"
+echo "2. 또는 main 브랜치에 push: git push origin main"
+
