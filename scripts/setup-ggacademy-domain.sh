@@ -3,7 +3,9 @@
 
 set -euo pipefail
 
-DOMAIN="ggacademy.top"
+DOMAIN="finder.ggacademy.top"
+SUBDOMAIN="finder"
+MAIN_DOMAIN="ggacademy.top"
 NGINX_CONFIG="/etc/nginx/sites-available/ggfinder"
 
 # 색상 정의
@@ -23,25 +25,28 @@ echo -e "${BLUE}1. Droplet IP 확인${NC}"
 DROPLET_IP=$(curl -s ifconfig.me || curl -s ipinfo.io/ip)
 echo "  Droplet IP: $DROPLET_IP"
 echo ""
-echo "⚠️  중요: 도메인 DNS 설정에서 다음 A 레코드를 추가하세요:"
-echo "  - ggacademy.top → $DROPLET_IP"
-echo "  - www.ggacademy.top → $DROPLET_IP"
+echo "⚠️  중요: 도메인 DNS 설정에서 다음 레코드를 추가하세요:"
+echo "  - finder.ggacademy.top → $DROPLET_IP (A 레코드 또는 CNAME)"
 echo ""
 read -p "DNS 설정을 완료하셨습니까? (y/N): " -n 1 -r
 echo
 if [[ ! $REPLY =~ ^[Yy]$ ]]; then
   echo -e "${YELLOW}⚠️  DNS 설정을 먼저 완료하세요.${NC}"
   echo ""
-  echo "도메인 제공업체에서 다음 설정을 추가하세요:"
-  echo "  타입: A"
-  echo "  호스트: @ (또는 ggacademy.top)"
-  echo "  값: $DROPLET_IP"
-  echo "  TTL: 3600"
-  echo ""
-  echo "  타입: A"
-  echo "  호스트: www"
-  echo "  값: $DROPLET_IP"
-  echo "  TTL: 3600"
+echo "도메인 제공업체에서 다음 설정을 추가하세요:"
+echo ""
+echo "  방법 1: A 레코드 (권장)"
+echo "    타입: A"
+echo "    호스트: finder"
+echo "    값: $DROPLET_IP"
+echo "    TTL: 3600"
+echo ""
+echo "  방법 2: CNAME 레코드"
+echo "    타입: CNAME"
+echo "    호스트: finder"
+echo "    값: @ (또는 ggacademy.top)"
+echo "    TTL: 3600"
+echo "    (단, 메인 도메인이 이미 A 레코드로 설정되어 있어야 함)"
   exit 1
 fi
 
@@ -59,10 +64,10 @@ echo ""
 
 # 3. Nginx 설정 파일 생성
 echo -e "${BLUE}3. Nginx 설정 파일 생성${NC}"
-sudo tee "$NGINX_CONFIG" > /dev/null <<'EOF'
+sudo tee "$NGINX_CONFIG" > /dev/null <<EOF
 server {
     listen 80;
-    server_name ggacademy.top www.ggacademy.top;
+    server_name ${DOMAIN};
 
     access_log /var/log/nginx/ggfinder_access.log;
     error_log /var/log/nginx/ggfinder_error.log;
@@ -145,9 +150,9 @@ echo "SSL 인증서 발급을 진행합니다..."
 read -p "이메일 주소를 입력하세요 (선택사항, Enter로 건너뛰기): " EMAIL
 
 if [ -n "$EMAIL" ]; then
-  sudo certbot --nginx -d ${DOMAIN} -d www.${DOMAIN} --non-interactive --agree-tos --email ${EMAIL} --redirect
+  sudo certbot --nginx -d ${DOMAIN} --non-interactive --agree-tos --email ${EMAIL} --redirect
 else
-  sudo certbot --nginx -d ${DOMAIN} -d www.${DOMAIN} --non-interactive --agree-tos --register-unsafely-without-email --redirect
+  sudo certbot --nginx -d ${DOMAIN} --non-interactive --agree-tos --register-unsafely-without-email --redirect
 fi
 
 if [ $? -eq 0 ]; then
