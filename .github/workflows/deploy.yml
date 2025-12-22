@@ -301,10 +301,18 @@ jobs:
                 # 누락된 마이그레이션 자동 해결
                 docker compose exec -T app npx prisma@6.1.0 migrate resolve --applied 20251215234033_add_father_mother_age 2>/dev/null || true
                 docker compose exec -T app npx prisma@6.1.0 migrate resolve --applied 20251216090000_add_avatar_url 2>/dev/null || true
+                docker compose exec -T app npx prisma@6.1.0 migrate resolve --applied 20251216120000_add_favorite_direction 2>/dev/null || true
                 # 누락된 컬럼 직접 추가 시도
+                docker compose exec -T db psql -U app -d ggfinder -c "DO \$\$ BEGIN IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'FavoriteDirection') THEN CREATE TYPE \"FavoriteDirection\" AS ENUM ('groom_to_bride', 'bride_to_groom'); END IF; END \$\$;" 2>/dev/null || true
+                docker compose exec -T db psql -U app -d ggfinder -c "DO \$\$ BEGIN IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'FavoriteStatus') THEN CREATE TYPE \"FavoriteStatus\" AS ENUM ('pending', 'accepted', 'rejected'); END IF; END \$\$;" 2>/dev/null || true
                 docker compose exec -T db psql -U app -d ggfinder -c "ALTER TABLE \"clients\" ADD COLUMN IF NOT EXISTS \"avatarUrl\" TEXT;" 2>/dev/null || true
+                docker compose exec -T db psql -U app -d ggfinder -c "ALTER TABLE \"favorites\" ADD COLUMN IF NOT EXISTS \"direction\" \"FavoriteDirection\" NOT NULL DEFAULT 'groom_to_bride';" 2>/dev/null || true
+                docker compose exec -T db psql -U app -d ggfinder -c "ALTER TABLE \"favorites\" ADD COLUMN IF NOT EXISTS \"status\" \"FavoriteStatus\" NOT NULL DEFAULT 'pending';" 2>/dev/null || true
+                docker compose exec -T db psql -U app -d ggfinder -c "ALTER TABLE \"favorites\" ADD COLUMN IF NOT EXISTS \"updatedAt\" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP;" 2>/dev/null || true
                 docker compose exec -T db psql -U app -d ggfinder -c "ALTER TABLE \"favorites\" ADD COLUMN IF NOT EXISTS \"fromClientId\" INTEGER;" 2>/dev/null || true
                 docker compose exec -T db psql -U app -d ggfinder -c "CREATE INDEX IF NOT EXISTS \"favorites_fromClientId_idx\" ON \"favorites\"(\"fromClientId\");" 2>/dev/null || true
+                docker compose exec -T db psql -U app -d ggfinder -c "CREATE INDEX IF NOT EXISTS \"favorites_direction_status_idx\" ON \"favorites\"(\"direction\", \"status\");" 2>/dev/null || true
+                docker compose exec -T db psql -U app -d ggfinder -c "CREATE INDEX IF NOT EXISTS \"favorites_status_idx\" ON \"favorites\"(\"status\");" 2>/dev/null || true
                 echo "🔄 Restarting container after migration resolution..."
                 docker compose restart app
                 sleep 10
