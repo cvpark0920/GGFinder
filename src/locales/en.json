@@ -104,6 +104,24 @@
       "superAdmin": "Super Admin",
       "platformAdmin": "Platform Admin",
       "agencyMember": "Agency Member"
+    },
+    "table": {
+      "number": "No.",
+      "name": "Name",
+      "age": "Age",
+      "region": "Region",
+      "status": "Status",
+      "agency": "Agency",
+      "registrationDate": "Registration Date",
+      "management": "Management",
+      "noResults": "No search results found.",
+      "edit": "Edit",
+      "match": "Match",
+      "delete": "Delete",
+      "matchTitle": "Create Match",
+      "editTitle": "Details/Edit",
+      "deleteTitle": "Delete",
+      "registrationDateLabel": "Registration Date"
     }
   },
   "profile": {

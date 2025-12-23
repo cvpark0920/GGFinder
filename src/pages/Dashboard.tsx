@@ -647,6 +647,8 @@ export default function Dashboard() {
           setFilterStatus={filtersHook.setFilterStatus}
           filterUserRole={filtersHook.filterUserRole}
           setFilterUserRole={filtersHook.setFilterUserRole}
+          filterAgencyRole={filtersHook.filterAgencyRole}
+          setFilterAgencyRole={filtersHook.setFilterAgencyRole}
           handleSortChange={filtersHook.handleSortChange}
           isAgencyMember={isAgencyMember}
         />
@@ -689,8 +691,6 @@ export default function Dashboard() {
           <TabsContent value="agencies">
             <AgencyTabContent
               agencies={filteredAgenciesList}
-              filterRole={filtersHook.filterAgencyRole}
-              onFilterRoleChange={filtersHook.setFilterAgencyRole}
               onEdit={(agency) => {
                 agenciesHook.handleEditAgency(agency);
                 dialogStateHook.setIsEditAgencyOpen(true);

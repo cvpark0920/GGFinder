@@ -104,6 +104,24 @@
       "superAdmin": "슈퍼관리자",
       "platformAdmin": "플랫폼 관리자",
       "agencyMember": "소속사 회원"
+    },
+    "table": {
+      "number": "번호",
+      "name": "이름",
+      "age": "나이",
+      "region": "지역",
+      "status": "상태",
+      "agency": "소속사",
+      "registrationDate": "등록일",
+      "management": "관리",
+      "noResults": "검색 결과가 없습니다.",
+      "edit": "수정",
+      "match": "매칭",
+      "delete": "삭제",
+      "matchTitle": "매칭하기",
+      "editTitle": "상세/수정",
+      "deleteTitle": "삭제",
+      "registrationDateLabel": "등록일"
     }
   },
   "profile": {

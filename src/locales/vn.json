@@ -104,6 +104,24 @@
       "superAdmin": "Quản trị viên cấp cao",
       "platformAdmin": "Quản trị viên nền tảng",
       "agencyMember": "Thành viên cơ quan"
+    },
+    "table": {
+      "number": "Số",
+      "name": "Tên",
+      "age": "Tuổi",
+      "region": "Khu vực",
+      "status": "Trạng thái",
+      "agency": "Cơ quan",
+      "registrationDate": "Ngày đăng ký",
+      "management": "Quản lý",
+      "noResults": "Không tìm thấy kết quả.",
+      "edit": "Chỉnh sửa",
+      "match": "Kết hợp",
+      "delete": "Xóa",
+      "matchTitle": "Tạo kết hợp",
+      "editTitle": "Chi tiết/Chỉnh sửa",
+      "deleteTitle": "Xóa",
+      "registrationDateLabel": "Ngày đăng ký"
     }
   },
   "profile": {

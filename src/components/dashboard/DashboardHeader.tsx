@@ -27,6 +27,8 @@ interface DashboardHeaderProps {
   setFilterStatus: (status: string) => void;
   filterUserRole: string;
   setFilterUserRole: (role: string) => void;
+  filterAgencyRole: string;
+  setFilterAgencyRole: (role: string) => void;
   handleSortChange: (value: string) => void;
   isAgencyMember?: boolean;
 }
@@ -39,6 +41,8 @@ export function DashboardHeader({
   setFilterStatus,
   filterUserRole,
   setFilterUserRole,
+  filterAgencyRole,
+  setFilterAgencyRole,
   handleSortChange,
   isAgencyMember = false,
 }: DashboardHeaderProps) {
@@ -102,6 +106,18 @@ export function DashboardHeader({
               </SelectContent>
             </Select>
           )}
+          {activeTab === "agencies" && (
+            <Select value={filterAgencyRole} onValueChange={setFilterAgencyRole}>
+              <SelectTrigger className="w-full md:w-[130px] h-11 md:h-10 bg-white">
+                <SelectValue placeholder="역할 필터" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">전체</SelectItem>
+                <SelectItem value="groom">신랑</SelectItem>
+                <SelectItem value="bride">신부</SelectItem>
+              </SelectContent>
+            </Select>
+          )}
           <Select value={filterStatus} onValueChange={setFilterStatus}>
             <SelectTrigger className="w-full md:w-[110px] h-11 md:h-10 bg-white">
               <SelectValue placeholder={t('dashboard.status.all')} />
@@ -142,19 +158,21 @@ export function DashboardHeader({
               )}
             </SelectContent>
           </Select>
-          <Select onValueChange={handleSortChange}>
-            <SelectTrigger className="w-full md:hidden h-11 bg-white">
-              <SelectValue placeholder={t('dashboard.sort.sortBy')} />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="date-desc">{t('dashboard.sort.dateDesc')}</SelectItem>
-              <SelectItem value="date-asc">{t('dashboard.sort.dateAsc')}</SelectItem>
-              <SelectItem value="name-asc">{t('dashboard.sort.nameAsc')}</SelectItem>
-              <SelectItem value="name-desc">{t('dashboard.sort.nameDesc')}</SelectItem>
-              <SelectItem value="age-asc">{t('dashboard.sort.ageAsc')}</SelectItem>
-              <SelectItem value="age-desc">{t('dashboard.sort.ageDesc')}</SelectItem>
-            </SelectContent>
-          </Select>
+          {(activeTab === "grooms" || activeTab === "brides") && (
+            <Select onValueChange={handleSortChange}>
+              <SelectTrigger className="w-full md:hidden h-11 bg-white">
+                <SelectValue placeholder={t('dashboard.sort.sortBy')} />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="date-desc">{t('dashboard.sort.dateDesc')}</SelectItem>
+                <SelectItem value="date-asc">{t('dashboard.sort.dateAsc')}</SelectItem>
+                <SelectItem value="name-asc">{t('dashboard.sort.nameAsc')}</SelectItem>
+                <SelectItem value="name-desc">{t('dashboard.sort.nameDesc')}</SelectItem>
+                <SelectItem value="age-asc">{t('dashboard.sort.ageAsc')}</SelectItem>
+                <SelectItem value="age-desc">{t('dashboard.sort.ageDesc')}</SelectItem>
+              </SelectContent>
+            </Select>
+          )}
         </div>
       </div>
     </div>

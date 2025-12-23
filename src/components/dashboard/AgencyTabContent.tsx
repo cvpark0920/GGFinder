@@ -28,35 +28,17 @@ import { Agency } from "../../types/dashboard";
 
 interface AgencyTabContentProps {
   agencies: Agency[];
-  filterRole: string;
-  onFilterRoleChange: (val: string) => void;
   onEdit: (agency: Agency) => void;
   onDelete: (id: number) => void;
 }
 
 export function AgencyTabContent({
   agencies,
-  filterRole,
-  onFilterRoleChange,
   onEdit,
   onDelete,
 }: AgencyTabContentProps) {
   return (
     <>
-      {/* Filter by Role */}
-      <div className="mb-4 flex gap-2 justify-between items-center">
-          <Select value={filterRole} onValueChange={onFilterRoleChange}>
-            <SelectTrigger className="w-[150px] bg-white">
-              <SelectValue placeholder="역할 필터" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">전체</SelectItem>
-              <SelectItem value="groom">신랑</SelectItem>
-              <SelectItem value="bride">신부</SelectItem>
-            </SelectContent>
-          </Select>
-      </div>
-
       {/* Mobile View: Cards */}
       <div className="space-y-3 md:hidden">
           {agencies.map((agency) => (
