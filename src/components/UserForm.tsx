@@ -26,6 +26,7 @@ import {
   SheetDescription,
   SheetFooter,
 } from "./ui/sheet";
+import { useLanguage } from "./LanguageContext";
 
 interface UserFormProps {
   initialData?: User | null;
@@ -42,6 +43,7 @@ export function UserForm({
   onSubmit,
   onCancel,
 }: UserFormProps) {
+  const { t } = useLanguage();
   const isSuperAdmin = currentUser?.role === 'super_admin';
   const isEditingSuperAdmin = initialData?.role === 'super_admin';
   const [formData, setFormData] = useState<Partial<User>>({
@@ -96,12 +98,12 @@ export function UserForm({
           </div>
           <div>
             <SheetTitle className="text-xl">
-              {isEditMode ? "사용자 정보 수정" : "새 사용자 추가"}
+              {isEditMode ? t('dashboard.user.titles.edit') : t('dashboard.user.titles.add')}
             </SheetTitle>
             <SheetDescription>
               {isEditMode 
-                ? "사용자의 계정 정보를 수정합니다." 
-                : "새로운 관리자나 소속사 회원을 시스템에 등록합니다."}
+                ? t('dashboard.user.descriptions.edit')
+                : t('dashboard.user.descriptions.add')}
             </SheetDescription>
           </div>
         </div>
@@ -113,17 +115,17 @@ export function UserForm({
           <CardHeader>
             <div className="flex items-center gap-2">
               <UserIcon className="w-5 h-5 text-slate-600" />
-              <CardTitle>기본 정보</CardTitle>
+              <CardTitle>{t('dashboard.user.sections.basicInfo')}</CardTitle>
             </div>
-            <CardDescription>사용자의 기본적인 신상 정보를 입력하세요</CardDescription>
+            <CardDescription>{t('dashboard.user.sectionDescriptions.basicInfo')}</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="username">아이디</Label>
+                <Label htmlFor="username">{t('dashboard.user.fields.username')}</Label>
                 <Input
                   id="username"
-                  placeholder="user123"
+                  placeholder={t('dashboard.user.placeholders.username')}
                   value={formData.username}
                   onChange={(e) => handleChange("username", e.target.value)}
                   disabled={isEditMode}
@@ -131,10 +133,10 @@ export function UserForm({
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="name">이름</Label>
+                <Label htmlFor="name">{t('dashboard.user.fields.name')}</Label>
                 <Input
                   id="name"
-                  placeholder="홍길동"
+                  placeholder={t('dashboard.user.placeholders.name')}
                   value={formData.name}
                   onChange={(e) => handleChange("name", e.target.value)}
                   className={inputClassName}
@@ -144,12 +146,12 @@ export function UserForm({
 
             <div className="space-y-2">
               <Label htmlFor="email" className="flex items-center gap-1">
-                <Mail className="w-3.5 h-3.5" /> 이메일
+                <Mail className="w-3.5 h-3.5" /> {t('dashboard.user.fields.email')}
               </Label>
               <Input
                 id="email"
                 type="email"
-                placeholder="example@email.com"
+                placeholder={t('dashboard.user.placeholders.email')}
                 value={formData.email}
                 onChange={(e) => handleChange("email", e.target.value)}
                 className={inputClassName}
@@ -163,39 +165,39 @@ export function UserForm({
           <CardHeader>
             <div className="flex items-center gap-2">
               <Shield className="w-5 h-5 text-slate-600" />
-              <CardTitle>권한 및 소속</CardTitle>
+              <CardTitle>{t('dashboard.user.sections.roleAndAgency')}</CardTitle>
             </div>
-            <CardDescription>사용자의 역할과 권한을 설정하세요</CardDescription>
+            <CardDescription>{t('dashboard.user.sectionDescriptions.roleAndAgency')}</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="role">역할</Label>
+              <Label htmlFor="role">{t('dashboard.user.fields.role')}</Label>
               <Select
                 value={formData.role}
                 onValueChange={(value: UserRole) => handleChange("role", value)}
                 disabled={isEditingSuperAdmin && !isSuperAdmin}
               >
                 <SelectTrigger className={inputClassName}>
-                  <SelectValue placeholder="역할 선택" />
+                  <SelectValue placeholder={t('dashboard.user.placeholders.role')} />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="super_admin" disabled={isEditingSuperAdmin && !isSuperAdmin}>
-                    <span className="font-medium">슈퍼관리자</span>
-                    <span className="ml-2 text-xs text-slate-400">- 모든 권한</span>
+                    <span className="font-medium">{t('dashboard.user.roles.superAdmin')}</span>
+                    <span className="ml-2 text-xs text-slate-400">{t('dashboard.user.roles.superAdminDesc')}</span>
                   </SelectItem>
                   <SelectItem value="platform_admin">
-                    <span className="font-medium">플랫폼 관리자</span>
-                    <span className="ml-2 text-xs text-slate-400">- 운영 관리</span>
+                    <span className="font-medium">{t('dashboard.user.roles.platformAdmin')}</span>
+                    <span className="ml-2 text-xs text-slate-400">{t('dashboard.user.roles.platformAdminDesc')}</span>
                   </SelectItem>
                   <SelectItem value="agency_member">
-                    <span className="font-medium">소속사 회원</span>
-                    <span className="ml-2 text-xs text-slate-400">- 소속사 전용</span>
+                    <span className="font-medium">{t('dashboard.user.roles.agencyMember')}</span>
+                    <span className="ml-2 text-xs text-slate-400">{t('dashboard.user.roles.agencyMemberDesc')}</span>
                   </SelectItem>
                 </SelectContent>
               </Select>
               {isEditingSuperAdmin && !isSuperAdmin && (
                 <p className="text-sm text-amber-600 mt-1">
-                  ⚠️ 슈퍼 관리자 계정의 역할은 슈퍼 관리자만 변경할 수 있습니다.
+                  {t('dashboard.user.warnings.superAdminRoleChange')}
                 </p>
               )}
               
@@ -203,19 +205,19 @@ export function UserForm({
                 {formData.role === "super_admin" && (
                   <div className="flex gap-2">
                     <Shield className="w-4 h-4 text-purple-600 mt-0.5" />
-                    <p>모든 데이터에 접근하고 시스템 설정을 변경할 수 있는 최고 관리자 권한입니다.</p>
+                    <p>{t('dashboard.user.roleDescriptions.superAdmin')}</p>
                   </div>
                 )}
                 {formData.role === "platform_admin" && (
                   <div className="flex gap-2">
                     <Shield className="w-4 h-4 text-indigo-600 mt-0.5" />
-                    <p>회원 및 매칭 관리 등 플랫폼 운영에 필요한 대부분의 권한을 가집니다.</p>
+                    <p>{t('dashboard.user.roleDescriptions.platformAdmin')}</p>
                   </div>
                 )}
                 {formData.role === "agency_member" && (
                   <div className="flex gap-2">
                     <UserIcon className="w-4 h-4 text-slate-500 mt-0.5" />
-                    <p>자신이 속한 소속사의 데이터만 조회하고 관리할 수 있습니다.</p>
+                    <p>{t('dashboard.user.roleDescriptions.agencyMember')}</p>
                   </div>
                 )}
               </div>
@@ -225,7 +227,7 @@ export function UserForm({
               <div className="space-y-2">
                 <AgencySelector
                   id="agency-select"
-                  label="소속사 선택"
+                  label={t('dashboard.user.fields.agency')}
                   agencies={agencies}
                   value={formData.agencyId?.toString() || ""}
                   onChange={(id) => handleChange("agencyId", id ? parseInt(id) : undefined)}
@@ -235,29 +237,29 @@ export function UserForm({
 
             <div className="space-y-2 pt-2 border-t mt-2">
               <Label htmlFor="status" className="flex items-center gap-1">
-                <CheckCircle2 className="w-3.5 h-3.5" /> 계정 상태
+                <CheckCircle2 className="w-3.5 h-3.5" /> {t('dashboard.user.fields.status')}
               </Label>
               <Select
                 value={formData.status}
                 onValueChange={(value: UserStatus) => handleChange("status", value)}
               >
                 <SelectTrigger className={inputClassName}>
-                  <SelectValue placeholder="상태 선택" />
+                  <SelectValue placeholder={t('dashboard.user.placeholders.status')} />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="pending">
                     <span className="flex items-center gap-2 text-amber-600">
-                      <span className="w-2 h-2 rounded-full bg-amber-500" /> 승인 대기
+                      <span className="w-2 h-2 rounded-full bg-amber-500" /> {t('dashboard.user.status.pending')}
                     </span>
                   </SelectItem>
                   <SelectItem value="active">
                     <span className="flex items-center gap-2 text-green-600">
-                      <span className="w-2 h-2 rounded-full bg-green-500" /> 활동 중
+                      <span className="w-2 h-2 rounded-full bg-green-500" /> {t('dashboard.user.status.active')}
                     </span>
                   </SelectItem>
                   <SelectItem value="suspended">
                     <span className="flex items-center gap-2 text-red-600">
-                      <span className="w-2 h-2 rounded-full bg-red-500" /> 정지됨
+                      <span className="w-2 h-2 rounded-full bg-red-500" /> {t('dashboard.user.status.suspended')}
                     </span>
                   </SelectItem>
                 </SelectContent>
@@ -274,13 +276,13 @@ export function UserForm({
           onClick={onCancel}
           className="flex-1"
         >
-          취소
+          {t('dashboard.user.buttons.cancel')}
         </Button>
         <Button 
           onClick={handleSubmit}
           className="flex-1 bg-slate-900 hover:bg-slate-800"
         >
-          {isEditMode ? "수정 완료" : "사용자 추가"}
+          {isEditMode ? t('dashboard.user.buttons.save') : t('dashboard.user.buttons.add')}
         </Button>
       </SheetFooter>
     </>

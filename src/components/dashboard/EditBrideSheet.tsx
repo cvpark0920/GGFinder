@@ -373,7 +373,7 @@ export function EditBrideSheet({
               <div className="space-y-2">
                 <Label htmlFor="edit-b-tattoo">{t('form.registration.fields.tattoo')}</Label>
                 <Select
-                  value={editingClient.tattoo || "없음"}
+                  value={editingClient.tattoo || t('form.registration.options.noTattoo')}
                   onValueChange={(val) =>
                     setEditingClient({
                       ...editingClient,
@@ -615,7 +615,7 @@ export function EditBrideSheet({
                   </Button>
                   {selectedPhotos.length > 0 && (
                     <span className="text-sm text-rose-600 font-medium">
-                      {selectedPhotos.length}장 선택됨
+                      {t('form.registration.media.photosSelected', { count: selectedPhotos.length })}
                     </span>
                   )}
                 </div>

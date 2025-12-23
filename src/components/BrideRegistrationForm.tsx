@@ -597,7 +597,7 @@ export function BrideRegistrationForm({
                 </Button>
                 {selectedPhotos.length > 0 && (
                   <span className="text-sm text-rose-600 font-medium">
-                    {selectedPhotos.length}장 선택됨
+                    {t('form.registration.media.photosSelected', { count: selectedPhotos.length })}
                   </span>
                 )}
               </div>

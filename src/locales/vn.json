@@ -14,6 +14,7 @@
     "no": "Không",
     "name": "Tên",
     "age": "Tuổi",
+    "ageUnit": "tuổi",
     "height": "Chiều cao",
     "weight": "Cân nặng",
     "count": "lượt",
@@ -32,7 +33,8 @@
     "date": "Ngày",
     "time": "Giờ",
     "createdAt": "Ngày tạo",
-    "updatedAt": "Ngày cập nhật"
+    "updatedAt": "Ngày cập nhật",
+    "education": "Học lực"
   },
   "nav": {
     "home": "YouTube",
@@ -122,6 +124,143 @@
       "editTitle": "Chi tiết/Chỉnh sửa",
       "deleteTitle": "Xóa",
       "registrationDateLabel": "Ngày đăng ký"
+    },
+    "agency": {
+      "registration": {
+        "title": "Đăng ký cơ quan",
+        "description": "Nhập thông tin cơ quan mới"
+      },
+      "edit": {
+        "title": "Sửa thông tin cơ quan",
+        "description": "Sửa thông tin cơ quan"
+      },
+      "sections": {
+        "basicInfo": "Thông tin cơ bản",
+        "contactInfo": "Thông tin người liên hệ",
+        "locationInfo": "Thông tin địa điểm",
+        "additionalInfo": "Thông tin bổ sung"
+      },
+      "fields": {
+        "name": "Tên cơ quan",
+        "role": "Vai trò",
+        "contact": "Tên người liên hệ",
+        "phone": "Số điện thoại",
+        "address": "Địa chỉ",
+        "status": "Trạng thái",
+        "memo": "Ghi chú"
+      },
+      "placeholders": {
+        "name": "VD: Hôn nhân Quốc tế Seoul",
+        "contact": "VD: Giám đốc Kim",
+        "phone": "VD: 02-1234-5678",
+        "address": "VD: Quận Gangnam, Seoul",
+        "memo": "Nhập ghi chú về cơ quan...",
+        "role": "Chọn vai trò"
+      },
+      "roles": {
+        "groom": "Giới thiệu chú rể",
+        "bride": "Giới thiệu cô dâu"
+      },
+      "status": {
+        "active": "Hoạt động",
+        "suspended": "Tạm dừng"
+      },
+      "buttons": {
+        "register": "Đăng ký cơ quan",
+        "save": "Hoàn tất sửa",
+        "cancel": "Hủy"
+      }
+    },
+    "user": {
+      "titles": {
+        "edit": "Sửa thông tin người dùng",
+        "add": "Thêm người dùng mới"
+      },
+      "descriptions": {
+        "edit": "Sửa thông tin tài khoản người dùng.",
+        "add": "Đăng ký quản trị viên hoặc thành viên cơ quan mới vào hệ thống."
+      },
+      "sections": {
+        "basicInfo": "Thông tin cơ bản",
+        "roleAndAgency": "Vai trò và cơ quan"
+      },
+      "sectionDescriptions": {
+        "basicInfo": "Nhập thông tin cá nhân cơ bản của người dùng",
+        "roleAndAgency": "Thiết lập vai trò và quyền của người dùng"
+      },
+      "fields": {
+        "username": "Tên đăng nhập",
+        "name": "Tên",
+        "email": "Email",
+        "role": "Vai trò",
+        "agency": "Chọn cơ quan",
+        "status": "Trạng thái tài khoản"
+      },
+      "placeholders": {
+        "username": "user123",
+        "name": "Nguyễn Văn A",
+        "email": "example@email.com",
+        "role": "Chọn vai trò",
+        "status": "Chọn trạng thái"
+      },
+      "roles": {
+        "superAdmin": "Quản trị viên cấp cao",
+        "platformAdmin": "Quản trị viên nền tảng",
+        "agencyMember": "Thành viên cơ quan",
+        "superAdminDesc": "- Tất cả quyền",
+        "platformAdminDesc": "- Quản lý vận hành",
+        "agencyMemberDesc": "- Chỉ cơ quan"
+      },
+      "roleDescriptions": {
+        "superAdmin": "Quyền quản trị viên cao nhất với quyền truy cập tất cả dữ liệu và cài đặt hệ thống.",
+        "platformAdmin": "Hầu hết các quyền cần thiết cho hoạt động nền tảng bao gồm quản lý thành viên và kết đôi.",
+        "agencyMember": "Chỉ có thể xem và quản lý dữ liệu từ cơ quan của mình."
+      },
+      "status": {
+        "pending": "Chờ phê duyệt",
+        "active": "Đang hoạt động",
+        "suspended": "Đã tạm dừng"
+      },
+      "warnings": {
+        "superAdminRoleChange": "⚠️ Chỉ quản trị viên cấp cao mới có thể thay đổi vai trò của tài khoản quản trị viên cấp cao."
+      },
+      "buttons": {
+        "cancel": "Hủy",
+        "save": "Hoàn tất sửa",
+        "add": "Thêm người dùng"
+      }
+    },
+    "youtube": {
+      "titles": {
+        "register": "Đăng ký video YouTube",
+        "edit": "Sửa video"
+      },
+      "descriptions": {
+        "register": "Đăng ký video YouTube để hiển thị trong ứng dụng."
+      },
+      "fields": {
+        "url": "YouTube URL",
+        "title": "Tiêu đề",
+        "status": "Trạng thái",
+        "description": "Mô tả"
+      },
+      "placeholders": {
+        "url": "https://www.youtube.com/watch?v=...",
+        "title": "Nhập tiêu đề video",
+        "description": "Nhập mô tả cho video"
+      },
+      "status": {
+        "active": "Hoạt động (Công khai)",
+        "inactive": "Không hoạt động (Riêng tư)"
+      },
+      "preview": {
+        "title": "Xem trước video"
+      },
+      "buttons": {
+        "cancel": "Hủy",
+        "register": "Đăng ký",
+        "save": "Hoàn tất sửa"
+      }
     }
   },
   "profile": {
@@ -297,6 +436,7 @@
         "physicalInfoGroom": "Nhập thông tin thể chất của chú rể",
         "physicalInfoBride": "Nhập thông tin thể chất của cô dâu",
         "lifestyleGroom": "Nhập thông tin lối sống của chú rể",
+        "lifestyle": "Thói quen sinh hoạt",
         "assetsLifestyle": "Nhập thông tin thu nhập và lối sống",
         "idealTypeAgency": "Nhập điều kiện lý tưởng và cơ quan",
         "affiliationMemo": "Nhập cơ quan và thông tin bổ sung",
@@ -375,7 +515,8 @@
         "uploadPhotosFirst": "Vui lòng tải lên ảnh hồ sơ trước",
         "primaryImageChanged": "Ảnh chính đã được thay đổi.",
         "primaryImageChangeFailed": "Không thể thay đổi ảnh chính.",
-        "existingImageDeleteInfo": "Ảnh hiện có có thể được xóa khi lưu."
+        "existingImageDeleteInfo": "Ảnh hiện có có thể được xóa khi lưu.",
+        "photosSelected": "Đã chọn {{count}} ảnh"
       }
     }
   },
@@ -410,6 +551,26 @@
     "progress": {
       "overall": "Tiến độ tổng thể",
       "completed": "Giai đoạn hoàn thành"
+    },
+    "create": {
+      "searchPlaceholder": {
+        "groom": "Tìm kiếm tên cô dâu hoặc khu vực",
+        "bride": "Tìm kiếm tên chú rể hoặc khu vực"
+      },
+      "noPartners": {
+        "groom": "Không có cô dâu nào có sẵn để kết đôi.",
+        "bride": "Không có chú rể nào có sẵn để kết đôi."
+      },
+      "fields": {
+        "age": "{{age}} tuổi",
+        "education": "Học lực {{education}}"
+      },
+      "placeholders": {
+        "nextStep": "VD: Lên lịch cuộc họp video"
+      },
+      "buttons": {
+        "cancel": "Hủy"
+      }
     }
   },
   "favorite": {

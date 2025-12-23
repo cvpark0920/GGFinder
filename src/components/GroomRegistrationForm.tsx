@@ -166,7 +166,7 @@ export function GroomRegistrationForm({
                       name: e.target.value,
                     })
                   }
-                  placeholder="홍길동"
+                  placeholder={t('form.registration.placeholders.nameGroom')}
                 />
               </div>
               <div className="space-y-2">
@@ -350,14 +350,14 @@ export function GroomRegistrationForm({
           <CardHeader>
             <div className="flex items-center gap-2">
               <Coffee className="w-5 h-5 text-indigo-600" />
-              <CardTitle>생활 습관</CardTitle>
+              <CardTitle>{t('form.registration.sections.lifestyle')}</CardTitle>
             </div>
-            <CardDescription>신랑의 생활 습관을 입력하세요</CardDescription>
+            <CardDescription>{t('form.registration.sectionDescriptions.lifestyleGroom')}</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="g-smoking">흡연유무</Label>
+                <Label htmlFor="g-smoking">{t('form.registration.fields.smoking')}</Label>
                 <Select
                   value={newClient.smoking}
                   onValueChange={(val) =>
@@ -368,16 +368,16 @@ export function GroomRegistrationForm({
                   }
                 >
                   <SelectTrigger id="g-smoking">
-                    <SelectValue placeholder="선택" />
+                    <SelectValue placeholder={t('common.select')} />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="비흡연">비흡연</SelectItem>
-                    <SelectItem value="흡연">흡연</SelectItem>
+                    <SelectItem value="비흡연">{t('form.registration.options.nonSmoker')}</SelectItem>
+                    <SelectItem value="흡연">{t('form.registration.options.smoker')}</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
               <div className="space-y-2">
-                <Label htmlFor="g-drinking">음주주량</Label>
+                <Label htmlFor="g-drinking">{t('form.registration.fields.drinking')}</Label>
                 <Input
                   id="g-drinking"
                   value={newClient.drinking}
@@ -387,7 +387,7 @@ export function GroomRegistrationForm({
                       drinking: e.target.value,
                     })
                   }
-                  placeholder="소주 1병"
+                  placeholder={t('form.registration.placeholders.drinking')}
                 />
               </div>
             </div>
@@ -525,7 +525,7 @@ export function GroomRegistrationForm({
                 </Button>
                 {selectedPhotos.length > 0 && (
                   <span className="text-sm text-indigo-600 font-medium">
-                    {selectedPhotos.length}장 선택됨
+                    {t('form.registration.media.photosSelected', { count: selectedPhotos.length })}
                   </span>
                 )}
               </div>

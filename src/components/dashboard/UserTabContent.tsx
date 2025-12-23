@@ -268,8 +268,6 @@ export function UserTabContent({
                     </div>
                     <div className="flex items-center gap-2 mt-1 text-xs text-slate-500">
                       <span>{user.username}</span>
-                      <span>•</span>
-                      <span>{user.email}</span>
                     </div>
                   </div>
                 </div>

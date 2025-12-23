@@ -77,7 +77,9 @@ export function CreateMatchSheet({
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
             <Input
-              placeholder={`${matchingClient?.type === "groom" ? "신부" : "신랑"} 이름 또는 지역 검색`}
+              placeholder={matchingClient?.type === "groom" 
+                ? t('match.create.searchPlaceholder.groom')
+                : t('match.create.searchPlaceholder.bride')}
               className="pl-9 h-11 border-slate-300 focus:border-rose-400 focus:ring-rose-400"
               value={partnerSearchTerm}
               onChange={(e) => setPartnerSearchTerm(e.target.value)}
@@ -92,9 +94,9 @@ export function CreateMatchSheet({
                   <div className="text-center text-slate-500">
                     <Users className="w-16 h-16 mx-auto mb-4 opacity-30" />
                     <p className="text-base font-medium">
-                      매칭 가능한{" "}
-                      {matchingClient?.type === "groom" ? "신부" : "신랑"}가
-                      없습니다.
+                      {matchingClient?.type === "groom" 
+                        ? t('match.create.noPartners.groom')
+                        : t('match.create.noPartners.bride')}
                     </p>
                   </div>
                 </CardContent>
@@ -145,7 +147,7 @@ export function CreateMatchSheet({
                                     : "bg-rose-100 text-rose-700"
                                 }`}
                               >
-                                {partner.age}세
+                                {t('match.create.fields.age', { age: partner.age })}
                               </Badge>
                             </div>
                             <div className="space-y-1.5">
@@ -156,7 +158,7 @@ export function CreateMatchSheet({
                               {partner.education && (
                                 <div className="flex items-center gap-1.5 text-sm text-slate-600">
                                   <GraduationCap className="w-3.5 h-3.5 text-slate-400" />
-                                  <span>학력 {partner.education}</span>
+                                  <span>{t('match.create.fields.education', { education: partner.education })}</span>
                                 </div>
                               )}
                               {partner.job && (
@@ -249,7 +251,7 @@ export function CreateMatchSheet({
                           nextStep: e.target.value,
                         })
                       }
-                      placeholder="예: 화상 미팅 일정 조율"
+                      placeholder={t('match.create.placeholders.nextStep')}
                       className="border-slate-300 focus:border-rose-400 focus:ring-rose-400"
                     />
                   </div>
@@ -283,7 +285,7 @@ export function CreateMatchSheet({
             onClick={() => onOpenChange(false)}
             className="flex-1 border-slate-300 hover:bg-slate-50"
           >
-            취소
+            {t('match.create.buttons.cancel')}
           </Button>
           <Button
             onClick={onCreateMatch}

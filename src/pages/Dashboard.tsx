@@ -507,7 +507,7 @@ export default function Dashboard() {
               <SheetTrigger asChild>
                 <Button className="bg-slate-800 hover:bg-slate-900 text-white gap-2 shadow-sm">
                   <Plus className="w-4 h-4" />
-                  사용자 추가
+                  {t('dashboard.user.buttons.add')}
                 </Button>
               </SheetTrigger>
               <SheetContent

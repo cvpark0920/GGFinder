@@ -19,6 +19,7 @@ import {
 } from "../ui/select";
 import { MemoTextarea } from "../MemoTextarea";
 import { Pencil, Building2, User as UserIcon, Phone, MapPin, FileText } from "lucide-react";
+import { useLanguage } from "../LanguageContext";
 
 interface EditAgencySheetProps {
   open: boolean;
@@ -51,6 +52,8 @@ export function EditAgencySheet({
   setNewAgency,
   onSave,
 }: EditAgencySheetProps) {
+  const { t } = useLanguage();
+  
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent
@@ -64,8 +67,8 @@ export function EditAgencySheet({
               <Pencil className="w-6 h-6 text-white" />
             </div>
             <div>
-              <SheetTitle className="text-xl">소속사 정보 수정</SheetTitle>
-              <SheetDescription>소속사 정보를 수정하세요</SheetDescription>
+              <SheetTitle className="text-xl">{t('dashboard.agency.edit.title')}</SheetTitle>
+              <SheetDescription>{t('dashboard.agency.edit.description')}</SheetDescription>
             </div>
           </div>
         </SheetHeader>
@@ -75,18 +78,18 @@ export function EditAgencySheet({
           <div className="bg-slate-50 rounded-xl p-4 space-y-4">
             <div className="flex items-center gap-2 mb-3">
               <Building2 className="w-4 h-4 text-rose-600" />
-              <h3 className="text-sm text-slate-700">기본 정보</h3>
+              <h3 className="text-sm text-slate-700">{t('dashboard.agency.sections.basicInfo')}</h3>
             </div>
             <div>
               <Label
                 htmlFor="edit-agency-name"
                 className="flex items-center gap-1"
               >
-                소속사명 <span className="text-rose-500">*</span>
+                {t('dashboard.agency.fields.name')} <span className="text-rose-500">*</span>
               </Label>
               <Input
                 id="edit-agency-name"
-                placeholder="예: 서울국제결혼"
+                placeholder={t('dashboard.agency.placeholders.name')}
                 value={newAgency.name}
                 onChange={(e) =>
                   setNewAgency({
@@ -102,7 +105,7 @@ export function EditAgencySheet({
                 htmlFor="edit-agency-role"
                 className="flex items-center gap-1"
               >
-                역할 <span className="text-rose-500">*</span>
+                {t('dashboard.agency.fields.role')} <span className="text-rose-500">*</span>
               </Label>
               <Select
                 value={newAgency.role}
@@ -120,13 +123,13 @@ export function EditAgencySheet({
                   <SelectItem value="groom">
                     <div className="flex items-center gap-2">
                       <div className="w-2 h-2 rounded-full bg-blue-500"></div>
-                      신랑 알선
+                      {t('dashboard.agency.roles.groom')}
                     </div>
                   </SelectItem>
                   <SelectItem value="bride">
                     <div className="flex items-center gap-2">
                       <div className="w-2 h-2 rounded-full bg-rose-500"></div>
-                      신부 알선
+                      {t('dashboard.agency.roles.bride')}
                     </div>
                   </SelectItem>
                 </SelectContent>
@@ -138,18 +141,18 @@ export function EditAgencySheet({
           <div className="bg-slate-50 rounded-xl p-4 space-y-4">
             <div className="flex items-center gap-2 mb-3">
               <UserIcon className="w-4 h-4 text-rose-600" />
-              <h3 className="text-sm text-slate-700">담당자 정보</h3>
+              <h3 className="text-sm text-slate-700">{t('dashboard.agency.sections.contactInfo')}</h3>
             </div>
             <div>
               <Label
                 htmlFor="edit-agency-contact"
                 className="flex items-center gap-1"
               >
-                담당자명 <span className="text-rose-500">*</span>
+                {t('dashboard.agency.fields.contact')} <span className="text-rose-500">*</span>
               </Label>
               <Input
                 id="edit-agency-contact"
-                placeholder="예: 김대표"
+                placeholder={t('dashboard.agency.placeholders.contact')}
                 value={newAgency.contact}
                 onChange={(e) =>
                   setNewAgency({
@@ -166,11 +169,11 @@ export function EditAgencySheet({
                 className="flex items-center gap-1"
               >
                 <Phone className="w-3.5 h-3.5" />
-                연락처 <span className="text-rose-500">*</span>
+                {t('dashboard.agency.fields.phone')} <span className="text-rose-500">*</span>
               </Label>
               <Input
                 id="edit-agency-phone"
-                placeholder="예: 02-1234-5678"
+                placeholder={t('dashboard.agency.placeholders.phone')}
                 value={newAgency.phone}
                 onChange={(e) =>
                   setNewAgency({
@@ -187,18 +190,18 @@ export function EditAgencySheet({
           <div className="bg-slate-50 rounded-xl p-4 space-y-4">
             <div className="flex items-center gap-2 mb-3">
               <MapPin className="w-4 h-4 text-rose-600" />
-              <h3 className="text-sm text-slate-700">위치 정보</h3>
+              <h3 className="text-sm text-slate-700">{t('dashboard.agency.sections.locationInfo')}</h3>
             </div>
             <div>
               <Label
                 htmlFor="edit-agency-address"
                 className="flex items-center gap-1"
               >
-                주소 <span className="text-rose-500">*</span>
+                {t('dashboard.agency.fields.address')} <span className="text-rose-500">*</span>
               </Label>
               <Input
                 id="edit-agency-address"
-                placeholder="예: 서울시 강남구"
+                placeholder={t('dashboard.agency.placeholders.address')}
                 value={newAgency.address}
                 onChange={(e) =>
                   setNewAgency({
@@ -215,10 +218,10 @@ export function EditAgencySheet({
           <div className="bg-slate-50 rounded-xl p-4 space-y-4">
             <div className="flex items-center gap-2 mb-3">
               <FileText className="w-4 h-4 text-rose-600" />
-              <h3 className="text-sm text-slate-700">추가 정보</h3>
+              <h3 className="text-sm text-slate-700">{t('dashboard.agency.sections.additionalInfo')}</h3>
             </div>
             <div>
-              <Label htmlFor="edit-agency-status">상태</Label>
+              <Label htmlFor="edit-agency-status">{t('dashboard.agency.fields.status')}</Label>
               <Select
                 value={newAgency.status}
                 onValueChange={(value) =>
@@ -238,23 +241,23 @@ export function EditAgencySheet({
                   <SelectItem value="활성">
                     <div className="flex items-center gap-2">
                       <div className="w-2 h-2 rounded-full bg-green-500"></div>
-                      활성
+                      {t('dashboard.agency.status.active')}
                     </div>
                   </SelectItem>
                   <SelectItem value="중지">
                     <div className="flex items-center gap-2">
                       <div className="w-2 h-2 rounded-full bg-gray-400"></div>
-                      중지
+                      {t('dashboard.agency.status.suspended')}
                     </div>
                   </SelectItem>
                 </SelectContent>
               </Select>
             </div>
             <div>
-              <Label htmlFor="edit-agency-memo">메모</Label>
+              <Label htmlFor="edit-agency-memo">{t('dashboard.agency.fields.memo')}</Label>
               <MemoTextarea
                 id="edit-agency-memo"
-                placeholder="소속사 관련 메모를 입력하세요..."
+                placeholder={t('dashboard.agency.placeholders.memo')}
                 value={newAgency.memo}
                 onChange={(value) =>
                   setNewAgency({
@@ -274,7 +277,7 @@ export function EditAgencySheet({
             onClick={() => onOpenChange(false)}
             className="flex-1"
           >
-            취소
+            {t('dashboard.agency.buttons.cancel')}
           </Button>
           <Button
             type="button"
@@ -288,7 +291,7 @@ export function EditAgencySheet({
             className="flex-1 bg-gradient-to-br from-blue-400 to-indigo-500 hover:from-blue-500 hover:to-indigo-600 border-0 shadow-md"
           >
             <Pencil className="w-4 h-4 mr-2" />
-            수정 완료
+            {t('dashboard.agency.buttons.save')}
           </Button>
         </SheetFooter>
       </SheetContent>

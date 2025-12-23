@@ -26,6 +26,7 @@ import {
 } from "lucide-react";
 import { Client, Agency, SortConfig } from "../../types/dashboard";
 import { Avatar, AvatarImage, AvatarFallback } from "../ui/avatar";
+import { useLanguage } from "../LanguageContext";
 
 interface ClientTabContentProps {
   clients: Client[];
@@ -52,6 +53,8 @@ export function ClientTabContent({
   sortConfig,
   onAvatarClick,
 }: ClientTabContentProps) {
+  const { t } = useLanguage();
+  
   const SortIcon = ({ column }: { column: keyof Client }) => {
     if (sortConfig?.key !== column)
       return <ArrowUpDown className="ml-2 h-4 w-4 text-slate-400" />;
@@ -109,7 +112,7 @@ export function ClientTabContent({
                     </div>
                     <div className="flex items-center gap-2 mt-0.5">
                       <p className="text-xs text-slate-400">
-                        등록일: {client.date}
+                        {t('dashboard.table.registrationDateLabel')}: {client.date}
                       </p>
                       {client.agencyId && (
                         <>
@@ -144,15 +147,15 @@ export function ClientTabContent({
                     }
                   >
                     <SelectTrigger className="w-full h-9 text-sm">
-                      <SelectValue placeholder="상태" />
+                      <SelectValue placeholder={t('dashboard.table.status')} />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="등록 완료">등록 완료</SelectItem>
-                      <SelectItem value="매칭 중">매칭 중</SelectItem>
-                      <SelectItem value="만남 예정">만남 예정</SelectItem>
-                      <SelectItem value="서류 준비">서류 준비</SelectItem>
-                      <SelectItem value="대기 중">대기 중</SelectItem>
-                      <SelectItem value="진행 중">진행 중</SelectItem>
+                      <SelectItem value="등록 완료">{t('dashboard.status.registered')}</SelectItem>
+                      <SelectItem value="매칭 중">{t('dashboard.status.matching')}</SelectItem>
+                      <SelectItem value="만남 예정">{t('dashboard.status.meetingScheduled')}</SelectItem>
+                      <SelectItem value="서류 준비">{t('dashboard.status.documents')}</SelectItem>
+                      <SelectItem value="대기 중">{t('dashboard.status.waiting')}</SelectItem>
+                      <SelectItem value="진행 중">{t('dashboard.status.inProgress')}</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -162,7 +165,7 @@ export function ClientTabContent({
                   className="gap-1 px-3 h-9"
                   onClick={() => onEdit(client)}
                 >
-                  <Pencil className="w-3.5 h-3.5" /> 수정
+                  <Pencil className="w-3.5 h-3.5" /> {t('dashboard.table.edit')}
                 </Button>
                 <Button
                   variant="default"
@@ -170,14 +173,14 @@ export function ClientTabContent({
                   className="gap-1 px-3 h-9 bg-rose-600 hover:bg-rose-700"
                   onClick={() => onMatch(client)}
                 >
-                  <Heart className="w-3.5 h-3.5" /> 매칭
+                  <Heart className="w-3.5 h-3.5" /> {t('dashboard.table.match')}
                 </Button>
               </div>
             </div>
           ))}
           {clients.length === 0 && (
             <div className="text-center py-10 text-slate-500 bg-white rounded-xl border border-dashed">
-              검색 결과가 없습니다.
+              {t('dashboard.table.noResults')}
             </div>
           )}
         </div>
@@ -187,13 +190,13 @@ export function ClientTabContent({
           <Table>
             <TableHeader>
               <TableRow className="bg-gradient-to-r from-slate-50 via-white to-slate-50 hover:bg-gradient-to-r hover:from-slate-50 hover:via-white hover:to-slate-50 border-b-2 border-slate-200">
-                <TableHead className="font-semibold text-slate-700 py-4 h-auto w-16 text-center">번호</TableHead>
+                <TableHead className="font-semibold text-slate-700 py-4 h-auto w-16 text-center">{t('dashboard.table.number')}</TableHead>
                 <TableHead
                   className="cursor-pointer font-semibold text-slate-700 py-4 h-auto"
                   onClick={() => onSort("name")}
                 >
                   <div className="flex items-center gap-1.5">
-                    이름 <SortIcon column="name" />
+                    {t('dashboard.table.name')} <SortIcon column="name" />
                   </div>
                 </TableHead>
                 <TableHead
@@ -201,7 +204,7 @@ export function ClientTabContent({
                   onClick={() => onSort("age")}
                 >
                   <div className="flex items-center gap-1.5">
-                    나이 <SortIcon column="age" />
+                    {t('dashboard.table.age')} <SortIcon column="age" />
                   </div>
                 </TableHead>
                 <TableHead
@@ -209,7 +212,7 @@ export function ClientTabContent({
                   onClick={() => onSort("loc")}
                 >
                   <div className="flex items-center gap-1.5">
-                    지역 <SortIcon column="loc" />
+                    {t('dashboard.table.region')} <SortIcon column="loc" />
                   </div>
                 </TableHead>
                 <TableHead
@@ -217,19 +220,19 @@ export function ClientTabContent({
                   onClick={() => onSort("status")}
                 >
                   <div className="flex items-center gap-1.5">
-                    상태 <SortIcon column="status" />
+                    {t('dashboard.table.status')} <SortIcon column="status" />
                   </div>
                 </TableHead>
-                <TableHead className="font-semibold text-slate-700 py-4 h-auto">소속사</TableHead>
+                <TableHead className="font-semibold text-slate-700 py-4 h-auto">{t('dashboard.table.agency')}</TableHead>
                 <TableHead
                   className="cursor-pointer font-semibold text-slate-700 py-4 h-auto"
                   onClick={() => onSort("date")}
                 >
                   <div className="flex items-center gap-1.5">
-                    등록일 <SortIcon column="date" />
+                    {t('dashboard.table.registrationDate')} <SortIcon column="date" />
                   </div>
                 </TableHead>
-                <TableHead className="text-right font-semibold text-slate-700 py-4 h-auto">관리</TableHead>
+                <TableHead className="text-right font-semibold text-slate-700 py-4 h-auto">{t('dashboard.table.management')}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -284,15 +287,15 @@ export function ClientTabContent({
                       }
                     >
                       <SelectTrigger className="w-[130px] h-9 text-xs border-slate-200 hover:border-rose-300 transition-colors">
-                        <SelectValue placeholder="상태" />
+                        <SelectValue placeholder={t('dashboard.table.status')} />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="등록 완료">등록 완료</SelectItem>
-                        <SelectItem value="매칭 중">매칭 중</SelectItem>
-                        <SelectItem value="만남 예정">만남 예정</SelectItem>
-                        <SelectItem value="서류 준비">서류 준비</SelectItem>
-                        <SelectItem value="대기 중">대기 중</SelectItem>
-                        <SelectItem value="진행 중">진행 중</SelectItem>
+                        <SelectItem value="등록 완료">{t('dashboard.status.registered')}</SelectItem>
+                        <SelectItem value="매칭 중">{t('dashboard.status.matching')}</SelectItem>
+                        <SelectItem value="만남 예정">{t('dashboard.status.meetingScheduled')}</SelectItem>
+                        <SelectItem value="서류 준비">{t('dashboard.status.documents')}</SelectItem>
+                        <SelectItem value="대기 중">{t('dashboard.status.waiting')}</SelectItem>
+                        <SelectItem value="진행 중">{t('dashboard.status.inProgress')}</SelectItem>
                       </SelectContent>
                     </Select>
                   </TableCell>
@@ -317,7 +320,7 @@ export function ClientTabContent({
                         variant="ghost"
                         size="icon"
                         className="h-9 w-9 text-rose-500 hover:text-rose-600 hover:bg-rose-50 transition-all rounded-lg"
-                        title="매칭하기"
+                        title={t('dashboard.table.matchTitle')}
                         onClick={() => onMatch(client)}
                       >
                         <Heart className="w-4 h-4" />
@@ -326,7 +329,7 @@ export function ClientTabContent({
                         variant="ghost"
                         size="icon"
                         className="h-9 w-9 text-slate-500 hover:text-blue-600 hover:bg-blue-50 transition-all rounded-lg"
-                        title="상세/수정"
+                        title={t('dashboard.table.editTitle')}
                         onClick={() => onEdit(client)}
                       >
                         <Pencil className="w-4 h-4" />
@@ -336,7 +339,7 @@ export function ClientTabContent({
                         size="icon"
                         className="h-9 w-9 text-slate-500 hover:text-red-600 hover:bg-red-50 transition-all rounded-lg"
                         onClick={() => onDelete(client.id, type, client.name)}
-                        title="삭제"
+                        title={t('dashboard.table.deleteTitle')}
                       >
                         <Trash2 className="w-4 h-4" />
                       </Button>
@@ -351,7 +354,7 @@ export function ClientTabContent({
                     className="text-center py-12 text-slate-500 bg-slate-50/50"
                   >
                     <div className="flex flex-col items-center gap-2">
-                      <span className="text-sm">검색 결과가 없습니다.</span>
+                      <span className="text-sm">{t('dashboard.table.noResults')}</span>
                     </div>
                   </TableCell>
                 </TableRow>

@@ -18,6 +18,7 @@ import {
 } from "./ui/sheet";
 import { Youtube, Link as LinkIcon, AlertCircle } from "lucide-react";
 import { YouTubeVideo } from "../types/dashboard";
+import { useLanguage } from "./LanguageContext";
 
 interface YouTubeRegistrationFormProps {
   initialData?: Partial<YouTubeVideo>;
@@ -30,6 +31,7 @@ export function YouTubeRegistrationForm({
   onSubmit,
   onCancel,
 }: YouTubeRegistrationFormProps) {
+  const { t } = useLanguage();
   const [formData, setFormData] = React.useState({
     title: "",
     url: "",
@@ -98,10 +100,10 @@ export function YouTubeRegistrationForm({
           </div>
           <div className="space-y-1">
             <SheetTitle className="text-xl">
-              {initialData?.id ? "동영상 수정" : "유튜브 동영상 등록"}
+              {initialData?.id ? t('dashboard.youtube.titles.edit') : t('dashboard.youtube.titles.register')}
             </SheetTitle>
             <SheetDescription className="text-slate-500">
-              앱에 표시될 유튜브 동영상을 등록하세요.
+              {t('dashboard.youtube.descriptions.register')}
             </SheetDescription>
           </div>
         </div>
@@ -111,7 +113,7 @@ export function YouTubeRegistrationForm({
         <div className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="video-url" className="text-sm font-medium text-slate-700">
-              YouTube URL <span className="text-red-500">*</span>
+              {t('dashboard.youtube.fields.url')} <span className="text-red-500">*</span>
             </Label>
             <div className="relative">
               <LinkIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
@@ -119,7 +121,7 @@ export function YouTubeRegistrationForm({
                 id="video-url"
                 value={formData.url}
                 onChange={handleUrlChange}
-                placeholder="https://www.youtube.com/watch?v=..."
+                placeholder={t('dashboard.youtube.placeholders.url')}
                 className="pl-9 bg-slate-50 border-slate-200 focus:bg-white transition-colors"
               />
             </div>
@@ -140,7 +142,7 @@ export function YouTubeRegistrationForm({
                 />
               </div>
               <div className="px-4 py-2 bg-slate-50 border-t border-slate-200 text-xs text-slate-500 flex items-center justify-between">
-                <span>동영상 미리보기</span>
+                <span>{t('dashboard.youtube.preview.title')}</span>
                 <span className="font-mono">{previewId}</span>
               </div>
             </div>
@@ -148,13 +150,13 @@ export function YouTubeRegistrationForm({
 
           <div className="space-y-2">
             <Label htmlFor="video-title" className="text-sm font-medium text-slate-700">
-              제목
+              {t('dashboard.youtube.fields.title')}
             </Label>
             <Input
               id="video-title"
               value={formData.title}
               onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-              placeholder="동영상 제목을 입력하세요"
+              placeholder={t('dashboard.youtube.placeholders.title')}
               className="bg-slate-50 border-slate-200 focus:bg-white transition-colors"
             />
           </div>
@@ -162,7 +164,7 @@ export function YouTubeRegistrationForm({
           <div className="grid grid-cols-2 gap-4">
              <div className="space-y-2 col-span-2">
               <Label htmlFor="video-status" className="text-sm font-medium text-slate-700">
-                상태
+                {t('dashboard.youtube.fields.status')}
               </Label>
               <Select
                 value={formData.status}
@@ -175,13 +177,13 @@ export function YouTubeRegistrationForm({
                   <SelectItem value="active">
                     <div className="flex items-center gap-2">
                       <div className="w-2 h-2 rounded-full bg-green-500" />
-                      활성 (공개)
+                      {t('dashboard.youtube.status.active')}
                     </div>
                   </SelectItem>
                   <SelectItem value="inactive">
                     <div className="flex items-center gap-2">
                       <div className="w-2 h-2 rounded-full bg-slate-400" />
-                      비활성 (비공개)
+                      {t('dashboard.youtube.status.inactive')}
                     </div>
                   </SelectItem>
                 </SelectContent>
@@ -191,13 +193,13 @@ export function YouTubeRegistrationForm({
 
           <div className="space-y-2">
             <Label htmlFor="video-desc" className="text-sm font-medium text-slate-700">
-              설명
+              {t('dashboard.youtube.fields.description')}
             </Label>
             <Textarea
               id="video-desc"
               value={formData.description}
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-              placeholder="동영상에 대한 설명을 입력하세요"
+              placeholder={t('dashboard.youtube.placeholders.description')}
               className="min-h-[100px] resize-none bg-slate-50 border-slate-200 focus:bg-white transition-colors"
             />
           </div>
@@ -210,14 +212,14 @@ export function YouTubeRegistrationForm({
           onClick={onCancel} 
           className="flex-1 h-11 text-base font-medium border-slate-300 hover:bg-slate-50"
         >
-          취소
+          {t('dashboard.youtube.buttons.cancel')}
         </Button>
         <Button 
           onClick={handleSubmit} 
           className="flex-1 h-11 text-base font-medium bg-red-600 hover:bg-red-700 text-white shadow-md hover:shadow-lg transition-all"
           disabled={!formData.url}
         >
-          {initialData?.id ? "수정완료" : "등록하기"}
+          {initialData?.id ? t('dashboard.youtube.buttons.save') : t('dashboard.youtube.buttons.register')}
         </Button>
       </SheetFooter>
     </>

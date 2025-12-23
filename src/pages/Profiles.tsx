@@ -2,9 +2,11 @@ import React, { useState, useEffect } from "react";
 import { Users, UserCircle } from "lucide-react";
 import ProfileList from "./ProfileList";
 import { useAuth } from "../components/AuthContext";
+import { useLanguage } from "../components/LanguageContext";
 
 export default function Profiles() {
   const { user, isLoading: authLoading } = useAuth();
+  const { t } = useLanguage();
   
   // 사용자 권한에 따라 조회 가능한 프로필 타입 결정
   const canViewBrides = user?.role === 'super_admin' || user?.role === 'platform_admin' || user?.agency?.role === 'groom';
@@ -82,7 +84,7 @@ export default function Profiles() {
             } ${!canViewBrides ? "opacity-50 cursor-not-allowed" : ""}`}
           >
             <Users className="w-5 h-5" />
-            <span className="font-medium">신부</span>
+            <span className="font-medium">{t('dashboard.tabs.brides')}</span>
           </button>
           <button
             onClick={() => handleTabClick("groom")}
@@ -94,7 +96,7 @@ export default function Profiles() {
             } ${!canViewGrooms ? "opacity-50 cursor-not-allowed" : ""}`}
           >
             <UserCircle className="w-5 h-5" />
-            <span className="font-medium">신랑</span>
+            <span className="font-medium">{t('dashboard.tabs.grooms')}</span>
           </button>
         </div>
       )}
