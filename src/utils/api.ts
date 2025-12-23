@@ -32,6 +32,21 @@ async function apiCall<T>(
   });
 
   if (!response.ok) {
+    // 401 Unauthorized 에러 처리 (토큰 만료)
+    if (response.status === 401) {
+      // localStorage에서 토큰 제거
+      localStorage.removeItem('idToken');
+      localStorage.removeItem('user');
+      
+      // 전역 이벤트 발생하여 Layout에서 처리하도록 함
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new CustomEvent('auth:unauthorized'));
+      }
+      
+      const errorData = await response.json().catch(() => ({ error: 'Invalid token' }));
+      throw new Error(errorData.error || '인증이 만료되었습니다. 다시 로그인해주세요.');
+    }
+    
     const errorData = await response.json().catch(() => ({ error: '알 수 없는 오류가 발생했습니다.' }));
     throw new Error(errorData.error || `HTTP ${response.status}: ${response.statusText}`);
   }
@@ -199,6 +214,21 @@ async function apiCallWithFiles<T>(
   });
 
   if (!response.ok) {
+    // 401 Unauthorized 에러 처리 (토큰 만료)
+    if (response.status === 401) {
+      // localStorage에서 토큰 제거
+      localStorage.removeItem('idToken');
+      localStorage.removeItem('user');
+      
+      // 전역 이벤트 발생하여 Layout에서 처리하도록 함
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new CustomEvent('auth:unauthorized'));
+      }
+      
+      const errorData = await response.json().catch(() => ({ error: 'Invalid token' }));
+      throw new Error(errorData.error || '인증이 만료되었습니다. 다시 로그인해주세요.');
+    }
+    
     const errorData = await response.json().catch(() => ({ error: '알 수 없는 오류가 발생했습니다.' }));
     throw new Error(errorData.error || `HTTP ${response.status}: ${response.statusText}`);
   }

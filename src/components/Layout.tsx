@@ -54,6 +54,24 @@ export default function Layout() {
     }
   }, [isLoading, isAuthenticated, location.pathname, navigate]);
 
+  // 401 에러 발생 시 처리 (토큰 만료)
+  React.useEffect(() => {
+    const handleUnauthorized = () => {
+      // AuthContext의 logout 호출
+      logout();
+      // 홈으로 리디렉션
+      navigate('/', { replace: true });
+      // 로그인 sheet 열기
+      setLoginSheetOpen(true);
+    };
+
+    window.addEventListener('auth:unauthorized', handleUnauthorized);
+    
+    return () => {
+      window.removeEventListener('auth:unauthorized', handleUnauthorized);
+    };
+  }, [logout, navigate]);
+
   const isActive = (path: string) => location.pathname.startsWith(path);
   // Exact match for home
   const isHomeActive = location.pathname === '/';
