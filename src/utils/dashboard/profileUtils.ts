@@ -53,10 +53,6 @@ function parseIdealType(idealType: string | undefined): string[] {
  * Client 타입을 BrideProfile 타입으로 변환
  */
 export function mapClientToBrideProfile(client: Client & any): BrideProfile {
-  // #region agent log
-  fetch('http://127.0.0.1:7243/ingest/1ea1dcfc-80be-42cc-9332-f848c10e9a0f',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'profileUtils.ts:mapClientToBrideProfile:entry',message:'Mapping client to bride profile',data:{clientId:client.id,hasImages:!!client.images,imagesCount:Array.isArray(client.images)?client.images.length:0,imagesType:typeof client.images,hasVideo:!!client.video,videoType:typeof client.video},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'C'})}).catch(()=>{});
-  // #endregion
-  
   // birthDate는 호환성을 위해 유지하되, birthYear로부터 생성
   const birthYear = client.birthYear || 0;
   const birthDate = client.birthDate || (birthYear ? `${birthYear}-01-01` : '');
@@ -96,10 +92,6 @@ export function mapClientToBrideProfile(client: Client & any): BrideProfile {
     avatarUrl: client.avatarUrl,
   };
   
-  // #region agent log
-  fetch('http://127.0.0.1:7243/ingest/1ea1dcfc-80be-42cc-9332-f848c10e9a0f',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'profileUtils.ts:mapClientToBrideProfile:exit',message:'Mapped bride profile result',data:{profileId:result.id,imagesCount:result.images.length,hasVideo:!!result.videoUrl,images:result.images.slice(0,2)},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'C'})}).catch(()=>{});
-  // #endregion
-  
   return result;
 }
 
@@ -107,10 +99,6 @@ export function mapClientToBrideProfile(client: Client & any): BrideProfile {
  * Client 타입을 GroomProfile 타입으로 변환
  */
 export function mapClientToGroomProfile(client: Client & any): GroomProfile {
-  // #region agent log
-  fetch('http://127.0.0.1:7243/ingest/1ea1dcfc-80be-42cc-9332-f848c10e9a0f',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'profileUtils.ts:mapClientToGroomProfile:entry',message:'Mapping client to groom profile',data:{clientId:client.id,hasImages:!!client.images,imagesCount:Array.isArray(client.images)?client.images.length:0,imagesType:typeof client.images,hasVideo:!!client.video,videoType:typeof client.video},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'C'})}).catch(()=>{});
-  // #endregion
-  
   const result = {
     id: client.id.toString(),
     type: 'groom',
@@ -139,10 +127,6 @@ export function mapClientToGroomProfile(client: Client & any): GroomProfile {
     videoUrl: client.video,
     avatarUrl: client.avatarUrl,
   };
-  
-  // #region agent log
-  fetch('http://127.0.0.1:7243/ingest/1ea1dcfc-80be-42cc-9332-f848c10e9a0f',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'profileUtils.ts:mapClientToGroomProfile:exit',message:'Mapped groom profile result',data:{profileId:result.id,imagesCount:result.images.length,hasVideo:!!result.videoUrl,images:result.images.slice(0,2)},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'C'})}).catch(()=>{});
-  // #endregion
   
   return result;
 }

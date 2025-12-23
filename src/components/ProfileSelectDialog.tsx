@@ -49,42 +49,19 @@ export function ProfileSelectDialog({
 
   const loadProfiles = async () => {
     if (!user?.agencyId) {
-      // #region agent log
-      fetch('http://127.0.0.1:7243/ingest/1ea1dcfc-80be-42cc-9332-f848c10e9a0f',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'ProfileSelectDialog.tsx:loadProfiles:noAgencyId',message:'No agencyId in user',data:{user:user ? {id:user.id,agencyId:user.agencyId} : null},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'C'})}).catch(()=>{});
-      // #endregion
       return;
     }
 
     setLoading(true);
-    // #region agent log
-    fetch('http://127.0.0.1:7243/ingest/1ea1dcfc-80be-42cc-9332-f848c10e9a0f',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'ProfileSelectDialog.tsx:loadProfiles:entry',message:'loadProfiles called',data:{profileType,selectableProfileType,userAgencyId:user.agencyId,userAgencyRole:user.agency?.role},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
-    // #endregion
     try {
       // 자신의 소속사 프로필만 조회
       const clients = await fetchClients(selectableProfileType, true);
-      // #region agent log
-      fetch('http://127.0.0.1:7243/ingest/1ea1dcfc-80be-42cc-9332-f848c10e9a0f',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'ProfileSelectDialog.tsx:loadProfiles:afterFetch',message:'After fetchClients',data:{clientsCount:clients.length,clients:clients.map(c=>({id:c.id,agencyId:c.agencyId,type:c.type,name:c.name})),userAgencyId:user.agencyId,userAgencyIdType:typeof user.agencyId},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
-      // #endregion
       // 자신의 소속사 프로필만 필터링
       const agencyProfiles = clients.filter(
-        (client) => {
-          const matches = client.agencyId === user.agencyId;
-          // #region agent log
-          if (!matches) {
-            fetch('http://127.0.0.1:7243/ingest/1ea1dcfc-80be-42cc-9332-f848c10e9a0f',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'ProfileSelectDialog.tsx:loadProfiles:filterMismatch',message:'Profile filtered out',data:{clientId:client.id,clientAgencyId:client.agencyId,clientAgencyIdType:typeof client.agencyId,userAgencyId:user.agencyId,userAgencyIdType:typeof user.agencyId,matches},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'D'})}).catch(()=>{});
-          }
-          // #endregion
-          return matches;
-        }
+        (client) => client.agencyId === user.agencyId
       );
-      // #region agent log
-      fetch('http://127.0.0.1:7243/ingest/1ea1dcfc-80be-42cc-9332-f848c10e9a0f',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'ProfileSelectDialog.tsx:loadProfiles:afterFilter',message:'After filtering',data:{agencyProfilesCount:agencyProfiles.length,profiles:agencyProfiles.map(p=>({id:p.id,agencyId:p.agencyId,name:p.name}))},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
-      // #endregion
       setProfiles(agencyProfiles);
     } catch (error) {
-      // #region agent log
-      fetch('http://127.0.0.1:7243/ingest/1ea1dcfc-80be-42cc-9332-f848c10e9a0f',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'ProfileSelectDialog.tsx:loadProfiles:error',message:'Error loading profiles',data:{error:error instanceof Error ? error.message : String(error),errorStack:error instanceof Error ? error.stack : undefined,selectableProfileType,userAgencyId:user.agencyId,userAgencyRole:user.agency?.role},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'B'})}).catch(()=>{});
-      // #endregion
       console.error('Failed to load profiles:', error);
     } finally {
       setLoading(false);

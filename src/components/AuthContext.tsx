@@ -40,9 +40,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [isLoading, setIsLoading] = useState(true);
 
   const login = (userData: User, token: string) => {
-    // #region agent log
-    fetch('http://127.0.0.1:7243/ingest/1ea1dcfc-80be-42cc-9332-f848c10e9a0f',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'AuthContext.tsx:login',message:'Login called',data:{userId:userData?.id,userRole:userData?.role,userName:userData?.name},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'E'})}).catch(()=>{});
-    // #endregion
     setUser(userData);
     setIdToken(token);
     localStorage.setItem('user', JSON.stringify(userData));
@@ -58,10 +55,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const checkAuth = async () => {
     const storedToken = localStorage.getItem('idToken');
-    // #region agent log
-    const storedUser = localStorage.getItem('user');
-    fetch('http://127.0.0.1:7243/ingest/1ea1dcfc-80be-42cc-9332-f848c10e9a0f',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'AuthContext.tsx:checkAuth:entry',message:'checkAuth called',data:{hasToken:!!storedToken,storedUserRole:storedUser?JSON.parse(storedUser).role:null},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
-    // #endregion
     if (!storedToken) {
       setIsLoading(false);
       return;
@@ -77,9 +70,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       if (response.ok) {
         const data = await response.json();
-        // #region agent log
-        fetch('http://127.0.0.1:7243/ingest/1ea1dcfc-80be-42cc-9332-f848c10e9a0f',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'AuthContext.tsx:checkAuth:apiResponse',message:'API response received',data:{userId:data.user?.id,userRole:data.user?.role,userName:data.user?.name,joinDate:data.user?.joinDate},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'D'})}).catch(()=>{});
-        // #endregion
         // joinDate를 ISO 문자열로 변환하여 저장
         const userData = {
           ...data.user,
@@ -88,9 +78,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         };
         setUser(userData);
         setIdToken(storedToken);
-        // #region agent log
-        fetch('http://127.0.0.1:7243/ingest/1ea1dcfc-80be-42cc-9332-f848c10e9a0f',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'AuthContext.tsx:checkAuth:setUser',message:'User state updated',data:{userId:data.user?.id,userRole:data.user?.role,joinDate:userData.joinDate},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
-        // #endregion
       } else {
         // 토큰이 유효하지 않으면 로그아웃
         logout();

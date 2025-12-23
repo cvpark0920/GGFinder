@@ -263,12 +263,7 @@ export default function ProfileDetail() {
               )}
             </div>
             {/* 찜하기 버튼 - 프로필 사진 위에 오버레이 */}
-            {/* #region agent log */}
-            {(() => {
-              const shouldShow = (profile.type === 'bride' && user?.agency?.role === 'groom') || (profile.type === 'groom' && user?.agency?.role === 'bride');
-              fetch('http://127.0.0.1:7243/ingest/1ea1dcfc-80be-42cc-9332-f848c10e9a0f',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'ProfileDetail.tsx:favoriteButton',message:'Favorite button visibility check',data:{profileType:profile.type,userAgencyRole:user?.agency?.role,shouldShow,profileId:profile.id},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'D'})}).catch(()=>{});
-              return shouldShow;
-            })() && (
+            {((profile.type === 'bride' && user?.agency?.role === 'groom') || (profile.type === 'groom' && user?.agency?.role === 'bride')) && (
               <button
                 onClick={toggleFavorite}
                 disabled={favoriteLoading}
@@ -284,7 +279,6 @@ export default function ProfileDetail() {
                 />
               </button>
             )}
-            {/* #endregion */}
           </div>
         </div>
 

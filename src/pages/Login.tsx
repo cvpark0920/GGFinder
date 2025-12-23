@@ -16,10 +16,7 @@ const GoogleLoginButton = lazy(() => {
     if (isCursorBrowser) {
       // Cursor 브라우저에서는 빈 컴포넌트 반환 (모듈 로드 방지)
       return Promise.resolve({ 
-        default: () => {
-          console.warn('[DEBUG] GoogleLoginButton should not be rendered in Cursor browser');
-          return null;
-        }
+        default: () => null
       });
     }
   }

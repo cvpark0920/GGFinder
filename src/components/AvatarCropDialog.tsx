@@ -82,10 +82,6 @@ export function AvatarCropDialog({
       const clientHeight = contentArea.clientHeight;
       const hasOverflow = scrollHeight > clientHeight;
       const canScroll = contentArea.scrollHeight > contentArea.clientHeight;
-
-      // #region agent log
-      fetch('http://127.0.0.1:7243/ingest/1ea1dcfc-80be-42cc-9332-f848c10e9a0f',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'AvatarCropDialog.tsx:useEffect:measureHeights',message:'Dialog height measurements',data:{viewportHeight,dialogHeight:totalHeight,contentHeight,headerHeight,footerHeight,scrollHeight,clientHeight,hasOverflow,canScroll,overflowY:window.getComputedStyle(contentArea).overflowY,overflowX:window.getComputedStyle(contentArea).overflowX,dialogOverflowY:window.getComputedStyle(dialogContent).overflowY},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
-      // #endregion
     };
 
     // 초기 측정
@@ -216,20 +212,7 @@ export function AvatarCropDialog({
             <div className="space-y-2">
               <Label>프로필 사진 선택</Label>
               <div className="flex flex-wrap gap-2">
-                {images.map((img, index) => {
-                  // #region agent log
-                  const logThumbnailSize = () => {
-                    setTimeout(() => {
-                      const button = document.querySelector(`[data-thumbnail-index="${index}"]`) as HTMLElement;
-                      if (button) {
-                        const rect = button.getBoundingClientRect();
-                        fetch('http://127.0.0.1:7243/ingest/1ea1dcfc-80be-42cc-9332-f848c10e9a0f',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'AvatarCropDialog.tsx:thumbnail:size',message:'Thumbnail size measurement',data:{index,width:rect.width,height:rect.height,layout:'flex-wrap'},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
-                      }
-                    }, 100);
-                  };
-                  if (index === 0) logThumbnailSize();
-                  // #endregion
-                  return (
+                {images.map((img, index) => (
                   <button
                     key={index}
                     data-thumbnail-index={index}
@@ -271,8 +254,7 @@ export function AvatarCropDialog({
                       </div>
                     )}
                   </button>
-                  );
-                })}
+                ))}
               </div>
             </div>
           )}

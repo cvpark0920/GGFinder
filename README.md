@@ -67,8 +67,6 @@
 
 ### Docker를 사용한 로컬 실행
 
-**상세 가이드는 [DOCKER_LOCAL_SETUP.md](./DOCKER_LOCAL_SETUP.md)를 참조하세요.**
-
 #### 빠른 시작
 
 ```bash
