@@ -31,6 +31,18 @@ DIGITALOCEAN_ACCESS_TOKEN: dop_v1_222e110f3a08ae81c62729c59412f18ea5b72bdabd5022
 
 
 
+# 1. 로컬 환경 시작
+npm run docker:dev
+
+# 2. 테스트 실행
+npm run test:local
+
+# 3. 브라우저에서 확인
+# http://localhost:4000
+
+
+
+
 
 
 

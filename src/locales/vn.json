@@ -247,6 +247,118 @@
       "created": "Đã tạo",
       "updated": "Đã cập nhật",
       "deleted": "Đã xóa"
+    },
+    "registration": {
+      "titles": {
+        "newBride": "Đăng ký cô dâu mới",
+        "editGroom": "Chỉnh sửa thông tin chú rể",
+        "editBride": "Chỉnh sửa thông tin cô dâu"
+      },
+      "descriptions": {
+        "newGroom": "Nhập thông tin cơ bản cho thành viên chú rể mới",
+        "newBride": "Nhập thông tin cơ bản cho thành viên cô dâu mới",
+        "editGroom": "Chỉnh sửa thông tin thành viên chú rể",
+        "editBride": "Chỉnh sửa thông tin thành viên cô dâu"
+      },
+      "sections": {
+        "basicInfo": "Thông tin cơ bản",
+        "educationJob": "Học vấn & Nghề nghiệp",
+        "physicalInfo": "Thông tin thể chất",
+        "lifestyle": "Lối sống",
+        "assetsLifestyle": "Tài sản & Lối sống",
+        "idealTypeAgency": "Lý tưởng & Thuộc về",
+        "familyReligion": "Gia đình & Tôn giáo",
+        "affiliationMemo": "Thuộc về & Ghi chú",
+        "media": "Ảnh & Video"
+      },
+      "sectionDescriptions": {
+        "basicInfoGroom": "Nhập thông tin cá nhân cơ bản của chú rể",
+        "basicInfoBride": "Nhập thông tin cá nhân cơ bản của cô dâu",
+        "educationJobGroom": "Nhập thông tin học vấn và nghề nghiệp của chú rể",
+        "educationJobBride": "Nhập thông tin học vấn và nghề nghiệp của cô dâu",
+        "physicalInfoGroom": "Nhập thông tin thể chất của chú rể",
+        "physicalInfoBride": "Nhập thông tin thể chất của cô dâu",
+        "lifestyleGroom": "Nhập thông tin lối sống của chú rể",
+        "assetsLifestyle": "Nhập thông tin thu nhập và lối sống",
+        "idealTypeAgency": "Nhập điều kiện lý tưởng và cơ quan",
+        "affiliationMemo": "Nhập cơ quan và thông tin bổ sung",
+        "familyReligion": "Nhập thông tin thành phần gia đình và tôn giáo",
+        "media": "Tải lên ảnh hồ sơ và video giới thiệu"
+      },
+      "fields": {
+        "birthYear": "Năm sinh",
+        "maritalStatus": "Tình trạng hôn nhân",
+        "annualIncome": "Thu nhập hàng năm - 10,000 KRW",
+        "height": "Chiều cao - cm",
+        "weight": "Cân nặng - kg",
+        "smoking": "Hút thuốc",
+        "drinking": "Uống rượu",
+        "currentJob": "Nghề nghiệp hiện tại",
+        "koreanLevel": "Trình độ tiếng Hàn",
+        "tattoo": "Hình xăm (Tattoo)",
+        "family": "Thành phần gia đình (Gia đình)",
+        "fatherAge": "Tuổi bố",
+        "motherAge": "Tuổi mẹ",
+        "jobWorkplace": "Nghề nghiệp (Nơi làm việc)",
+        "nameWithVietnamese": "Tên (Tên)",
+        "residenceWithVietnamese": "Nơi cư trú (Địa chỉ)",
+        "educationWithVietnamese": "Học vấn (Học lực)",
+        "heightWithVietnamese": "Chiều cao (Cao) - cm",
+        "weightWithVietnamese": "Cân nặng (Cân nặng) - kg",
+        "residenceAddress": "Địa chỉ cư trú",
+        "idealType": "Điều kiện lý tưởng",
+        "agency": "Cơ quan"
+      },
+      "placeholders": {
+        "nameGroom": "Hong Gildong",
+        "nameBride": "vũ quốc hương",
+        "residenceGroom": "Gangnam-gu, Seoul",
+        "residenceBride": "Hà Nội",
+        "education": "Đại học",
+        "job": "Nhân viên văn phòng",
+        "jobBride": "Thợ may",
+        "income": "5000",
+        "educationLevel": "9",
+        "heightGroom": "175",
+        "heightBride": "163",
+        "weightGroom": "70",
+        "weightBride": "54",
+        "family": "Bố mẹ, 1 chị gái",
+        "drinking": "1 chai soju",
+        "idealType": "Tính cách tươi sáng và vui vẻ"
+      },
+      "buttons": {
+        "register": "Đăng ký",
+        "update": "Cập nhật",
+        "updateComplete": "Cập nhật hoàn tất",
+        "cancel": "Hủy",
+        "selectAvatar": "Chọn ảnh đại diện",
+        "changeAvatar": "Thay đổi ảnh đại diện",
+        "selectPhotos": "Chọn ảnh",
+        "selectVideo": "Chọn video",
+        "setPrimary": "Đặt làm chính"
+      },
+      "options": {
+        "firstMarriage": "Kết hôn lần đầu",
+        "remarriage": "Tái hôn",
+        "nonSmoker": "Không hút thuốc",
+        "smoker": "Hút thuốc",
+        "noTattoo": "Không",
+        "hasTattoo": "Có",
+        "koreanHigh": "Cao",
+        "koreanMid": "Trung bình",
+        "koreanLow": "Thấp"
+      },
+      "media": {
+        "avatarImage": "Ảnh đại diện",
+        "uploadPhotos": "Tải lên ảnh",
+        "uploadVideo": "Tải lên video",
+        "primary": "Chính",
+        "uploadPhotosFirst": "Vui lòng tải lên ảnh hồ sơ trước",
+        "primaryImageChanged": "Ảnh chính đã được thay đổi.",
+        "primaryImageChangeFailed": "Không thể thay đổi ảnh chính.",
+        "existingImageDeleteInfo": "Ảnh hiện có có thể được xóa khi lưu."
+      }
     }
   },
   "match": {

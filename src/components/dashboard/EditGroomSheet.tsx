@@ -41,6 +41,7 @@ import { toast } from "sonner";
 import { updateClientImageOrder, fetchClient } from "../../utils/api";
 import { Badge } from "../ui/badge";
 import { Star } from "lucide-react";
+import { useLanguage } from "../LanguageContext";
 
 interface EditGroomSheetProps {
   open: boolean;
@@ -79,6 +80,7 @@ export function EditGroomSheet({
   selectedAvatar,
   onAvatarChange,
 }: EditGroomSheetProps) {
+  const { t } = useLanguage();
   const [isAvatarDialogOpen, setIsAvatarDialogOpen] = useState(false);
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
 
@@ -157,10 +159,10 @@ export function EditGroomSheet({
     try {
       const updatedClient = await updateClientImageOrder(editingClient.id, imageId);
       setEditingClient(updatedClient);
-      toast.success('대표 이미지가 변경되었습니다.');
+      toast.success(t('form.registration.media.primaryImageChanged'));
     } catch (error) {
       console.error('Failed to update image order:', error);
-      toast.error('대표 이미지 변경에 실패했습니다.');
+      toast.error(t('form.registration.media.primaryImageChangeFailed'));
     }
   };
 
@@ -175,9 +177,9 @@ export function EditGroomSheet({
               <FileEdit className="w-6 h-6 text-indigo-600" />
             </div>
             <div>
-              <SheetTitle className="text-xl">신랑 정보 수정</SheetTitle>
+              <SheetTitle className="text-xl">{t('form.registration.titles.editGroom')}</SheetTitle>
               <SheetDescription>
-                신랑 회원의 정보를 수정하세요.
+                {t('form.registration.descriptions.editGroom')}
               </SheetDescription>
             </div>
           </div>
@@ -189,14 +191,14 @@ export function EditGroomSheet({
             <CardHeader>
               <div className="flex items-center gap-2">
                 <User className="w-5 h-5 text-indigo-600" />
-                <CardTitle>기본 정보</CardTitle>
+                <CardTitle>{t('form.registration.sections.basicInfo')}</CardTitle>
               </div>
-              <CardDescription>신랑의 기본적인 인적사항을 수정하세요</CardDescription>
+              <CardDescription>{t('form.registration.sectionDescriptions.basicInfoGroom')}</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="edit-g-name">이름</Label>
+                  <Label htmlFor="edit-g-name">{t('form.labels.name')}</Label>
                   <Input
                     id="edit-g-name"
                     value={editingClient.name}
@@ -206,11 +208,11 @@ export function EditGroomSheet({
                         name: e.target.value,
                       })
                     }
-                    placeholder="홍길동"
+                    placeholder={t('form.registration.placeholders.nameGroom')}
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="edit-g-birthYear">출생년도</Label>
+                  <Label htmlFor="edit-g-birthYear">{t('form.registration.fields.birthYear')}</Label>
                   <Select
                     value={editingClient.birthYear?.toString() || ''}
                     onValueChange={(val) =>
@@ -221,7 +223,7 @@ export function EditGroomSheet({
                     }
                   >
                     <SelectTrigger id="edit-g-birthYear">
-                      <SelectValue placeholder="선택" />
+                      <SelectValue placeholder={t('common.select')} />
                     </SelectTrigger>
                     <SelectContent className="max-h-[300px]">
                       {Array.from({ length: new Date().getFullYear() - 1899 }, (_, i) => {
@@ -239,7 +241,7 @@ export function EditGroomSheet({
 
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="edit-g-loc">거주지 주소</Label>
+                  <Label htmlFor="edit-g-loc">{t('form.registration.fields.residenceAddress')}</Label>
                   <Input
                     id="edit-g-loc"
                     value={editingClient.loc}
@@ -249,11 +251,11 @@ export function EditGroomSheet({
                         loc: e.target.value,
                       })
                     }
-                    placeholder="서울시 강남구"
+                    placeholder={t('form.registration.placeholders.residenceGroom')}
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="edit-g-marriage">결혼유무</Label>
+                  <Label htmlFor="edit-g-marriage">{t('form.registration.fields.maritalStatus')}</Label>
                   <Select
                     value={editingClient.marriage}
                     onValueChange={(val) =>
@@ -264,11 +266,11 @@ export function EditGroomSheet({
                     }
                   >
                     <SelectTrigger id="edit-g-marriage">
-                      <SelectValue placeholder="선택" />
+                      <SelectValue placeholder={t('common.select')} />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="초혼">초혼</SelectItem>
-                      <SelectItem value="재혼">재혼</SelectItem>
+                      <SelectItem value="초혼">{t('form.registration.options.firstMarriage')}</SelectItem>
+                      <SelectItem value="재혼">{t('form.registration.options.remarriage')}</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -281,14 +283,14 @@ export function EditGroomSheet({
             <CardHeader>
               <div className="flex items-center gap-2">
                 <Briefcase className="w-5 h-5 text-indigo-600" />
-                <CardTitle>학력 및 직업</CardTitle>
+                <CardTitle>{t('form.registration.sections.educationJob')}</CardTitle>
               </div>
-              <CardDescription>신랑의 학력과 직업 정보를 수정하세요</CardDescription>
+              <CardDescription>{t('form.registration.sectionDescriptions.educationJobGroom')}</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="edit-g-edu">학력</Label>
+                  <Label htmlFor="edit-g-edu">{t('form.labels.education')}</Label>
                   <Input
                     id="edit-g-edu"
                     value={editingClient.education || ""}
@@ -298,11 +300,11 @@ export function EditGroomSheet({
                         education: e.target.value,
                       })
                     }
-                    placeholder="대졸"
+                    placeholder={t('form.registration.placeholders.education')}
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="edit-g-job">직업(직장)</Label>
+                  <Label htmlFor="edit-g-job">{t('form.registration.fields.jobWorkplace')}</Label>
                   <Input
                     id="edit-g-job"
                     value={editingClient.job || ""}
@@ -312,7 +314,7 @@ export function EditGroomSheet({
                         job: e.target.value,
                       })
                     }
-                    placeholder="회사원"
+                    placeholder={t('form.registration.placeholders.job')}
                   />
                 </div>
               </div>
@@ -324,14 +326,14 @@ export function EditGroomSheet({
             <CardHeader>
               <div className="flex items-center gap-2">
                 <Activity className="w-5 h-5 text-indigo-600" />
-                <CardTitle>신체 정보</CardTitle>
+                <CardTitle>{t('form.registration.sections.physicalInfo')}</CardTitle>
               </div>
-              <CardDescription>신랑의 신체 정보를 수정하세요</CardDescription>
+              <CardDescription>{t('form.registration.sectionDescriptions.physicalInfoGroom')}</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="edit-g-height">신장 - cm</Label>
+                  <Label htmlFor="edit-g-height">{t('form.registration.fields.height')}</Label>
                   <Input
                     id="edit-g-height"
                     type="number"
@@ -344,11 +346,11 @@ export function EditGroomSheet({
                         height: e.target.value ? parseInt(e.target.value) || 0 : undefined,
                       })
                     }
-                    placeholder="175"
+                    placeholder={t('form.registration.placeholders.heightGroom')}
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="edit-g-weight">몸무게 - kg</Label>
+                  <Label htmlFor="edit-g-weight">{t('form.registration.fields.weight')}</Label>
                   <Input
                     id="edit-g-weight"
                     type="number"
@@ -361,7 +363,7 @@ export function EditGroomSheet({
                         weight: e.target.value ? parseInt(e.target.value) || 0 : undefined,
                       })
                     }
-                    placeholder="70"
+                    placeholder={t('form.registration.placeholders.weightGroom')}
                   />
                 </div>
               </div>
@@ -373,14 +375,14 @@ export function EditGroomSheet({
             <CardHeader>
               <div className="flex items-center gap-2">
                 <DollarSign className="w-5 h-5 text-indigo-600" />
-                <CardTitle>재산 및 라이프스타일</CardTitle>
+                <CardTitle>{t('form.registration.sections.assetsLifestyle')}</CardTitle>
               </div>
-              <CardDescription>소득 및 생활 습관 정보를 수정하세요</CardDescription>
+              <CardDescription>{t('form.registration.sectionDescriptions.assetsLifestyle')}</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="edit-g-income">연소득 - 만원</Label>
+                  <Label htmlFor="edit-g-income">{t('form.registration.fields.annualIncome')}</Label>
                   <Input
                     id="edit-g-income"
                     type="number"
@@ -392,11 +394,11 @@ export function EditGroomSheet({
                         income: e.target.value,
                       })
                     }
-                    placeholder="5000"
+                    placeholder={t('form.registration.placeholders.income')}
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="edit-g-smoking">흡연유무</Label>
+                  <Label htmlFor="edit-g-smoking">{t('form.registration.fields.smoking')}</Label>
                   <Select
                     value={editingClient.smoking || "비흡연"}
                     onValueChange={(val) =>
@@ -407,18 +409,18 @@ export function EditGroomSheet({
                     }
                   >
                     <SelectTrigger id="edit-g-smoking">
-                      <SelectValue placeholder="선택" />
+                      <SelectValue placeholder={t('common.select')} />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="비흡연">비흡연</SelectItem>
-                      <SelectItem value="흡연">흡연</SelectItem>
+                      <SelectItem value="비흡연">{t('form.registration.options.nonSmoker')}</SelectItem>
+                      <SelectItem value="흡연">{t('form.registration.options.smoker')}</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="edit-g-drinking">음주주량</Label>
+                <Label htmlFor="edit-g-drinking">{t('form.registration.fields.drinking')}</Label>
                 <Input
                   id="edit-g-drinking"
                   value={editingClient.drinking || ""}
@@ -428,7 +430,7 @@ export function EditGroomSheet({
                       drinking: e.target.value,
                     })
                   }
-                  placeholder="소주 1병"
+                  placeholder={t('form.registration.placeholders.drinking')}
                 />
               </div>
             </CardContent>
@@ -439,14 +441,14 @@ export function EditGroomSheet({
             <CardHeader>
               <div className="flex items-center gap-2">
                 <Building2 className="w-5 h-5 text-indigo-600" />
-                <CardTitle>소속 및 메모</CardTitle>
+                <CardTitle>{t('form.registration.sections.affiliationMemo')}</CardTitle>
               </div>
-              <CardDescription>소속사와 추가 정보를 수정하세요</CardDescription>
+              <CardDescription>{t('form.registration.sectionDescriptions.affiliationMemo')}</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <AgencySelector
                 id="edit-g-agency"
-                label="소속사"
+                label={t('form.registration.fields.agency')}
                 value={editingClient.agencyId?.toString() || ""}
                 onChange={(val) =>
                   setEditingClient({
@@ -459,7 +461,7 @@ export function EditGroomSheet({
               />
 
               <div className="space-y-2">
-                <Label htmlFor="edit-g-ideal">이상형 조건</Label>
+                <Label htmlFor="edit-g-ideal">{t('form.registration.fields.idealType')}</Label>
                 <textarea
                   id="edit-g-ideal"
                   value={editingClient.idealType || ""}
@@ -469,7 +471,7 @@ export function EditGroomSheet({
                       idealType: e.target.value,
                     })
                   }
-                  placeholder="성격이 밝고 명랑한 분"
+                  placeholder={t('form.registration.placeholders.idealType')}
                   className="flex min-h-[80px] w-full rounded-md border border-input bg-slate-50 px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 resize-none"
                 />
               </div>
@@ -492,14 +494,14 @@ export function EditGroomSheet({
             <CardHeader>
               <div className="flex items-center gap-2">
                 <ImageIcon className="w-5 h-5 text-indigo-600" />
-                <CardTitle>사진 및 동영상</CardTitle>
+                <CardTitle>{t('form.registration.sections.media')}</CardTitle>
               </div>
-              <CardDescription>프로필 사진과 소개 동영상을 업로드하세요</CardDescription>
+              <CardDescription>{t('form.registration.sectionDescriptions.media')}</CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
               {/* 아바타 설정 */}
               <div className="space-y-3 pb-4 border-b">
-                <Label>아바타 이미지</Label>
+                <Label>{t('form.registration.media.avatarImage')}</Label>
                 <div className="flex items-center gap-4">
                   <Avatar className="w-20 h-20 border-2 border-slate-200">
                     {avatarPreview ? (
@@ -519,7 +521,7 @@ export function EditGroomSheet({
                       onClick={() => setIsAvatarDialogOpen(true)}
                       disabled={allImageUrls.length === 0}
                     >
-                      <UserCircle className="w-4 h-4" /> 아바타 {editingClient.avatarUrl ? '변경' : '선택'}
+                      <UserCircle className="w-4 h-4" /> {editingClient.avatarUrl ? t('form.registration.buttons.changeAvatar') : t('form.registration.buttons.selectAvatar')}
                     </Button>
                     {avatarPreview && (
                       <Button
@@ -529,12 +531,12 @@ export function EditGroomSheet({
                         className="gap-2 text-red-600 hover:text-red-700"
                         onClick={handleRemoveAvatar}
                       >
-                        <X className="w-4 h-4" /> 제거
+                        <X className="w-4 h-4" /> {t('common.delete')}
                       </Button>
                     )}
                     {allImageUrls.length === 0 && (
                       <p className="text-xs text-slate-500">
-                        먼저 프로필 사진을 업로드해주세요
+                        {t('form.registration.media.uploadPhotosFirst')}
                       </p>
                     )}
                   </div>
@@ -543,7 +545,7 @@ export function EditGroomSheet({
 
               {/* 사진 업로드 */}
               <div className="space-y-3">
-                <Label htmlFor="edit-g-photos">사진 업로드</Label>
+                <Label htmlFor="edit-g-photos">{t('form.registration.media.uploadPhotos')}</Label>
                 <div className="flex items-center gap-2">
                   <Input
                     id="edit-g-photos"
@@ -563,7 +565,7 @@ export function EditGroomSheet({
                       htmlFor="edit-g-photos"
                       className="flex items-center gap-2 cursor-pointer"
                     >
-                      <Upload className="w-4 h-4" /> 사진 선택
+                      <Upload className="w-4 h-4" /> {t('form.registration.buttons.selectPhotos')}
                     </label>
                   </Button>
                   {selectedPhotos.length > 0 && (
@@ -597,7 +599,7 @@ export function EditGroomSheet({
 
               {/* 동영상 업로드 */}
               <div className="space-y-3 pt-3 border-t">
-                <Label htmlFor="edit-g-video">동영상 업로드</Label>
+                <Label htmlFor="edit-g-video">{t('form.registration.media.uploadVideo')}</Label>
                 <div className="flex items-center gap-2">
                   <Input
                     id="edit-g-video"
@@ -616,7 +618,7 @@ export function EditGroomSheet({
                       htmlFor="edit-g-video"
                       className="flex items-center gap-2 cursor-pointer"
                     >
-                      <Video className="w-4 h-4" /> 동영상 선택
+                      <Video className="w-4 h-4" /> {t('form.registration.buttons.selectVideo')}
                     </label>
                   </Button>
                   {selectedVideo && (
@@ -653,13 +655,13 @@ export function EditGroomSheet({
             onClick={() => onOpenChange(false)}
             className="flex-1"
           >
-            취소
+            {t('form.registration.buttons.cancel')}
           </Button>
           <Button
             onClick={onSave}
             className="flex-1 bg-indigo-600 hover:bg-indigo-700"
           >
-            수정 완료
+            {t('form.registration.buttons.updateComplete')}
           </Button>
         </SheetFooter>
       </SheetContent>

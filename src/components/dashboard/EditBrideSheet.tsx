@@ -40,6 +40,7 @@ import { toast } from "sonner";
 import { updateClientImageOrder, fetchClient } from "../../utils/api";
 import { Badge } from "../ui/badge";
 import { Star } from "lucide-react";
+import { useLanguage } from "../LanguageContext";
 
 interface EditBrideSheetProps {
   open: boolean;
@@ -78,6 +79,7 @@ export function EditBrideSheet({
   selectedAvatar,
   onAvatarChange,
 }: EditBrideSheetProps) {
+  const { t } = useLanguage();
   const [isAvatarDialogOpen, setIsAvatarDialogOpen] = useState(false);
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
 
@@ -156,10 +158,10 @@ export function EditBrideSheet({
     try {
       const updatedClient = await updateClientImageOrder(editingClient.id, imageId);
       setEditingClient(updatedClient);
-      toast.success('대표 이미지가 변경되었습니다.');
+      toast.success(t('form.registration.media.primaryImageChanged'));
     } catch (error) {
       console.error('Failed to update image order:', error);
-      toast.error('대표 이미지 변경에 실패했습니다.');
+      toast.error(t('form.registration.media.primaryImageChangeFailed'));
     }
   };
 
@@ -174,9 +176,9 @@ export function EditBrideSheet({
               <FileEdit className="w-6 h-6 text-rose-600" />
             </div>
             <div>
-              <SheetTitle className="text-xl">신부 정보 수정</SheetTitle>
+              <SheetTitle className="text-xl">{t('form.registration.titles.editBride')}</SheetTitle>
               <SheetDescription>
-                신부 회원의 정보를 수정하세요.
+                {t('form.registration.descriptions.editBride')}
               </SheetDescription>
             </div>
           </div>
@@ -188,14 +190,14 @@ export function EditBrideSheet({
             <CardHeader>
               <div className="flex items-center gap-2">
                 <User className="w-5 h-5 text-rose-600" />
-                <CardTitle>기본 정보</CardTitle>
+                <CardTitle>{t('form.registration.sections.basicInfo')}</CardTitle>
               </div>
-              <CardDescription>신부의 기본적인 인적사항을 수정하세요</CardDescription>
+              <CardDescription>{t('form.registration.sectionDescriptions.basicInfoBride')}</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="edit-b-name">이름 (Tên)</Label>
+                  <Label htmlFor="edit-b-name">{t('form.registration.fields.nameWithVietnamese')}</Label>
                   <Input
                     id="edit-b-name"
                     value={editingClient.name}
@@ -205,11 +207,11 @@ export function EditBrideSheet({
                         name: e.target.value,
                       })
                     }
-                    placeholder="vũ quốc hương"
+                    placeholder={t('form.registration.placeholders.nameBride')}
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="edit-b-birthYear">출생년도</Label>
+                  <Label htmlFor="edit-b-birthYear">{t('form.registration.fields.birthYear')}</Label>
                   <Select
                     value={editingClient.birthYear?.toString() || ''}
                     onValueChange={(val) =>
@@ -220,7 +222,7 @@ export function EditBrideSheet({
                     }
                   >
                     <SelectTrigger id="edit-b-birthYear">
-                      <SelectValue placeholder="선택" />
+                      <SelectValue placeholder={t('common.select')} />
                     </SelectTrigger>
                     <SelectContent className="max-h-[300px]">
                       {Array.from({ length: new Date().getFullYear() - 1899 }, (_, i) => {
@@ -238,7 +240,7 @@ export function EditBrideSheet({
 
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="edit-b-loc">거주지 (Địa chỉ)</Label>
+                  <Label htmlFor="edit-b-loc">{t('form.registration.fields.residenceWithVietnamese')}</Label>
                   <Input
                     id="edit-b-loc"
                     value={editingClient.loc}
@@ -248,11 +250,11 @@ export function EditBrideSheet({
                         loc: e.target.value,
                       })
                     }
-                    placeholder="Hà Nội"
+                    placeholder={t('form.registration.placeholders.residenceBride')}
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="edit-b-marriage">결혼유무</Label>
+                  <Label htmlFor="edit-b-marriage">{t('form.registration.fields.maritalStatus')}</Label>
                   <Select
                     value={editingClient.marriage}
                     onValueChange={(val) =>
@@ -263,11 +265,11 @@ export function EditBrideSheet({
                     }
                   >
                     <SelectTrigger id="edit-b-marriage">
-                      <SelectValue placeholder="선택" />
+                      <SelectValue placeholder={t('common.select')} />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="초혼">초혼</SelectItem>
-                      <SelectItem value="재혼">재혼</SelectItem>
+                      <SelectItem value="초혼">{t('form.registration.options.firstMarriage')}</SelectItem>
+                      <SelectItem value="재혼">{t('form.registration.options.remarriage')}</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -280,14 +282,14 @@ export function EditBrideSheet({
             <CardHeader>
               <div className="flex items-center gap-2">
                 <Briefcase className="w-5 h-5 text-rose-600" />
-                <CardTitle>학력 및 직업</CardTitle>
+                <CardTitle>{t('form.registration.sections.educationJob')}</CardTitle>
               </div>
-              <CardDescription>신부의 학력과 직업 정보를 수정하세요</CardDescription>
+              <CardDescription>{t('form.registration.sectionDescriptions.educationJobBride')}</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="edit-b-edu">학력 (Học lực)</Label>
+                  <Label htmlFor="edit-b-edu">{t('form.registration.fields.educationWithVietnamese')}</Label>
                   <Input
                     id="edit-b-edu"
                     type="number"
@@ -300,11 +302,11 @@ export function EditBrideSheet({
                         education: e.target.value,
                       })
                     }
-                    placeholder="9"
+                    placeholder={t('form.registration.placeholders.educationLevel')}
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="edit-b-job">현재직업</Label>
+                  <Label htmlFor="edit-b-job">{t('form.registration.fields.currentJob')}</Label>
                   <Input
                     id="edit-b-job"
                     value={editingClient.job || ""}
@@ -314,7 +316,7 @@ export function EditBrideSheet({
                         job: e.target.value,
                       })
                     }
-                    placeholder="재봉사"
+                    placeholder={t('form.registration.placeholders.jobBride')}
                   />
                 </div>
               </div>
@@ -326,14 +328,14 @@ export function EditBrideSheet({
             <CardHeader>
               <div className="flex items-center gap-2">
                 <Activity className="w-5 h-5 text-rose-600" />
-                <CardTitle>신체 정보</CardTitle>
+                <CardTitle>{t('form.registration.sections.physicalInfo')}</CardTitle>
               </div>
-              <CardDescription>신부의 신체 정보를 수정하세요</CardDescription>
+              <CardDescription>{t('form.registration.sectionDescriptions.physicalInfoBride')}</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="edit-b-height">키 (Cao) - cm</Label>
+                  <Label htmlFor="edit-b-height">{t('form.registration.fields.heightWithVietnamese')}</Label>
                   <Input
                     id="edit-b-height"
                     type="number"
@@ -346,11 +348,11 @@ export function EditBrideSheet({
                         height: e.target.value ? parseInt(e.target.value) || 0 : undefined,
                       })
                     }
-                    placeholder="163"
+                    placeholder={t('form.registration.placeholders.heightBride')}
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="edit-b-weight">몸무게(Cân nặng) - kg</Label>
+                  <Label htmlFor="edit-b-weight">{t('form.registration.fields.weightWithVietnamese')}</Label>
                   <Input
                     id="edit-b-weight"
                     type="number"
@@ -363,13 +365,13 @@ export function EditBrideSheet({
                         weight: e.target.value ? parseInt(e.target.value) || 0 : undefined,
                       })
                     }
-                    placeholder="54"
+                    placeholder={t('form.registration.placeholders.weightBride')}
                   />
                 </div>
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="edit-b-tattoo">문신(Tattoo) 여부</Label>
+                <Label htmlFor="edit-b-tattoo">{t('form.registration.fields.tattoo')}</Label>
                 <Select
                   value={editingClient.tattoo || "없음"}
                   onValueChange={(val) =>
@@ -380,11 +382,11 @@ export function EditBrideSheet({
                   }
                 >
                   <SelectTrigger id="edit-b-tattoo">
-                    <SelectValue placeholder="선택" />
+                    <SelectValue placeholder={t('common.select')} />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="없음">없음</SelectItem>
-                    <SelectItem value="있음">있음</SelectItem>
+                    <SelectItem value="없음">{t('form.registration.options.noTattoo')}</SelectItem>
+                    <SelectItem value="있음">{t('form.registration.options.hasTattoo')}</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -396,13 +398,13 @@ export function EditBrideSheet({
             <CardHeader>
               <div className="flex items-center gap-2">
                 <Heart className="w-5 h-5 text-rose-600" />
-                <CardTitle>가족 및 종교</CardTitle>
+                <CardTitle>{t('form.registration.sections.familyReligion')}</CardTitle>
               </div>
-              <CardDescription>가족 구성과 종교 정보를 수정하세요</CardDescription>
+              <CardDescription>{t('form.registration.sectionDescriptions.familyReligion')}</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="edit-b-family">가족구성 (Gia đình)</Label>
+                <Label htmlFor="edit-b-family">{t('form.registration.fields.family')}</Label>
                 <Input
                   id="edit-b-family"
                   value={editingClient.family || ""}
@@ -412,13 +414,13 @@ export function EditBrideSheet({
                       family: e.target.value,
                     })
                   }
-                  placeholder="부모님, 언니 1명"
+                  placeholder={t('form.registration.placeholders.family')}
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="edit-b-fatherAge">아빠 나이</Label>
+                  <Label htmlFor="edit-b-fatherAge">{t('form.registration.fields.fatherAge')}</Label>
                   <Input
                     id="edit-b-fatherAge"
                     type="number"
@@ -435,7 +437,7 @@ export function EditBrideSheet({
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="edit-b-motherAge">엄마 나이</Label>
+                  <Label htmlFor="edit-b-motherAge">{t('form.registration.fields.motherAge')}</Label>
                   <Input
                     id="edit-b-motherAge"
                     type="number"
@@ -452,6 +454,30 @@ export function EditBrideSheet({
                   />
                 </div>
               </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="edit-b-religion">{t('form.labels.religion')}</Label>
+                <Select
+                  value={editingClient.religion || ""}
+                  onValueChange={(val) =>
+                    setEditingClient({
+                      ...editingClient,
+                      religion: val,
+                    })
+                  }
+                >
+                  <SelectTrigger id="edit-b-religion">
+                    <SelectValue placeholder={t('common.select')} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="무교">{t('profile.filters.noReligion')}</SelectItem>
+                    <SelectItem value="불교">{t('profile.filters.buddhism')}</SelectItem>
+                    <SelectItem value="기독교">{t('profile.filters.christianity')}</SelectItem>
+                    <SelectItem value="천주교">{t('profile.filters.catholicism')}</SelectItem>
+                    <SelectItem value="기타">{t('profile.filters.other')}</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
             </CardContent>
           </Card>
 
@@ -460,14 +486,14 @@ export function EditBrideSheet({
             <CardHeader>
               <div className="flex items-center gap-2">
                 <Building2 className="w-5 h-5 text-rose-600" />
-                <CardTitle>소속 및 메모</CardTitle>
+                <CardTitle>{t('form.registration.sections.affiliationMemo')}</CardTitle>
               </div>
-              <CardDescription>소속사와 추가 정보를 수정하세요</CardDescription>
+              <CardDescription>{t('form.registration.sectionDescriptions.affiliationMemo')}</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <AgencySelector
                 id="edit-b-agency"
-                label="소속사"
+                label={t('form.registration.fields.agency')}
                 value={editingClient.agencyId?.toString() || ""}
                 onChange={(val) =>
                   setEditingClient({
@@ -480,7 +506,7 @@ export function EditBrideSheet({
               />
 
               <div className="space-y-2">
-                <Label htmlFor="edit-b-ideal">이상형 조건</Label>
+                <Label htmlFor="edit-b-ideal">{t('form.registration.fields.idealType')}</Label>
                 <textarea
                   id="edit-b-ideal"
                   value={editingClient.idealType || ""}
@@ -490,7 +516,7 @@ export function EditBrideSheet({
                       idealType: e.target.value,
                     })
                   }
-                  placeholder="성격이 밝고 명랑한 분"
+                  placeholder={t('form.registration.placeholders.idealType')}
                   className="flex min-h-[80px] w-full rounded-md border border-input bg-slate-50 px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 resize-none"
                 />
               </div>
@@ -513,14 +539,14 @@ export function EditBrideSheet({
             <CardHeader>
               <div className="flex items-center gap-2">
                 <ImageIcon className="w-5 h-5 text-rose-600" />
-                <CardTitle>사진 및 동영상</CardTitle>
+                <CardTitle>{t('form.registration.sections.media')}</CardTitle>
               </div>
-              <CardDescription>프로필 사진과 소개 동영상을 업로드하세요</CardDescription>
+              <CardDescription>{t('form.registration.sectionDescriptions.media')}</CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
               {/* 아바타 설정 */}
               <div className="space-y-3 pb-4 border-b">
-                <Label>아바타 이미지</Label>
+                <Label>{t('form.registration.media.avatarImage')}</Label>
                 <div className="flex items-center gap-4">
                   <Avatar className="w-20 h-20 border-2 border-slate-200">
                     {avatarPreview ? (
@@ -540,7 +566,7 @@ export function EditBrideSheet({
                       onClick={() => setIsAvatarDialogOpen(true)}
                       disabled={allImageUrls.length === 0}
                     >
-                      <UserCircle className="w-4 h-4" /> 아바타 {editingClient?.avatarUrl ? '변경' : '선택'}
+                      <UserCircle className="w-4 h-4" /> {editingClient?.avatarUrl ? t('form.registration.buttons.changeAvatar') : t('form.registration.buttons.selectAvatar')}
                     </Button>
                     {avatarPreview && (
                       <Button
@@ -550,12 +576,12 @@ export function EditBrideSheet({
                         className="gap-2 text-red-600 hover:text-red-700"
                         onClick={handleRemoveAvatar}
                       >
-                        <X className="w-4 h-4" /> 제거
+                        <X className="w-4 h-4" /> {t('common.delete')}
                       </Button>
                     )}
                     {allImageUrls.length === 0 && (
                       <p className="text-xs text-slate-500">
-                        먼저 프로필 사진을 업로드해주세요
+                        {t('form.registration.media.uploadPhotosFirst')}
                       </p>
                     )}
                   </div>
@@ -564,7 +590,7 @@ export function EditBrideSheet({
 
               {/* 사진 업로드 */}
               <div className="space-y-3">
-                <Label htmlFor="edit-b-photos">사진 업로드</Label>
+                <Label htmlFor="edit-b-photos">{t('form.registration.media.uploadPhotos')}</Label>
                 <div className="flex items-center gap-2">
                   <Input
                     id="edit-b-photos"
@@ -584,7 +610,7 @@ export function EditBrideSheet({
                       htmlFor="edit-b-photos"
                       className="flex items-center gap-2 cursor-pointer"
                     >
-                      <Upload className="w-4 h-4" /> 사진 선택
+                      <Upload className="w-4 h-4" /> {t('form.registration.buttons.selectPhotos')}
                     </label>
                   </Button>
                   {selectedPhotos.length > 0 && (
@@ -611,7 +637,7 @@ export function EditBrideSheet({
                           {isPrimary && (
                             <Badge className="absolute top-1 left-1 bg-rose-500 text-white text-xs px-2 py-0.5">
                               <Star className="w-3 h-3 mr-1" />
-                              대표
+                              {t('form.registration.media.primary')}
                             </Badge>
                           )}
                           {canSetPrimary && (
@@ -622,7 +648,7 @@ export function EditBrideSheet({
                               onClick={() => img.id && handleSetPrimaryImage(img.id)}
                             >
                               <Star className="w-3 h-3 mr-1" />
-                              대표로 설정
+                              {t('form.registration.buttons.setPrimary')}
                             </Button>
                           )}
                           {img.isNew && img.newIndex !== null && (
@@ -642,7 +668,7 @@ export function EditBrideSheet({
                               className="absolute top-1 right-1 h-7 w-7 bg-white/95 hover:bg-white shadow-sm opacity-0 group-hover:opacity-100 transition-opacity"
                               onClick={() => {
                                 // 기존 이미지 삭제는 저장 시 처리되므로 여기서는 비활성화
-                                toast.info('기존 이미지는 저장 시 삭제할 수 있습니다.');
+                                toast.info(t('form.registration.media.existingImageDeleteInfo'));
                               }}
                               disabled
                             >
@@ -658,7 +684,7 @@ export function EditBrideSheet({
 
               {/* 동영상 업로드 */}
               <div className="space-y-3 pt-3 border-t">
-                <Label htmlFor="edit-b-video">동영상 업로드</Label>
+                <Label htmlFor="edit-b-video">{t('form.registration.media.uploadVideo')}</Label>
                 <div className="flex items-center gap-2">
                   <Input
                     id="edit-b-video"
@@ -677,7 +703,7 @@ export function EditBrideSheet({
                       htmlFor="edit-b-video"
                       className="flex items-center gap-2 cursor-pointer"
                     >
-                      <Video className="w-4 h-4" /> 동영상 선택
+                      <Video className="w-4 h-4" /> {t('form.registration.buttons.selectVideo')}
                     </label>
                   </Button>
                   {selectedVideo && (
@@ -714,13 +740,13 @@ export function EditBrideSheet({
             onClick={() => onOpenChange(false)}
             className="flex-1"
           >
-            취소
+            {t('form.registration.buttons.cancel')}
           </Button>
           <Button
             onClick={onSave}
             className="flex-1 bg-rose-600 hover:bg-rose-700"
           >
-            수정 완료
+            {t('form.registration.buttons.updateComplete')}
           </Button>
         </SheetFooter>
       </SheetContent>

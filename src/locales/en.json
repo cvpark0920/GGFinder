@@ -247,6 +247,118 @@
       "created": "Created",
       "updated": "Updated",
       "deleted": "Deleted"
+    },
+    "registration": {
+      "titles": {
+        "newBride": "New Bride Registration",
+        "editGroom": "Edit Groom Information",
+        "editBride": "Edit Bride Information"
+      },
+      "descriptions": {
+        "newGroom": "Enter basic information for the new groom member",
+        "newBride": "Enter basic information for the new bride member",
+        "editGroom": "Edit the groom member's information",
+        "editBride": "Edit the bride member's information"
+      },
+      "sections": {
+        "basicInfo": "Basic Information",
+        "educationJob": "Education & Job",
+        "physicalInfo": "Physical Information",
+        "lifestyle": "Lifestyle",
+        "assetsLifestyle": "Assets & Lifestyle",
+        "idealTypeAgency": "Ideal Type & Agency",
+        "familyReligion": "Family & Religion",
+        "affiliationMemo": "Affiliation & Memo",
+        "media": "Photos & Video"
+      },
+      "sectionDescriptions": {
+        "basicInfoGroom": "Enter the groom's basic personal information",
+        "basicInfoBride": "Enter the bride's basic personal information",
+        "educationJobGroom": "Enter the groom's education and job information",
+        "educationJobBride": "Enter the bride's education and job information",
+        "physicalInfoGroom": "Enter the groom's physical information",
+        "physicalInfoBride": "Enter the bride's physical information",
+        "lifestyleGroom": "Enter the groom's lifestyle information",
+        "assetsLifestyle": "Enter income and lifestyle information",
+        "idealTypeAgency": "Enter ideal type conditions and agency",
+        "affiliationMemo": "Enter agency and additional information",
+        "familyReligion": "Enter family composition and religion information",
+        "media": "Upload profile photos and introduction video"
+      },
+      "fields": {
+        "birthYear": "Birth Year",
+        "maritalStatus": "Marital Status",
+        "annualIncome": "Annual Income - 10,000 KRW",
+        "height": "Height - cm",
+        "weight": "Weight - kg",
+        "smoking": "Smoking",
+        "drinking": "Drinking",
+        "currentJob": "Current Job",
+        "koreanLevel": "Korean Language Level",
+        "tattoo": "Tattoo",
+        "family": "Family Composition (Gia đình)",
+        "fatherAge": "Father's Age",
+        "motherAge": "Mother's Age",
+        "jobWorkplace": "Job (Workplace)",
+        "nameWithVietnamese": "Name (Tên)",
+        "residenceWithVietnamese": "Residence (Địa chỉ)",
+        "educationWithVietnamese": "Education (Học lực)",
+        "heightWithVietnamese": "Height (Cao) - cm",
+        "weightWithVietnamese": "Weight (Cân nặng) - kg",
+        "residenceAddress": "Residence Address",
+        "idealType": "Ideal Type Conditions",
+        "agency": "Agency"
+      },
+      "placeholders": {
+        "nameGroom": "Hong Gildong",
+        "nameBride": "vũ quốc hương",
+        "residenceGroom": "Gangnam-gu, Seoul",
+        "residenceBride": "Hà Nội",
+        "education": "Bachelor's Degree",
+        "job": "Office Worker",
+        "jobBride": "Seamstress",
+        "income": "5000",
+        "educationLevel": "9",
+        "heightGroom": "175",
+        "heightBride": "163",
+        "weightGroom": "70",
+        "weightBride": "54",
+        "family": "Parents, 1 older sister",
+        "drinking": "1 bottle of soju",
+        "idealType": "Bright and cheerful personality"
+      },
+      "buttons": {
+        "register": "Register",
+        "update": "Update",
+        "updateComplete": "Update Complete",
+        "cancel": "Cancel",
+        "selectAvatar": "Select Avatar",
+        "changeAvatar": "Change Avatar",
+        "selectPhotos": "Select Photos",
+        "selectVideo": "Select Video",
+        "setPrimary": "Set as Primary"
+      },
+      "options": {
+        "firstMarriage": "First Marriage",
+        "remarriage": "Remarriage",
+        "nonSmoker": "Non-smoker",
+        "smoker": "Smoker",
+        "noTattoo": "No",
+        "hasTattoo": "Yes",
+        "koreanHigh": "High",
+        "koreanMid": "Medium",
+        "koreanLow": "Low"
+      },
+      "media": {
+        "avatarImage": "Avatar Image",
+        "uploadPhotos": "Upload Photos",
+        "uploadVideo": "Upload Video",
+        "primary": "Primary",
+        "uploadPhotosFirst": "Please upload profile photos first",
+        "primaryImageChanged": "Primary image has been changed.",
+        "primaryImageChangeFailed": "Failed to change primary image.",
+        "existingImageDeleteInfo": "Existing images can be deleted when saving."
+      }
     }
   },
   "match": {

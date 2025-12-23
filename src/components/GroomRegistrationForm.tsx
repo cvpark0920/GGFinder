@@ -137,7 +137,7 @@ export function GroomRegistrationForm({
           <div>
             <SheetTitle className="text-xl">{t('dashboard.buttons.registerGroom')}</SheetTitle>
             <SheetDescription>
-              {t('form.labels.name')}
+              {t('form.registration.descriptions.newGroom')}
             </SheetDescription>
           </div>
         </div>
@@ -149,9 +149,9 @@ export function GroomRegistrationForm({
           <CardHeader>
             <div className="flex items-center gap-2">
               <User className="w-5 h-5 text-indigo-600" />
-              <CardTitle>{t('profile.basicInfo')}</CardTitle>
+              <CardTitle>{t('form.registration.sections.basicInfo')}</CardTitle>
             </div>
-            <CardDescription>{t('profile.basicInfo')}</CardDescription>
+            <CardDescription>{t('form.registration.sectionDescriptions.basicInfoGroom')}</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
@@ -170,7 +170,7 @@ export function GroomRegistrationForm({
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="g-birthYear">출생년도</Label>
+                <Label htmlFor="g-birthYear">{t('form.registration.fields.birthYear')}</Label>
                 <Select
                   value={newClient.birthYear || ''}
                   onValueChange={(val) =>
@@ -181,7 +181,7 @@ export function GroomRegistrationForm({
                   }
                 >
                   <SelectTrigger id="g-birthYear">
-                    <SelectValue placeholder="선택" />
+                    <SelectValue placeholder={t('common.select')} />
                   </SelectTrigger>
                   <SelectContent className="max-h-[300px]">
                     {Array.from({ length: new Date().getFullYear() - 1899 }, (_, i) => {
@@ -199,7 +199,7 @@ export function GroomRegistrationForm({
 
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="g-marriage">결혼유무</Label>
+                <Label htmlFor="g-marriage">{t('form.registration.fields.maritalStatus')}</Label>
                 <Select
                   value={newClient.marriage}
                   onValueChange={(val) =>
@@ -210,11 +210,11 @@ export function GroomRegistrationForm({
                   }
                 >
                   <SelectTrigger id="g-marriage">
-                    <SelectValue placeholder="선택" />
+                    <SelectValue placeholder={t('common.select')} />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="초혼">초혼</SelectItem>
-                    <SelectItem value="재혼">재혼</SelectItem>
+                    <SelectItem value="초혼">{t('form.registration.options.firstMarriage')}</SelectItem>
+                    <SelectItem value="재혼">{t('form.registration.options.remarriage')}</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -229,7 +229,7 @@ export function GroomRegistrationForm({
                       loc: e.target.value,
                     })
                   }
-                  placeholder="서울시 강남구"
+                  placeholder={t('form.registration.placeholders.residenceGroom')}
                 />
               </div>
             </div>
@@ -241,9 +241,9 @@ export function GroomRegistrationForm({
           <CardHeader>
             <div className="flex items-center gap-2">
               <Briefcase className="w-5 h-5 text-indigo-600" />
-              <CardTitle>{t('profile.education')} & {t('profile.job')}</CardTitle>
+              <CardTitle>{t('form.registration.sections.educationJob')}</CardTitle>
             </div>
-            <CardDescription>{t('profile.education')} & {t('profile.job')}</CardDescription>
+            <CardDescription>{t('form.registration.sectionDescriptions.educationJobGroom')}</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
@@ -258,7 +258,7 @@ export function GroomRegistrationForm({
                       education: e.target.value,
                     })
                   }
-                  placeholder="대졸"
+                  placeholder={t('form.registration.placeholders.education')}
                 />
               </div>
               <div className="space-y-2">
@@ -272,13 +272,13 @@ export function GroomRegistrationForm({
                       job: e.target.value,
                     })
                   }
-                  placeholder="회사원"
+                  placeholder={t('form.registration.placeholders.job')}
                 />
               </div>
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="g-income">연소득 - 만원</Label>
+              <Label htmlFor="g-income">{t('form.registration.fields.annualIncome')}</Label>
               <Input
                 id="g-income"
                 type="number"
@@ -290,7 +290,7 @@ export function GroomRegistrationForm({
                     income: e.target.value,
                   })
                 }
-                placeholder="5000"
+                placeholder={t('form.registration.placeholders.income')}
               />
             </div>
           </CardContent>
@@ -301,14 +301,14 @@ export function GroomRegistrationForm({
           <CardHeader>
             <div className="flex items-center gap-2">
               <Activity className="w-5 h-5 text-indigo-600" />
-              <CardTitle>신체 정보</CardTitle>
+              <CardTitle>{t('form.registration.sections.physicalInfo')}</CardTitle>
             </div>
-            <CardDescription>신랑의 신체 정보를 입력하세요</CardDescription>
+            <CardDescription>{t('form.registration.sectionDescriptions.physicalInfoGroom')}</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="g-height">신장 - cm</Label>
+                <Label htmlFor="g-height">{t('form.registration.fields.height')}</Label>
                 <Input
                   id="g-height"
                   type="number"
@@ -321,11 +321,11 @@ export function GroomRegistrationForm({
                       height: e.target.value,
                     })
                   }
-                  placeholder="175"
+                  placeholder={t('form.registration.placeholders.heightGroom')}
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="g-weight">{t('form.labels.weight')} - kg</Label>
+                <Label htmlFor="g-weight">{t('form.registration.fields.weight')}</Label>
                 <Input
                   id="g-weight"
                   type="number"
@@ -338,7 +338,7 @@ export function GroomRegistrationForm({
                       weight: e.target.value,
                     })
                   }
-                  placeholder="70"
+                  placeholder={t('form.registration.placeholders.weightGroom')}
                 />
               </div>
             </div>
@@ -399,13 +399,13 @@ export function GroomRegistrationForm({
           <CardHeader>
             <div className="flex items-center gap-2">
               <Heart className="w-5 h-5 text-indigo-600" />
-              <CardTitle>이상형 및 소속</CardTitle>
+              <CardTitle>{t('form.registration.sections.idealTypeAgency')}</CardTitle>
             </div>
-            <CardDescription>이상형 조건과 소속사를 입력하세요</CardDescription>
+            <CardDescription>{t('form.registration.sectionDescriptions.idealTypeAgency')}</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="g-ideal">이상형여성 조건</Label>
+              <Label htmlFor="g-ideal">{t('form.registration.fields.idealType')}</Label>
               <textarea
                 id="g-ideal"
                 value={newClient.idealType}
@@ -415,14 +415,14 @@ export function GroomRegistrationForm({
                     idealType: e.target.value,
                   })
                 }
-                placeholder="성격이 밝고 명랑한 분"
+                placeholder={t('form.registration.placeholders.idealType')}
                 className="flex min-h-[80px] w-full rounded-md border border-input bg-slate-50 px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 resize-none"
               />
             </div>
 
             <AgencySelector
               id="g-agency"
-              label="소속사"
+              label={t('form.registration.fields.agency')}
               value={newClient.agencyId || ""}
               onChange={(val) =>
                 setNewClient({
@@ -449,14 +449,14 @@ export function GroomRegistrationForm({
           <CardHeader>
             <div className="flex items-center gap-2">
               <ImageIcon className="w-5 h-5 text-indigo-600" />
-              <CardTitle>{t('form.labels.photos')} & {t('form.labels.video')}</CardTitle>
+              <CardTitle>{t('form.registration.sections.media')}</CardTitle>
             </div>
-            <CardDescription>{t('form.labels.avatar')} & {t('form.labels.video')}</CardDescription>
+            <CardDescription>{t('form.registration.sectionDescriptions.media')}</CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
             {/* 아바타 설정 */}
             <div className="space-y-3 pb-4 border-b">
-              <Label>아바타 이미지</Label>
+              <Label>{t('form.registration.media.avatarImage')}</Label>
               <div className="flex items-center gap-4">
                 <Avatar className="w-20 h-20 border-2 border-slate-200">
                   {avatarPreview ? (
@@ -476,7 +476,7 @@ export function GroomRegistrationForm({
                     onClick={() => setIsAvatarDialogOpen(true)}
                     disabled={photoPreviewUrls.length === 0}
                   >
-                    <UserCircle className="w-4 h-4" /> 아바타 선택
+                    <UserCircle className="w-4 h-4" /> {t('form.registration.buttons.selectAvatar')}
                   </Button>
                   {avatarPreview && (
                     <Button
@@ -486,7 +486,7 @@ export function GroomRegistrationForm({
                       className="gap-2 text-red-600 hover:text-red-700"
                       onClick={handleRemoveAvatar}
                     >
-                      <X className="w-4 h-4" /> 제거
+                      <X className="w-4 h-4" /> {t('common.delete')}
                     </Button>
                   )}
                   {photoPreviewUrls.length === 0 && (
@@ -500,7 +500,7 @@ export function GroomRegistrationForm({
 
             {/* 사진 업로드 */}
             <div className="space-y-3">
-              <Label htmlFor="g-photos">{t('form.labels.photos')}</Label>
+              <Label htmlFor="g-photos">{t('form.registration.media.uploadPhotos')}</Label>
               <div className="flex items-center gap-2">
                 <Input
                   id="g-photos"
@@ -520,7 +520,7 @@ export function GroomRegistrationForm({
                     htmlFor="g-photos"
                     className="flex items-center gap-2 cursor-pointer"
                   >
-                    <Upload className="w-4 h-4" /> {t('common.select')} {t('form.labels.photos')}
+                    <Upload className="w-4 h-4" /> {t('form.registration.buttons.selectPhotos')}
                   </label>
                 </Button>
                 {selectedPhotos.length > 0 && (
@@ -545,7 +545,7 @@ export function GroomRegistrationForm({
                         {isPrimary && (
                           <Badge className="absolute top-1 left-1 bg-indigo-500 text-white text-xs px-2 py-0.5">
                             <Star className="w-3 h-3 mr-1" />
-                            대표
+                            {t('form.registration.media.primary')}
                           </Badge>
                         )}
                         <Button
@@ -565,7 +565,7 @@ export function GroomRegistrationForm({
 
             {/* 동영상 업로드 */}
             <div className="space-y-3 pt-3 border-t">
-              <Label htmlFor="g-video">{t('form.labels.video')}</Label>
+              <Label htmlFor="g-video">{t('form.registration.media.uploadVideo')}</Label>
               <div className="flex items-center gap-2">
                 <Input
                   id="g-video"
@@ -584,7 +584,7 @@ export function GroomRegistrationForm({
                     htmlFor="g-video"
                     className="flex items-center gap-2 cursor-pointer"
                   >
-                    <Video className="w-4 h-4" /> {t('common.select')} {t('form.labels.video')}
+                    <Video className="w-4 h-4" /> {t('form.registration.buttons.selectVideo')}
                   </label>
                 </Button>
                 {selectedVideo && (
@@ -627,7 +627,7 @@ export function GroomRegistrationForm({
           onClick={onSubmit}
           className="flex-1 bg-indigo-600 hover:bg-indigo-700"
         >
-          {t('common.submit')}
+          {t('form.registration.buttons.register')}
         </Button>
       </SheetFooter>
 

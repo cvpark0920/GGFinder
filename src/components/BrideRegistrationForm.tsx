@@ -30,6 +30,7 @@ import { AgencySelector } from "./AgencySelector";
 import { MemoTextarea } from "./MemoTextarea";
 import { Badge } from "./ui/badge";
 import { Star } from "lucide-react";
+import { useLanguage } from "./LanguageContext";
 import {
   SheetHeader,
   SheetTitle,
@@ -98,6 +99,7 @@ export function BrideRegistrationForm({
   selectedAvatar,
   onAvatarChange,
 }: BrideRegistrationFormProps) {
+  const { t } = useLanguage();
   const [isAvatarDialogOpen, setIsAvatarDialogOpen] = useState(false);
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
 
@@ -136,9 +138,9 @@ export function BrideRegistrationForm({
             <UserPlus className="w-6 h-6 text-rose-600" />
           </div>
           <div>
-            <SheetTitle className="text-xl">신규 신부 등록</SheetTitle>
+            <SheetTitle className="text-xl">{t('form.registration.titles.newBride')}</SheetTitle>
             <SheetDescription>
-              새로운 신부 회원의 기본 정보를 입력하세요.
+              {t('form.registration.descriptions.newBride')}
             </SheetDescription>
           </div>
         </div>
@@ -150,14 +152,14 @@ export function BrideRegistrationForm({
           <CardHeader>
             <div className="flex items-center gap-2">
               <User className="w-5 h-5 text-rose-600" />
-              <CardTitle>기본 정보</CardTitle>
+              <CardTitle>{t('form.registration.sections.basicInfo')}</CardTitle>
             </div>
-            <CardDescription>신부의 기본적인 인적사항을 입력하세요</CardDescription>
+            <CardDescription>{t('form.registration.sectionDescriptions.basicInfoBride')}</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="b-name">이름 (Tên)</Label>
+                <Label htmlFor="b-name">{t('form.registration.fields.nameWithVietnamese')}</Label>
                 <Input
                   id="b-name"
                   value={newClient.name}
@@ -167,11 +169,11 @@ export function BrideRegistrationForm({
                       name: e.target.value,
                     })
                   }
-                  placeholder="vũ quốc hương"
+                  placeholder={t('form.registration.placeholders.nameBride')}
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="b-birthYear">출생년도</Label>
+                <Label htmlFor="b-birthYear">{t('form.registration.fields.birthYear')}</Label>
                 <Select
                   value={newClient.birthYear || ''}
                   onValueChange={(val) =>
@@ -182,7 +184,7 @@ export function BrideRegistrationForm({
                   }
                 >
                   <SelectTrigger id="b-birthYear">
-                    <SelectValue placeholder="선택" />
+                    <SelectValue placeholder={t('common.select')} />
                   </SelectTrigger>
                   <SelectContent className="max-h-[300px]">
                     {Array.from({ length: new Date().getFullYear() - 1899 }, (_, i) => {
@@ -200,7 +202,7 @@ export function BrideRegistrationForm({
 
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="b-loc">거주지 (Địa chỉ)</Label>
+                <Label htmlFor="b-loc">{t('form.registration.fields.residenceWithVietnamese')}</Label>
                 <Input
                   id="b-loc"
                   value={newClient.loc}
@@ -210,11 +212,11 @@ export function BrideRegistrationForm({
                       loc: e.target.value,
                     })
                   }
-                  placeholder="Hà Nội"
+                  placeholder={t('form.registration.placeholders.residenceBride')}
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="b-marriage">결혼유무</Label>
+                <Label htmlFor="b-marriage">{t('form.registration.fields.maritalStatus')}</Label>
                 <Select
                   value={newClient.marriage}
                   onValueChange={(val) =>
@@ -225,11 +227,11 @@ export function BrideRegistrationForm({
                   }
                 >
                   <SelectTrigger id="b-marriage">
-                    <SelectValue placeholder="선택" />
+                    <SelectValue placeholder={t('common.select')} />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="초혼">초혼</SelectItem>
-                    <SelectItem value="재혼">재혼</SelectItem>
+                    <SelectItem value="초혼">{t('form.registration.options.firstMarriage')}</SelectItem>
+                    <SelectItem value="재혼">{t('form.registration.options.remarriage')}</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -242,14 +244,14 @@ export function BrideRegistrationForm({
           <CardHeader>
             <div className="flex items-center gap-2">
               <Briefcase className="w-5 h-5 text-rose-600" />
-              <CardTitle>학력 및 직업</CardTitle>
+              <CardTitle>{t('form.registration.sections.educationJob')}</CardTitle>
             </div>
-            <CardDescription>신부의 학력과 직업 정보를 입력하세요</CardDescription>
+            <CardDescription>{t('form.registration.sectionDescriptions.educationJobBride')}</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="b-edu">학력 (Học lực)</Label>
+                <Label htmlFor="b-edu">{t('form.registration.fields.educationWithVietnamese')}</Label>
                 <Input
                   id="b-edu"
                   type="number"
@@ -262,11 +264,11 @@ export function BrideRegistrationForm({
                       education: e.target.value,
                     })
                   }
-                  placeholder="9"
+                  placeholder={t('form.registration.placeholders.educationLevel')}
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="b-job">현재직업</Label>
+                <Label htmlFor="b-job">{t('form.registration.fields.currentJob')}</Label>
                 <Input
                   id="b-job"
                   value={newClient.job}
@@ -276,13 +278,13 @@ export function BrideRegistrationForm({
                       job: e.target.value,
                     })
                   }
-                  placeholder="재봉사"
+                  placeholder={t('form.registration.placeholders.jobBride')}
                 />
               </div>
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="b-korean">한국어 능력</Label>
+              <Label htmlFor="b-korean">{t('form.registration.fields.koreanLevel')}</Label>
               <Select
                 value={newClient.koreanLevel}
                 onValueChange={(val) =>
@@ -293,13 +295,13 @@ export function BrideRegistrationForm({
                 }
               >
                 <SelectTrigger id="b-korean">
-                  <SelectValue placeholder="선택" />
+                  <SelectValue placeholder={t('common.select')} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="상">상</SelectItem>
-                  <SelectItem value="중">중</SelectItem>
-                  <SelectItem value="하">하</SelectItem>
-                  <SelectItem value="없음">없음</SelectItem>
+                  <SelectItem value="상">{t('form.registration.options.koreanHigh')}</SelectItem>
+                  <SelectItem value="중">{t('form.registration.options.koreanMid')}</SelectItem>
+                  <SelectItem value="하">{t('form.registration.options.koreanLow')}</SelectItem>
+                  <SelectItem value="없음">{t('form.registration.options.noTattoo')}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -311,14 +313,14 @@ export function BrideRegistrationForm({
           <CardHeader>
             <div className="flex items-center gap-2">
               <Activity className="w-5 h-5 text-rose-600" />
-              <CardTitle>신체 정보</CardTitle>
+              <CardTitle>{t('form.registration.sections.physicalInfo')}</CardTitle>
             </div>
-            <CardDescription>신부의 신체 정보를 입력하세요</CardDescription>
+            <CardDescription>{t('form.registration.sectionDescriptions.physicalInfoBride')}</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="b-height">키 (Cao) - cm</Label>
+                <Label htmlFor="b-height">{t('form.registration.fields.heightWithVietnamese')}</Label>
                 <Input
                   id="b-height"
                   type="number"
@@ -331,11 +333,11 @@ export function BrideRegistrationForm({
                       height: e.target.value,
                     })
                   }
-                  placeholder="163"
+                  placeholder={t('form.registration.placeholders.heightBride')}
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="b-weight">몸무게 (Cân nặng) - kg</Label>
+                <Label htmlFor="b-weight">{t('form.registration.fields.weightWithVietnamese')}</Label>
                 <Input
                   id="b-weight"
                   type="number"
@@ -348,13 +350,13 @@ export function BrideRegistrationForm({
                       weight: e.target.value,
                     })
                   }
-                  placeholder="52"
+                  placeholder={t('form.registration.placeholders.weightBride')}
                 />
               </div>
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="b-tattoo">문신(Tattoo) 여부</Label>
+              <Label htmlFor="b-tattoo">{t('form.registration.fields.tattoo')}</Label>
               <Select
                 value={newClient.tattoo || "없음"}
                 onValueChange={(val) =>
@@ -365,11 +367,11 @@ export function BrideRegistrationForm({
                 }
               >
                 <SelectTrigger id="b-tattoo">
-                  <SelectValue placeholder="선택" />
+                  <SelectValue placeholder={t('common.select')} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="없음">없음</SelectItem>
-                  <SelectItem value="있음">있음</SelectItem>
+                  <SelectItem value="없음">{t('form.registration.options.noTattoo')}</SelectItem>
+                  <SelectItem value="있음">{t('form.registration.options.hasTattoo')}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -381,13 +383,13 @@ export function BrideRegistrationForm({
           <CardHeader>
             <div className="flex items-center gap-2">
               <Heart className="w-5 h-5 text-rose-600" />
-              <CardTitle>가족 및 종교</CardTitle>
+              <CardTitle>{t('form.registration.sections.familyReligion')}</CardTitle>
             </div>
-            <CardDescription>가족 구성과 종교 정보를 입력하세요</CardDescription>
+            <CardDescription>{t('form.registration.sectionDescriptions.familyReligion')}</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="b-family">가족구성 (Gia đình)</Label>
+              <Label htmlFor="b-family">{t('form.registration.fields.family')}</Label>
               <Input
                 id="b-family"
                 value={newClient.family}
@@ -397,13 +399,13 @@ export function BrideRegistrationForm({
                     family: e.target.value,
                   })
                 }
-                placeholder="부모님, 언니 1명"
+                placeholder={t('form.registration.placeholders.family')}
               />
             </div>
 
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="b-fatherAge">아빠 나이</Label>
+                <Label htmlFor="b-fatherAge">{t('form.registration.fields.fatherAge')}</Label>
                 <Input
                   id="b-fatherAge"
                   type="number"
@@ -420,7 +422,7 @@ export function BrideRegistrationForm({
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="b-motherAge">엄마 나이</Label>
+                <Label htmlFor="b-motherAge">{t('form.registration.fields.motherAge')}</Label>
                 <Input
                   id="b-motherAge"
                   type="number"
@@ -439,7 +441,7 @@ export function BrideRegistrationForm({
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="b-religion">종교</Label>
+              <Label htmlFor="b-religion">{t('form.labels.religion')}</Label>
               <Select
                 value={newClient.religion}
                 onValueChange={(val) =>
@@ -450,14 +452,14 @@ export function BrideRegistrationForm({
                 }
               >
                 <SelectTrigger id="b-religion">
-                  <SelectValue placeholder="선택" />
+                  <SelectValue placeholder={t('common.select')} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="무교">무교</SelectItem>
-                  <SelectItem value="불교">불교</SelectItem>
-                  <SelectItem value="기독교">기독교</SelectItem>
-                  <SelectItem value="천주교">천주교</SelectItem>
-                  <SelectItem value="기타">기타</SelectItem>
+                  <SelectItem value="무교">{t('profile.filters.noReligion')}</SelectItem>
+                  <SelectItem value="불교">{t('profile.filters.buddhism')}</SelectItem>
+                  <SelectItem value="기독교">{t('profile.filters.christianity')}</SelectItem>
+                  <SelectItem value="천주교">{t('profile.filters.catholicism')}</SelectItem>
+                  <SelectItem value="기타">{t('profile.filters.other')}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -469,14 +471,14 @@ export function BrideRegistrationForm({
           <CardHeader>
             <div className="flex items-center gap-2">
               <Building2 className="w-5 h-5 text-rose-600" />
-              <CardTitle>소속 및 메모</CardTitle>
+              <CardTitle>{t('form.registration.sections.affiliationMemo')}</CardTitle>
             </div>
-            <CardDescription>소속사와 추가 정보를 입력하세요</CardDescription>
+            <CardDescription>{t('form.registration.sectionDescriptions.affiliationMemo')}</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <AgencySelector
               id="b-agency"
-              label="소속사"
+              label={t('form.registration.fields.agency')}
               value={newClient.agencyId || ""}
               onChange={(val) =>
                 setNewClient({
@@ -489,7 +491,7 @@ export function BrideRegistrationForm({
             />
 
             <div className="space-y-2">
-              <Label htmlFor="b-ideal">이상형 조건</Label>
+              <Label htmlFor="b-ideal">{t('form.registration.fields.idealType')}</Label>
               <textarea
                 id="b-ideal"
                 value={newClient.idealType || ""}
@@ -499,7 +501,7 @@ export function BrideRegistrationForm({
                     idealType: e.target.value,
                   })
                 }
-                placeholder="성격이 밝고 명랑한 분"
+                placeholder={t('form.registration.placeholders.idealType')}
                 className="flex min-h-[80px] w-full rounded-md border border-input bg-slate-50 px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 resize-none"
               />
             </div>
@@ -519,14 +521,14 @@ export function BrideRegistrationForm({
           <CardHeader>
             <div className="flex items-center gap-2">
               <ImageIcon className="w-5 h-5 text-rose-600" />
-              <CardTitle>사진 및 동영상</CardTitle>
+              <CardTitle>{t('form.registration.sections.media')}</CardTitle>
             </div>
-            <CardDescription>프로필 사진과 소개 동영상을 업로드하세요</CardDescription>
+            <CardDescription>{t('form.registration.sectionDescriptions.media')}</CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
             {/* 아바타 설정 */}
             <div className="space-y-3 pb-4 border-b">
-              <Label>아바타 이미지</Label>
+              <Label>{t('form.registration.media.avatarImage')}</Label>
               <div className="flex items-center gap-4">
                 <Avatar className="w-20 h-20 border-2 border-slate-200">
                   {avatarPreview ? (
@@ -546,7 +548,7 @@ export function BrideRegistrationForm({
                     onClick={() => setIsAvatarDialogOpen(true)}
                     disabled={photoPreviewUrls.length === 0}
                   >
-                    <UserCircle className="w-4 h-4" /> 아바타 선택
+                    <UserCircle className="w-4 h-4" /> {t('form.registration.buttons.selectAvatar')}
                   </Button>
                   {avatarPreview && (
                     <Button
@@ -556,12 +558,12 @@ export function BrideRegistrationForm({
                       className="gap-2 text-red-600 hover:text-red-700"
                       onClick={handleRemoveAvatar}
                     >
-                      <X className="w-4 h-4" /> 제거
+                      <X className="w-4 h-4" /> {t('common.delete')}
                     </Button>
                   )}
                   {photoPreviewUrls.length === 0 && (
                     <p className="text-xs text-slate-500">
-                      먼저 프로필 사진을 업로드해주세요
+                      {t('form.registration.media.uploadPhotosFirst')}
                     </p>
                   )}
                 </div>
@@ -570,7 +572,7 @@ export function BrideRegistrationForm({
 
             {/* 사진 업로드 */}
             <div className="space-y-3">
-              <Label htmlFor="b-photos">사진 업로드</Label>
+              <Label htmlFor="b-photos">{t('form.registration.media.uploadPhotos')}</Label>
               <div className="flex items-center gap-2">
                 <Input
                   id="b-photos"
@@ -590,7 +592,7 @@ export function BrideRegistrationForm({
                     htmlFor="b-photos"
                     className="flex items-center gap-2 cursor-pointer"
                   >
-                    <Upload className="w-4 h-4" /> 사진 선택
+                    <Upload className="w-4 h-4" /> {t('form.registration.buttons.selectPhotos')}
                   </label>
                 </Button>
                 {selectedPhotos.length > 0 && (
@@ -615,7 +617,7 @@ export function BrideRegistrationForm({
                         {isPrimary && (
                           <Badge className="absolute top-1 left-1 bg-rose-500 text-white text-xs px-2 py-0.5">
                             <Star className="w-3 h-3 mr-1" />
-                            대표
+                            {t('form.registration.media.primary')}
                           </Badge>
                         )}
                         <Button
@@ -635,7 +637,7 @@ export function BrideRegistrationForm({
 
             {/* 동영상 업로드 */}
             <div className="space-y-3 pt-3 border-t">
-              <Label htmlFor="b-video">동영상 업로드</Label>
+              <Label htmlFor="b-video">{t('form.registration.media.uploadVideo')}</Label>
               <div className="flex items-center gap-2">
                 <Input
                   id="b-video"
@@ -654,7 +656,7 @@ export function BrideRegistrationForm({
                     htmlFor="b-video"
                     className="flex items-center gap-2 cursor-pointer"
                   >
-                    <Video className="w-4 h-4" /> 동영상 선택
+                    <Video className="w-4 h-4" /> {t('form.registration.buttons.selectVideo')}
                   </label>
                 </Button>
                 {selectedVideo && (
@@ -691,13 +693,13 @@ export function BrideRegistrationForm({
           onClick={onClose}
           className="flex-1"
         >
-          취소
+          {t('form.registration.buttons.cancel')}
         </Button>
         <Button
           onClick={onSubmit}
           className="flex-1 bg-rose-600 hover:bg-rose-700"
         >
-          등록하기
+          {t('form.registration.buttons.register')}
         </Button>
       </SheetFooter>
 

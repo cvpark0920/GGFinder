@@ -247,6 +247,111 @@
       "created": "생성되었습니다",
       "updated": "수정되었습니다",
       "deleted": "삭제되었습니다"
+    },
+    "registration": {
+      "titles": {
+        "newBride": "신규 신부 등록",
+        "editGroom": "신랑 정보 수정",
+        "editBride": "신부 정보 수정"
+      },
+      "descriptions": {
+        "newBride": "새로운 신부 회원의 기본 정보를 입력하세요",
+        "editGroom": "신랑 회원의 정보를 수정하세요",
+        "editBride": "신부 회원의 정보를 수정하세요"
+      },
+      "sections": {
+        "basicInfo": "기본 정보",
+        "educationJob": "학력 및 직업",
+        "physicalInfo": "신체 정보",
+        "lifestyle": "생활 습관",
+        "assetsLifestyle": "재산 및 라이프스타일",
+        "idealTypeAgency": "이상형 및 소속",
+        "familyReligion": "가족 및 종교",
+        "affiliationMemo": "소속 및 메모",
+        "media": "사진 및 동영상"
+      },
+      "sectionDescriptions": {
+        "basicInfoGroom": "신랑의 기본적인 인적사항을 입력하세요",
+        "basicInfoBride": "신부의 기본적인 인적사항을 입력하세요",
+        "educationJobGroom": "신랑의 학력과 직업 정보를 입력하세요",
+        "educationJobBride": "신부의 학력과 직업 정보를 입력하세요",
+        "physicalInfoGroom": "신랑의 신체 정보를 입력하세요",
+        "physicalInfoBride": "신부의 신체 정보를 입력하세요",
+        "lifestyleGroom": "신랑의 생활 습관을 입력하세요",
+        "assetsLifestyle": "소득 및 생활 습관 정보를 입력하세요",
+        "idealTypeAgency": "이상형 조건과 소속사를 입력하세요",
+        "familyReligion": "가족 구성과 종교 정보를 입력하세요",
+        "media": "프로필 사진과 소개 동영상을 업로드하세요"
+      },
+      "fields": {
+        "birthYear": "출생년도",
+        "maritalStatus": "결혼유무",
+        "annualIncome": "연소득 - 만원",
+        "height": "신장 - cm",
+        "weight": "몸무게 - kg",
+        "smoking": "흡연유무",
+        "drinking": "음주주량",
+        "currentJob": "현재직업",
+        "koreanLevel": "한국어 능력",
+        "tattoo": "문신(Tattoo) 여부",
+        "family": "가족구성 (Gia đình)",
+        "fatherAge": "아빠 나이",
+        "motherAge": "엄마 나이",
+        "jobWorkplace": "직업(직장)",
+        "nameWithVietnamese": "이름 (Tên)",
+        "residenceWithVietnamese": "거주지 (Địa chỉ)",
+        "educationWithVietnamese": "학력 (Học lực)",
+        "heightWithVietnamese": "키 (Cao) - cm",
+        "weightWithVietnamese": "몸무게 (Cân nặng) - kg",
+        "residenceAddress": "거주지 주소",
+        "idealType": "이상형여성 조건",
+        "agency": "소속사"
+      },
+      "placeholders": {
+        "nameGroom": "홍길동",
+        "nameBride": "vũ quốc hương",
+        "residenceGroom": "서울시 강남구",
+        "residenceBride": "Hà Nội",
+        "education": "대졸",
+        "job": "회사원",
+        "jobBride": "재봉사",
+        "income": "5000",
+        "educationLevel": "9",
+        "heightGroom": "175",
+        "heightBride": "163",
+        "weightGroom": "70",
+        "weightBride": "54",
+        "family": "부모님, 언니 1명",
+        "drinking": "소주 1병",
+        "idealType": "성격이 밝고 명랑한 분"
+      },
+      "buttons": {
+        "register": "등록하기",
+        "update": "수정하기",
+        "cancel": "취소",
+        "selectAvatar": "아바타 선택",
+        "selectPhotos": "사진 선택",
+        "selectVideo": "동영상 선택",
+        "setPrimary": "대표로 설정"
+      },
+      "options": {
+        "firstMarriage": "초혼",
+        "remarriage": "재혼",
+        "nonSmoker": "비흡연",
+        "smoker": "흡연",
+        "noTattoo": "없음",
+        "hasTattoo": "있음",
+        "koreanHigh": "상",
+        "koreanMid": "중",
+        "koreanLow": "하"
+      },
+      "media": {
+        "avatarImage": "아바타 이미지",
+        "uploadPhotos": "사진 업로드",
+        "uploadVideo": "동영상 업로드",
+        "primary": "대표",
+        "uploadPhotosFirst": "먼저 프로필 사진을 업로드해주세요"
+      }
     }
   },
   "match": {
