@@ -123,7 +123,7 @@ export default function Layout() {
             <div className="bg-gradient-to-br from-rose-500 to-pink-600 text-white px-2.5 py-1.5 rounded-lg shadow-md flex items-center justify-center">
               <span className="font-black text-lg tracking-tighter leading-none">GG</span>
             </div>
-            <span className="font-bold text-xl tracking-tight text-slate-900 hidden sm:inline">GGFinder</span>
+            <span className="font-bold text-xl tracking-tight text-slate-900 hidden sm:inline">FINDER</span>
           </Link>
 
           <nav className="hidden md:flex items-center gap-6">
