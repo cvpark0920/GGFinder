@@ -108,7 +108,7 @@
       "agencyMember": "소속사 회원"
     },
     "table": {
-      "number": "번호",
+      "number": "ID",
       "name": "이름",
       "age": "나이",
       "region": "지역",

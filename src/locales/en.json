@@ -108,7 +108,7 @@
       "agencyMember": "Agency Member"
     },
     "table": {
-      "number": "No.",
+      "number": "ID",
       "name": "Name",
       "age": "Age",
       "region": "Region",

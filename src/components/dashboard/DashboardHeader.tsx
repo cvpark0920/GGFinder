@@ -88,7 +88,9 @@ export function DashboardHeader({
         <div className="relative w-full md:w-64">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
           <Input
-            placeholder={t('dashboard.search.placeholder')}
+            placeholder={activeTab === "grooms" || activeTab === "brides" 
+              ? t('dashboard.search.placeholder') + ", ID 검색"
+              : t('dashboard.search.placeholder')}
             className="pl-9 h-11 md:h-10 bg-white border-slate-200 focus-visible:ring-rose-500 shadow-sm text-sm"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}

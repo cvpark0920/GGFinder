@@ -320,7 +320,14 @@ export function ClientTabContent({
           <Table>
             <TableHeader>
               <TableRow className="bg-gradient-to-r from-slate-50 via-white to-slate-50 hover:bg-gradient-to-r hover:from-slate-50 hover:via-white hover:to-slate-50 border-b-2 border-slate-200">
-                <TableHead className="font-semibold text-slate-700 py-4 h-auto w-16 text-center">{t('dashboard.table.number')}</TableHead>
+                <TableHead
+                  className="cursor-pointer font-semibold text-slate-700 py-4 h-auto w-16 text-center"
+                  onClick={() => onSort("id")}
+                >
+                  <div className="flex items-center justify-center gap-1.5">
+                    {t('dashboard.table.number')} <SortIcon column="id" />
+                  </div>
+                </TableHead>
                 <TableHead
                   className="cursor-pointer font-semibold text-slate-700 py-4 h-auto"
                   onClick={() => onSort("name")}

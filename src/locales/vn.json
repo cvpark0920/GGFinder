@@ -108,7 +108,7 @@
       "agencyMember": "Thành viên cơ quan"
     },
     "table": {
-      "number": "Số",
+      "number": "ID",
       "name": "Tên",
       "age": "Tuổi",
       "region": "Khu vực",

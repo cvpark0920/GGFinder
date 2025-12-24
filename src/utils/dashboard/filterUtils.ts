@@ -15,9 +15,18 @@ export function getFilteredAndSortedClients(
   if (searchTerm) {
     const term = searchTerm.toLowerCase();
     result = result.filter(
-      (c) =>
-        c.name.toLowerCase().includes(term) ||
-        c.loc.toLowerCase().includes(term)
+      (c) => {
+        // 프로필 코드 생성 (BR-001, GR-001 형식)
+        const profileCode = c.type === 'bride' 
+          ? `br-${String(c.id).padStart(3, '0')}` 
+          : `gr-${String(c.id).padStart(3, '0')}`;
+        return (
+          c.name.toLowerCase().includes(term) ||
+          c.loc.toLowerCase().includes(term) ||
+          String(c.id).includes(term) ||
+          profileCode.includes(term)
+        );
+      }
     );
   }
 
@@ -29,6 +38,13 @@ export function getFilteredAndSortedClients(
   // 3. 정렬
   if (sortConfig) {
     result.sort((a, b) => {
+      // ID 정렬의 경우 숫자로 비교
+      if (sortConfig.key === "id") {
+        const valA = a.id ?? 0;
+        const valB = b.id ?? 0;
+        return sortConfig.direction === "asc" ? valA - valB : valB - valA;
+      }
+      
       // 선택적 필드 안전하게 처리
       const valA = a[sortConfig.key] ?? "";
       const valB = b[sortConfig.key] ?? "";
