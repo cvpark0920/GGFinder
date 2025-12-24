@@ -23,15 +23,25 @@ if (!process.env.GOOGLE_CLIENT_SECRET) {
 const googleClientId = process.env.GOOGLE_CLIENT_ID;
 const googleClientSecret = process.env.GOOGLE_CLIENT_SECRET;
 // GOOGLE_REDIRECT_URI는 백엔드 URL이어야 함 (Google OAuth 콜백이 백엔드로 옴)
-// 개발 환경에서는 localhost:4000 (백엔드), 프로덕션에서는 백엔드 도메인 사용
+// 개발 환경에서는 localhost:4000 (백엔드), 프로덕션에서는 환경 변수 필수
 const isDevelopment = process.env.NODE_ENV !== 'production';
-const defaultBackendUrl = isDevelopment ? 'http://localhost:4000' : (process.env.FRONTEND_URL || 'https://finder.ggacademy.top');
+const defaultBackendUrl = isDevelopment ? 'http://localhost:4000' : undefined;
 const backendBaseUrl = process.env.API_BASE_URL || process.env.FRONTEND_URL || defaultBackendUrl;
-const googleRedirectUri = process.env.GOOGLE_REDIRECT_URI || `${backendBaseUrl}/api/auth/google/callback`;
+if (!backendBaseUrl) {
+  console.error('⚠️ ERROR: API_BASE_URL or FRONTEND_URL must be set in production!');
+}
+const googleRedirectUri = process.env.GOOGLE_REDIRECT_URI || (backendBaseUrl ? `${backendBaseUrl}/api/auth/google/callback` : undefined);
+if (!googleRedirectUri) {
+  console.error('⚠️ ERROR: GOOGLE_REDIRECT_URI must be set in production!');
+}
 
 // 프론트엔드 URL (인증 후 리디렉션용)
-const defaultFrontendUrl = isDevelopment ? 'http://localhost:4001' : 'https://finder.ggacademy.top';
+// 개발 환경에서만 기본값 사용, 프로덕션에서는 환경 변수 필수
+const defaultFrontendUrl = isDevelopment ? 'http://localhost:4001' : undefined;
 const frontendBaseUrl = process.env.FRONTEND_URL || process.env.CORS_ORIGIN || defaultFrontendUrl;
+if (!frontendBaseUrl) {
+  console.error('⚠️ ERROR: FRONTEND_URL or CORS_ORIGIN must be set in production!');
+}
 
 // 디버깅: Google OAuth 설정 로그
 console.log('[Google OAuth Config]', {
@@ -73,8 +83,11 @@ router.get('/google/redirect', async (req: Request, res: Response) => {
     // sameSite: 'none'은 크로스 도메인 요청을 허용 (Google OAuth 리디렉션용)
     const isProduction = process.env.NODE_ENV === 'production';
     const isDevelopment = !isProduction;
-    const defaultFrontendUrl = isDevelopment ? 'http://localhost:4001' : 'https://finder.ggacademy.top';
+    const defaultFrontendUrl = isDevelopment ? 'http://localhost:4001' : undefined;
     const frontendUrl = process.env.FRONTEND_URL || process.env.CORS_ORIGIN || defaultFrontendUrl;
+    if (!frontendUrl) {
+      console.error('⚠️ ERROR: FRONTEND_URL or CORS_ORIGIN must be set in production!');
+    }
     
     // 디버깅: 환경 변수 로그
     console.log('[OAuth Redirect] Environment check:', {
@@ -138,8 +151,9 @@ router.get('/google/callback', async (req: Request, res: Response) => {
 
     // 환경 변수 확인 및 fallback 처리
     // 개발 환경에서는 localhost:4001을 기본값으로 사용 (프론트엔드가 4001에서 실행)
+    // 프로덕션에서는 환경 변수 필수
     const isDevelopment = process.env.NODE_ENV !== 'production';
-    const defaultFrontendUrl = isDevelopment ? 'http://localhost:4001' : 'https://finder.ggacademy.top';
+    const defaultFrontendUrl = isDevelopment ? 'http://localhost:4001' : undefined;
     let frontendUrl = process.env.FRONTEND_URL || process.env.CORS_ORIGIN;
     
     // 환경 변수가 없으면 요청의 host를 사용하여 URL 구성
@@ -170,9 +184,19 @@ router.get('/google/callback', async (req: Request, res: Response) => {
             frontendUrl = defaultFrontendUrl; // 개발/프로덕션에 맞는 기본값 사용
           }
         } else {
-          frontendUrl = defaultFrontendUrl; // 개발/프로덕션에 맞는 기본값 사용
+          if (defaultFrontendUrl) {
+            frontendUrl = defaultFrontendUrl; // 개발 환경 기본값 사용
+          } else {
+            console.error('⚠️ ERROR: FRONTEND_URL or CORS_ORIGIN must be set in production!');
+            return res.status(500).json({ error: 'Frontend URL configuration error' });
+          }
         }
       }
+    }
+    
+    if (!frontendUrl) {
+      console.error('⚠️ ERROR: Frontend URL could not be determined!');
+      return res.status(500).json({ error: 'Frontend URL configuration error' });
     }
     
     console.log('[OAuth Callback] Frontend URL determined:', {
@@ -353,8 +377,9 @@ router.get('/google/callback', async (req: Request, res: Response) => {
     console.error('Google OAuth callback error:', error);
     // 에러 발생 시에도 동일한 frontendUrl 로직 사용
     // 개발 환경에서는 localhost:4001을 기본값으로 사용
+    // 프로덕션에서는 환경 변수 필수
     const isDevelopment = process.env.NODE_ENV !== 'production';
-    const defaultFrontendUrl = isDevelopment ? 'http://localhost:4001' : 'https://finder.ggacademy.top';
+    const defaultFrontendUrl = isDevelopment ? 'http://localhost:4001' : undefined;
     let errorFrontendUrl = process.env.FRONTEND_URL || process.env.CORS_ORIGIN;
     if (!errorFrontendUrl) {
       const requestHost = req.get('host');
@@ -377,13 +402,29 @@ router.get('/google/callback', async (req: Request, res: Response) => {
             console.warn('[OAuth Callback] Error handler - Using request origin/referer as fallback:', errorFrontendUrl);
           } catch (e) {
             console.error('[OAuth Callback] Error handler - Failed to parse origin/referer:', requestOrigin);
-            errorFrontendUrl = defaultFrontendUrl;
+            if (defaultFrontendUrl) {
+              errorFrontendUrl = defaultFrontendUrl;
+            } else {
+              console.error('⚠️ ERROR: FRONTEND_URL or CORS_ORIGIN must be set in production!');
+              return res.status(500).json({ error: 'Frontend URL configuration error' });
+            }
           }
         } else {
-          errorFrontendUrl = defaultFrontendUrl;
+          if (defaultFrontendUrl) {
+            errorFrontendUrl = defaultFrontendUrl;
+          } else {
+            console.error('⚠️ ERROR: FRONTEND_URL or CORS_ORIGIN must be set in production!');
+            return res.status(500).json({ error: 'Frontend URL configuration error' });
+          }
         }
       }
     }
+    
+    if (!errorFrontendUrl) {
+      console.error('⚠️ ERROR: Error frontend URL could not be determined!');
+      return res.status(500).json({ error: 'Frontend URL configuration error' });
+    }
+    
     console.log('[OAuth Callback] Error handler - Frontend URL:', {
       FRONTEND_URL: process.env.FRONTEND_URL,
       CORS_ORIGIN: process.env.CORS_ORIGIN,
