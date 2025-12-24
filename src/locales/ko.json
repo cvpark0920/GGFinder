@@ -486,6 +486,7 @@
       "buttons": {
         "register": "등록하기",
         "update": "수정하기",
+        "updateComplete": "수정 완료",
         "cancel": "취소",
         "selectAvatar": "아바타 선택",
         "selectPhotos": "사진 선택",
