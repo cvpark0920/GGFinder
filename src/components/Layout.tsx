@@ -252,7 +252,16 @@ export default function Layout() {
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" size="sm" className="gap-2 hover:bg-slate-100">
                     <Avatar className="w-8 h-8">
-                      <AvatarImage src={user?.picture || undefined} alt={user?.name || 'User'} />
+                      {user?.picture && user.picture.trim() !== '' ? (
+                        <AvatarImage 
+                          src={user.picture} 
+                          alt={user?.name || 'User'}
+                          onError={(e) => {
+                            // 이미지 로드 실패 시 fallback 표시
+                            e.currentTarget.style.display = 'none';
+                          }}
+                        />
+                      ) : null}
                       <AvatarFallback className="bg-gradient-to-br from-indigo-400 to-indigo-600 text-white font-semibold text-sm">
                         {user?.name?.slice(0, 1) || 'U'}
                       </AvatarFallback>

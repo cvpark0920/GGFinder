@@ -42,6 +42,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const refreshIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
   const login = (userData: User, token: string) => {
+    // 디버깅: picture 확인
+    console.log('[AuthContext] Login - User picture:', {
+      hasPicture: !!userData.picture,
+      pictureUrl: userData.picture ? `${userData.picture.substring(0, 50)}...` : 'null',
+      userData: { ...userData, picture: userData.picture || 'null' },
+    });
     setUser(userData);
     setIdToken(token);
     localStorage.setItem('user', JSON.stringify(userData));
