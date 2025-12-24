@@ -258,6 +258,11 @@ jobs:
               fi
             fi
             
+            # 환경 변수를 Docker Compose에 전달
+            export FRONTEND_URL="${FRONTEND_URL}"
+            export CORS_ORIGIN="${CORS_ORIGIN}"
+            export VITE_API_BASE_URL="${VITE_API_BASE_URL}"
+            
             docker compose up -d || {
               echo "❌ Docker compose up failed"
               # 롤백 시도

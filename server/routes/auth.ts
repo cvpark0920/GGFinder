@@ -149,54 +149,21 @@ router.get('/google/callback', async (req: Request, res: Response) => {
   try {
     const { code, state, error } = req.query;
 
-    // 환경 변수 확인 및 fallback 처리
-    // 개발 환경에서는 localhost:4001을 기본값으로 사용 (프론트엔드가 4001에서 실행)
-    // 프로덕션에서는 환경 변수 필수
-    const isDevelopment = process.env.NODE_ENV !== 'production';
-    const defaultFrontendUrl = isDevelopment ? 'http://localhost:4001' : undefined;
-    let frontendUrl = process.env.FRONTEND_URL || process.env.CORS_ORIGIN;
-    
-    // 환경 변수가 없으면 요청의 host를 사용하여 URL 구성
-    // Google OAuth 콜백은 Google 서버에서 직접 호출되므로 origin/referer가 없을 수 있음
-    if (!frontendUrl) {
-      const requestHost = req.get('host');
-      const protocol = req.protocol || (req.secure ? 'https' : 'http');
-      
-      if (requestHost) {
-        // 개발 환경이고 백엔드 호스트인 경우 프론트엔드 포트로 변경
-        if (isDevelopment && requestHost.includes(':4000')) {
-          frontendUrl = 'http://localhost:4001';
-          console.warn('[OAuth Callback] Development mode: Using frontend port 4001');
-        } else {
-          frontendUrl = `${protocol}://${requestHost}`;
-          console.warn('[OAuth Callback] Using request host as fallback:', frontendUrl);
-        }
-      } else {
-        // 최후의 수단: origin 또는 referer 시도
-        const requestOrigin = req.get('origin') || req.get('referer');
-        if (requestOrigin) {
-          try {
-            const url = new URL(requestOrigin);
-            frontendUrl = `${url.protocol}//${url.host}`;
-            console.warn('[OAuth Callback] Using request origin/referer as fallback:', frontendUrl);
-          } catch (e) {
-            console.error('[OAuth Callback] Failed to parse origin/referer:', requestOrigin);
-            frontendUrl = defaultFrontendUrl; // 개발/프로덕션에 맞는 기본값 사용
-          }
-        } else {
-          if (defaultFrontendUrl) {
-            frontendUrl = defaultFrontendUrl; // 개발 환경 기본값 사용
-          } else {
-            console.error('⚠️ ERROR: FRONTEND_URL or CORS_ORIGIN must be set in production!');
-            return res.status(500).json({ error: 'Frontend URL configuration error' });
-          }
-        }
-      }
-    }
+    // 프론트엔드 URL 결정 (인증 후 리디렉션용)
+    // 전역에서 설정한 frontendBaseUrl 사용 (환경 변수 기반)
+    // 프로덕션에서는 환경 변수가 필수이므로 fallback 로직 제거
+    const frontendUrl = frontendBaseUrl;
     
     if (!frontendUrl) {
       console.error('⚠️ ERROR: Frontend URL could not be determined!');
-      return res.status(500).json({ error: 'Frontend URL configuration error' });
+      console.error('Environment variables:', {
+        FRONTEND_URL: process.env.FRONTEND_URL,
+        CORS_ORIGIN: process.env.CORS_ORIGIN,
+        NODE_ENV: process.env.NODE_ENV,
+      });
+      return res.status(500).json({ 
+        error: 'Frontend URL configuration error. Please set FRONTEND_URL or CORS_ORIGIN environment variable.' 
+      });
     }
     
     console.log('[OAuth Callback] Frontend URL determined:', {
