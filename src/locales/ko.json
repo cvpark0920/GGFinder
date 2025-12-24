@@ -440,6 +440,7 @@
         "assetsLifestyle": "소득 및 생활 습관 정보를 입력하세요",
         "idealTypeAgency": "이상형 조건과 소속사를 입력하세요",
         "familyReligion": "가족 구성과 종교 정보를 입력하세요",
+        "affiliationMemo": "소속사 및 메모 정보를 입력하세요",
         "media": "프로필 사진과 소개 동영상을 업로드하세요"
       },
       "fields": {
