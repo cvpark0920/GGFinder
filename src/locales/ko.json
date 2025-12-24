@@ -412,6 +412,7 @@
         "editBride": "신부 정보 수정"
       },
       "descriptions": {
+        "newGroom": "새로운 신랑 회원의 기본 정보를 입력하세요",
         "newBride": "새로운 신부 회원의 기본 정보를 입력하세요",
         "editGroom": "신랑 회원의 정보를 수정하세요",
         "editBride": "신부 회원의 정보를 수정하세요"
