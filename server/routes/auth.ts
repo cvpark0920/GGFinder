@@ -30,7 +30,7 @@ const backendBaseUrl = process.env.API_BASE_URL || process.env.FRONTEND_URL || d
 const googleRedirectUri = process.env.GOOGLE_REDIRECT_URI || `${backendBaseUrl}/api/auth/google/callback`;
 
 // 프론트엔드 URL (인증 후 리디렉션용)
-const defaultFrontendUrl = isDevelopment ? 'http://localhost:4001' : 'http://localhost:4000';
+const defaultFrontendUrl = isDevelopment ? 'http://localhost:4001' : 'https://finder.ggacademy.top';
 const frontendBaseUrl = process.env.FRONTEND_URL || process.env.CORS_ORIGIN || defaultFrontendUrl;
 
 // 디버깅: Google OAuth 설정 로그
@@ -73,7 +73,7 @@ router.get('/google/redirect', async (req: Request, res: Response) => {
     // sameSite: 'none'은 크로스 도메인 요청을 허용 (Google OAuth 리디렉션용)
     const isProduction = process.env.NODE_ENV === 'production';
     const isDevelopment = !isProduction;
-    const defaultFrontendUrl = isDevelopment ? 'http://localhost:4001' : 'http://localhost:4000';
+    const defaultFrontendUrl = isDevelopment ? 'http://localhost:4001' : 'https://finder.ggacademy.top';
     const frontendUrl = process.env.FRONTEND_URL || process.env.CORS_ORIGIN || defaultFrontendUrl;
     
     // 디버깅: 환경 변수 로그
@@ -139,7 +139,7 @@ router.get('/google/callback', async (req: Request, res: Response) => {
     // 환경 변수 확인 및 fallback 처리
     // 개발 환경에서는 localhost:4001을 기본값으로 사용 (프론트엔드가 4001에서 실행)
     const isDevelopment = process.env.NODE_ENV !== 'production';
-    const defaultFrontendUrl = isDevelopment ? 'http://localhost:4001' : 'http://localhost:4000';
+    const defaultFrontendUrl = isDevelopment ? 'http://localhost:4001' : 'https://finder.ggacademy.top';
     let frontendUrl = process.env.FRONTEND_URL || process.env.CORS_ORIGIN;
     
     // 환경 변수가 없으면 요청의 host를 사용하여 URL 구성
@@ -354,7 +354,7 @@ router.get('/google/callback', async (req: Request, res: Response) => {
     // 에러 발생 시에도 동일한 frontendUrl 로직 사용
     // 개발 환경에서는 localhost:4001을 기본값으로 사용
     const isDevelopment = process.env.NODE_ENV !== 'production';
-    const defaultFrontendUrl = isDevelopment ? 'http://localhost:4001' : 'http://localhost:4000';
+    const defaultFrontendUrl = isDevelopment ? 'http://localhost:4001' : 'https://finder.ggacademy.top';
     let errorFrontendUrl = process.env.FRONTEND_URL || process.env.CORS_ORIGIN;
     if (!errorFrontendUrl) {
       const requestHost = req.get('host');
