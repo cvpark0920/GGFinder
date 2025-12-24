@@ -3,16 +3,114 @@ import { User, Agency, Client, YouTubeVideo } from '../types/dashboard';
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:4000';
 
 /**
+ * JWT 토큰의 payload 파싱
+ */
+function parseJwtPayload(token: string): any {
+  try {
+    const base64Url = token.split('.')[1];
+    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+    const jsonPayload = decodeURIComponent(
+      atob(base64)
+        .split('')
+        .map((c) => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
+        .join('')
+    );
+    return JSON.parse(jsonPayload);
+  } catch (error) {
+    console.error('Failed to parse JWT token:', error);
+    return null;
+  }
+}
+
+/**
+ * ID Token의 만료 시간 확인 (초 단위 Unix timestamp)
+ */
+export function getTokenExpiry(token: string): number | null {
+  const payload = parseJwtPayload(token);
+  return payload?.exp || null;
+}
+
+/**
+ * 토큰이 만료되었는지 확인
+ */
+export function isTokenExpired(token: string): boolean {
+  const exp = getTokenExpiry(token);
+  if (!exp) return true;
+  const now = Math.floor(Date.now() / 1000);
+  return exp <= now;
+}
+
+/**
+ * 토큰이 만료 임박인지 확인 (10분 전)
+ */
+export function isTokenExpiringSoon(token: string, bufferMinutes: number = 10): boolean {
+  const exp = getTokenExpiry(token);
+  if (!exp) return true;
+  const now = Math.floor(Date.now() / 1000);
+  const bufferSeconds = bufferMinutes * 60;
+  return exp <= now + bufferSeconds;
+}
+
+/**
+ * Refresh Token으로 새 ID Token 발급
+ */
+export async function refreshToken(): Promise<string | null> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/auth/refresh`, {
+      method: 'POST',
+      credentials: 'include', // 쿠키 포함
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to refresh token');
+    }
+
+    const data = await response.json();
+    const newIdToken = data.idToken;
+
+    if (newIdToken) {
+      // 새 토큰을 localStorage에 저장
+      localStorage.setItem('idToken', newIdToken);
+      return newIdToken;
+    }
+
+    return null;
+  } catch (error) {
+    console.error('Token refresh error:', error);
+    return null;
+  }
+}
+
+/**
  * API 호출 헬퍼 함수
  */
 async function apiCall<T>(
   endpoint: string,
   options: RequestInit = {}
 ): Promise<T> {
-  const token = localStorage.getItem('idToken');
+  let token = localStorage.getItem('idToken');
   
   if (!token) {
     throw new Error('인증 토큰이 없습니다.');
+  }
+
+  // 토큰이 만료 임박(10분 전)이면 자동 갱신
+  if (isTokenExpiringSoon(token, 10)) {
+    const newToken = await refreshToken();
+    if (newToken) {
+      token = newToken;
+    } else {
+      // 갱신 실패 시 401 에러 처리
+      localStorage.removeItem('idToken');
+      localStorage.removeItem('user');
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new CustomEvent('auth:unauthorized'));
+      }
+      throw new Error('인증이 만료되었습니다. 다시 로그인해주세요.');
+    }
   }
 
   const url = `${API_BASE_URL}${endpoint}`;

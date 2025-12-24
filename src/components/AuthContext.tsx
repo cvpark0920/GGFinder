@@ -1,4 +1,5 @@
-import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
+import React, { createContext, useContext, useState, ReactNode, useEffect, useRef } from 'react';
+import { refreshToken, isTokenExpiringSoon } from '../utils/api';
 
 interface User {
   id: number;
@@ -38,6 +39,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [idToken, setIdToken] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const refreshIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
   const login = (userData: User, token: string) => {
     setUser(userData);
@@ -90,10 +92,75 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
+  // 토큰 자동 갱신 함수
+  const autoRefreshToken = async () => {
+    const currentToken = localStorage.getItem('idToken');
+    if (!currentToken) return;
+
+    // 토큰이 만료 임박(10분 전)인지 확인
+    if (isTokenExpiringSoon(currentToken, 10)) {
+      const newToken = await refreshToken();
+      if (newToken) {
+        setIdToken(newToken);
+        // 새 토큰으로 사용자 정보 다시 가져오기
+        try {
+          const response = await fetch(`${API_BASE_URL}/api/auth/me`, {
+            method: 'GET',
+            headers: {
+              'Authorization': `Bearer ${newToken}`,
+            },
+          });
+          if (response.ok) {
+            const data = await response.json();
+            const userData = {
+              ...data.user,
+              joinDate: data.user.joinDate ? (typeof data.user.joinDate === 'string' ? data.user.joinDate : new Date(data.user.joinDate).toISOString()) : null,
+              lastLogin: data.user.lastLogin ? (typeof data.user.lastLogin === 'string' ? data.user.lastLogin : new Date(data.user.lastLogin).toISOString()) : null,
+            };
+            setUser(userData);
+          }
+        } catch (error) {
+          console.error('Failed to refresh user data:', error);
+        }
+      } else {
+        // Refresh Token도 만료된 경우 로그아웃
+        logout();
+      }
+    }
+  };
+
   // 컴포넌트 마운트 시 인증 상태 확인
   useEffect(() => {
     checkAuth();
   }, []);
+
+  // 토큰 자동 갱신 인터벌 설정
+  useEffect(() => {
+    if (!idToken) {
+      // 토큰이 없으면 인터벌 정리
+      if (refreshIntervalRef.current) {
+        clearInterval(refreshIntervalRef.current);
+        refreshIntervalRef.current = null;
+      }
+      return;
+    }
+
+    // 5분마다 토큰 만료 상태 확인 및 갱신
+    refreshIntervalRef.current = setInterval(() => {
+      autoRefreshToken();
+    }, 5 * 60 * 1000); // 5분
+
+    // 초기 확인
+    autoRefreshToken();
+
+    // 클린업
+    return () => {
+      if (refreshIntervalRef.current) {
+        clearInterval(refreshIntervalRef.current);
+        refreshIntervalRef.current = null;
+      }
+    };
+  }, [idToken]);
 
   return (
     <AuthContext.Provider
