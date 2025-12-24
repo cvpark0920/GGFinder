@@ -264,7 +264,14 @@ router.get('/google/callback', async (req: Request, res: Response) => {
     // 사용자 정보 추출
     const userEmail = email;
     const userName = name || email.split('@')[0];
-    const userPicture = picture || null;
+    // Google picture URL이 있으면 사용, 없으면 null
+    // Google picture URL은 보통 https://lh3.googleusercontent.com/... 형식
+    const userPicture = picture && picture.trim() !== '' ? picture : null;
+    
+    console.log('[OAuth Callback] User picture:', {
+      hasPicture: !!picture,
+      pictureUrl: picture ? `${picture.substring(0, 50)}...` : 'null',
+    });
 
     // 슈퍼 관리자 여부 확인
     const isSuperAdmin = userEmail === SUPER_ADMIN_EMAIL;
@@ -437,7 +444,14 @@ router.post('/google', async (req: Request, res: Response) => {
     // 사용자 정보 추출
     const userEmail = email;
     const userName = name || email.split('@')[0];
-    const userPicture = picture || null;
+    // Google picture URL이 있으면 사용, 없으면 null
+    // Google picture URL은 보통 https://lh3.googleusercontent.com/... 형식
+    const userPicture = picture && picture.trim() !== '' ? picture : null;
+    
+    console.log('[OAuth POST] User picture:', {
+      hasPicture: !!picture,
+      pictureUrl: picture ? `${picture.substring(0, 50)}...` : 'null',
+    });
 
     // 슈퍼 관리자 여부 확인
     const isSuperAdmin = userEmail === SUPER_ADMIN_EMAIL;
