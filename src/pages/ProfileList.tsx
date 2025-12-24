@@ -16,7 +16,8 @@ import {
   Church,
   FileEdit,
   Calendar,
-  Phone
+  Phone,
+  Circle
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Badge } from '../components/ui/badge';
@@ -599,12 +600,10 @@ export default function ProfileList({ type }: ProfileListProps) {
                             <span className="truncate">{profile.job}</span>
                           </div>
                         )}
-                        {(type === 'bride' ? (profile as any).currentAddress : (profile as any).residence) && (
+                        {profile.tattoo && (
                           <div className="flex items-center gap-2">
-                            <MapPin className="w-4 h-4 text-slate-400" />
-                            <span className="truncate">
-                              {type === 'bride' ? (profile as any).currentAddress : (profile as any).residence}
-                            </span>
+                            <Circle className="w-4 h-4 text-slate-400" />
+                            <span className="truncate">{t('form.registration.fields.tattoo')}: {profile.tattoo}</span>
                           </div>
                         )}
                       </div>
