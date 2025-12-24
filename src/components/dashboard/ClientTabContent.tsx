@@ -236,13 +236,15 @@ export function ClientTabContent({
               </TableRow>
             </TableHeader>
             <TableBody>
-              {clients.map((client, index) => (
+              {clients.map((client, index) => {
+                const profileCode = type === 'bride' ? `BR-${String(client.id).padStart(3, '0')}` : `GR-${String(client.id).padStart(3, '0')}`;
+                return (
                 <TableRow 
                   key={client.id}
                   className="hover:bg-gradient-to-r hover:from-rose-50/30 hover:via-white hover:to-rose-50/30 transition-all duration-150 border-b border-slate-100 group"
                 >
                   <TableCell className="py-4 text-center">
-                    <span className="text-slate-500 font-medium">{index + 1}</span>
+                    <span className="text-slate-500 font-medium">{profileCode}</span>
                   </TableCell>
                   <TableCell className="py-4">
                     <div className="flex items-center gap-3">
@@ -346,7 +348,8 @@ export function ClientTabContent({
                     </div>
                   </TableCell>
                 </TableRow>
-              ))}
+                );
+              })}
               {clients.length === 0 && (
                 <TableRow>
                   <TableCell
