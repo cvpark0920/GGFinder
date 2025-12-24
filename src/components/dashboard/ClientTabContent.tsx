@@ -27,6 +27,15 @@ import {
 import { Client, Agency, SortConfig } from "../../types/dashboard";
 import { Avatar, AvatarImage, AvatarFallback } from "../ui/avatar";
 import { useLanguage } from "../LanguageContext";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationEllipsis,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "../ui/pagination";
 
 interface ClientTabContentProps {
   clients: Client[];
@@ -39,6 +48,11 @@ interface ClientTabContentProps {
   onSort: (key: keyof Client) => void;
   sortConfig: SortConfig | null;
   onAvatarClick?: (client: Client) => void;
+  currentPage?: number;
+  totalPages?: number;
+  totalItems?: number;
+  itemsPerPage?: number;
+  onPageChange?: (page: number) => void;
 }
 
 export function ClientTabContent({
@@ -52,8 +66,122 @@ export function ClientTabContent({
   onSort,
   sortConfig,
   onAvatarClick,
+  currentPage = 1,
+  totalPages = 1,
+  totalItems = 0,
+  itemsPerPage = 10,
+  onPageChange,
 }: ClientTabContentProps) {
   const { t } = useLanguage();
+  
+  // 페이징 UI 렌더링 함수
+  const renderPagination = () => {
+    if (!onPageChange || totalPages <= 1) return null;
+
+    const getPageNumbers = () => {
+      const pages: (number | 'ellipsis')[] = [];
+      const maxVisiblePages = 5;
+
+      if (totalPages <= maxVisiblePages) {
+        // 전체 페이지가 5개 이하면 모두 표시
+        for (let i = 1; i <= totalPages; i++) {
+          pages.push(i);
+        }
+      } else {
+        // 첫 페이지
+        pages.push(1);
+
+        if (currentPage <= 3) {
+          // 현재 페이지가 앞쪽에 있으면
+          for (let i = 2; i <= 4; i++) {
+            pages.push(i);
+          }
+          pages.push('ellipsis');
+          pages.push(totalPages);
+        } else if (currentPage >= totalPages - 2) {
+          // 현재 페이지가 뒤쪽에 있으면
+          pages.push('ellipsis');
+          for (let i = totalPages - 3; i <= totalPages; i++) {
+            pages.push(i);
+          }
+        } else {
+          // 현재 페이지가 중간에 있으면
+          pages.push('ellipsis');
+          for (let i = currentPage - 1; i <= currentPage + 1; i++) {
+            pages.push(i);
+          }
+          pages.push('ellipsis');
+          pages.push(totalPages);
+        }
+      }
+
+      return pages;
+    };
+
+    const pageNumbers = getPageNumbers();
+    const startIndex = (currentPage - 1) * itemsPerPage + 1;
+    const endIndex = Math.min(currentPage * itemsPerPage, totalItems);
+
+    return (
+      <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mt-4 px-4 py-3 border-t border-slate-200 bg-slate-50/50">
+        <div className="text-sm text-slate-600 whitespace-nowrap min-w-fit">
+          {totalItems > 0 ? (
+            <>
+              {startIndex}-{endIndex} / {totalItems} {t('dashboard.table.items') || '개'}
+            </>
+          ) : (
+            t('dashboard.table.noResults')
+          )}
+        </div>
+        <Pagination>
+          <PaginationContent>
+            <PaginationItem>
+              <PaginationPrevious
+                href="#"
+                onClick={(e) => {
+                  e.preventDefault();
+                  if (currentPage > 1) {
+                    onPageChange(currentPage - 1);
+                  }
+                }}
+                className={currentPage === 1 ? 'pointer-events-none opacity-50' : ''}
+              />
+            </PaginationItem>
+            {pageNumbers.map((page, index) => (
+              <PaginationItem key={index}>
+                {page === 'ellipsis' ? (
+                  <PaginationEllipsis />
+                ) : (
+                  <PaginationLink
+                    href="#"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      onPageChange(page);
+                    }}
+                    isActive={page === currentPage}
+                  >
+                    {page}
+                  </PaginationLink>
+                )}
+              </PaginationItem>
+            ))}
+            <PaginationItem>
+              <PaginationNext
+                href="#"
+                onClick={(e) => {
+                  e.preventDefault();
+                  if (currentPage < totalPages) {
+                    onPageChange(currentPage + 1);
+                  }
+                }}
+                className={currentPage === totalPages ? 'pointer-events-none opacity-50' : ''}
+              />
+            </PaginationItem>
+          </PaginationContent>
+        </Pagination>
+      </div>
+    );
+  };
   
   const SortIcon = ({ column }: { column: keyof Client }) => {
     if (sortConfig?.key !== column)
@@ -183,6 +311,8 @@ export function ClientTabContent({
               {t('dashboard.table.noResults')}
             </div>
           )}
+          {/* Mobile Pagination */}
+          {renderPagination()}
         </div>
 
         {/* Desktop View: Table */}
@@ -364,6 +494,7 @@ export function ClientTabContent({
               )}
             </TableBody>
           </Table>
+          {renderPagination()}
         </div>
     </>
   );

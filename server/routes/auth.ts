@@ -22,21 +22,26 @@ if (!process.env.GOOGLE_CLIENT_SECRET) {
 
 const googleClientId = process.env.GOOGLE_CLIENT_ID;
 const googleClientSecret = process.env.GOOGLE_CLIENT_SECRET;
-// GOOGLE_REDIRECT_URI가 없으면 FRONTEND_URL 기반으로 생성
-// 개발 환경에서는 localhost:4001을 기본값으로 사용 (프론트엔드가 4001에서 실행)
+// GOOGLE_REDIRECT_URI는 백엔드 URL이어야 함 (Google OAuth 콜백이 백엔드로 옴)
+// 개발 환경에서는 localhost:4000 (백엔드), 프로덕션에서는 백엔드 도메인 사용
 const isDevelopment = process.env.NODE_ENV !== 'production';
+const defaultBackendUrl = isDevelopment ? 'http://localhost:4000' : (process.env.FRONTEND_URL || 'https://finder.ggacademy.top');
+const backendBaseUrl = process.env.API_BASE_URL || process.env.FRONTEND_URL || defaultBackendUrl;
+const googleRedirectUri = process.env.GOOGLE_REDIRECT_URI || `${backendBaseUrl}/api/auth/google/callback`;
+
+// 프론트엔드 URL (인증 후 리디렉션용)
 const defaultFrontendUrl = isDevelopment ? 'http://localhost:4001' : 'http://localhost:4000';
 const frontendBaseUrl = process.env.FRONTEND_URL || process.env.CORS_ORIGIN || defaultFrontendUrl;
-const googleRedirectUri = process.env.GOOGLE_REDIRECT_URI || `${frontendBaseUrl}/api/auth/google/callback`;
 
 // 디버깅: Google OAuth 설정 로그
 console.log('[Google OAuth Config]', {
   GOOGLE_CLIENT_ID: googleClientId ? `${googleClientId.substring(0, 20)}...` : 'NOT SET',
   GOOGLE_CLIENT_SECRET: googleClientSecret ? 'SET' : 'NOT SET',
   GOOGLE_REDIRECT_URI: googleRedirectUri,
+  backendBaseUrl,
+  frontendBaseUrl,
   FRONTEND_URL: process.env.FRONTEND_URL,
   CORS_ORIGIN: process.env.CORS_ORIGIN,
-  frontendBaseUrl,
 });
 
 if (!googleClientId || !googleClientSecret) {
@@ -264,14 +269,7 @@ router.get('/google/callback', async (req: Request, res: Response) => {
     // 사용자 정보 추출
     const userEmail = email;
     const userName = name || email.split('@')[0];
-    // Google picture URL이 있으면 사용, 없으면 null
-    // Google picture URL은 보통 https://lh3.googleusercontent.com/... 형식
-    const userPicture = picture && picture.trim() !== '' ? picture : null;
-    
-    console.log('[OAuth Callback] User picture:', {
-      hasPicture: !!picture,
-      pictureUrl: picture ? `${picture.substring(0, 50)}...` : 'null',
-    });
+    const userPicture = picture || null;
 
     // 슈퍼 관리자 여부 확인
     const isSuperAdmin = userEmail === SUPER_ADMIN_EMAIL;
@@ -342,18 +340,6 @@ router.get('/google/callback', async (req: Request, res: Response) => {
     };
     res.clearCookie('oauth_state', clearCookieOptions);
     res.clearCookie('oauth_return_url', clearCookieOptions);
-
-    // Refresh Token을 httpOnly 쿠키에 저장
-    if (tokens.refresh_token) {
-      const refreshTokenCookieOptions: any = {
-        httpOnly: true,
-        secure: isProduction,
-        sameSite: isProduction ? 'none' : 'lax',
-        maxAge: 30 * 24 * 60 * 60 * 1000, // 30일
-        path: '/',
-      };
-      res.cookie('refresh_token', tokens.refresh_token, refreshTokenCookieOptions);
-    }
 
     // 프론트엔드로 리디렉션 (토큰을 쿼리 파라미터로 전달)
     // 보안을 위해 짧은 세션 토큰을 사용하거나, httpOnly 쿠키로 전달하는 것이 더 안전함
@@ -444,14 +430,7 @@ router.post('/google', async (req: Request, res: Response) => {
     // 사용자 정보 추출
     const userEmail = email;
     const userName = name || email.split('@')[0];
-    // Google picture URL이 있으면 사용, 없으면 null
-    // Google picture URL은 보통 https://lh3.googleusercontent.com/... 형식
-    const userPicture = picture && picture.trim() !== '' ? picture : null;
-    
-    console.log('[OAuth POST] User picture:', {
-      hasPicture: !!picture,
-      pictureUrl: picture ? `${picture.substring(0, 50)}...` : 'null',
-    });
+    const userPicture = picture || null;
 
     // 슈퍼 관리자 여부 확인
     const isSuperAdmin = userEmail === SUPER_ADMIN_EMAIL;
@@ -544,68 +523,6 @@ router.post('/google', async (req: Request, res: Response) => {
 });
 
 /**
- * Refresh Token으로 새 ID Token 발급
- * POST /api/auth/refresh
- */
-router.post('/refresh', async (req: Request, res: Response) => {
-  try {
-    const refreshToken = req.cookies?.refresh_token;
-
-    if (!refreshToken) {
-      return res.status(401).json({ error: 'Refresh token not found' });
-    }
-
-    // Refresh Token으로 새 Access Token 및 ID Token 발급
-    client.setCredentials({
-      refresh_token: refreshToken,
-    });
-
-    const { credentials } = await client.refreshAccessToken();
-
-    if (!credentials.id_token) {
-      return res.status(401).json({ error: 'Failed to refresh token' });
-    }
-
-    // 새 ID Token 검증
-    const ticket = await client.verifyIdToken({
-      idToken: credentials.id_token,
-      audience: process.env.GOOGLE_CLIENT_ID,
-    });
-
-    const payload = ticket.getPayload();
-    if (!payload) {
-      return res.status(401).json({ error: 'Invalid token' });
-    }
-
-    // 새 Refresh Token이 있으면 업데이트 (Google이 새로 발급할 수 있음)
-    if (credentials.refresh_token) {
-      const isProduction = process.env.NODE_ENV === 'production';
-      const refreshTokenCookieOptions: any = {
-        httpOnly: true,
-        secure: isProduction,
-        sameSite: isProduction ? 'none' : 'lax',
-        maxAge: 30 * 24 * 60 * 60 * 1000, // 30일
-        path: '/',
-      };
-      res.cookie('refresh_token', credentials.refresh_token, refreshTokenCookieOptions);
-    }
-
-    // 새 ID Token과 만료 시간 반환
-    res.json({
-      idToken: credentials.id_token,
-      expiresIn: credentials.expiry_date ? Math.floor((credentials.expiry_date - Date.now()) / 1000) : 3600,
-      exp: payload.exp,
-    });
-  } catch (error) {
-    console.error('Token refresh error:', error);
-    res.status(401).json({
-      error: 'Failed to refresh token',
-      message: error instanceof Error ? error.message : 'Unknown error',
-    });
-  }
-});
-
-/**
  * 토큰 검증 및 사용자 정보 조회
  * GET /api/auth/me
  */
@@ -643,7 +560,7 @@ router.get('/me', async (req: Request, res: Response) => {
       return res.status(404).json({ error: 'User not found' });
     }
 
-    // 사용자 정보 반환 (토큰 만료 시간 포함)
+    // 사용자 정보 반환
     res.json({
       user: {
         id: user.id,
@@ -658,7 +575,6 @@ router.get('/me', async (req: Request, res: Response) => {
         joinDate: user.joinDate,
         lastLogin: user.lastLogin,
       },
-      exp: payload.exp, // 토큰 만료 시간 (Unix timestamp)
     });
   } catch (error) {
     console.error('Token verification error:', error);

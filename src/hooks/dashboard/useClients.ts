@@ -22,12 +22,12 @@ export function useClients(initialGrooms: Client[], initialBrides: Client[]) {
       setIsLoading(true);
       setError(null);
       try {
-        const [groomsData, bridesData] = await Promise.all([
-          fetchClients('groom'),
-          fetchClients('bride'),
+        const [groomsResult, bridesResult] = await Promise.all([
+          fetchClients({ type: 'groom' }),
+          fetchClients({ type: 'bride' }),
         ]);
-        setGrooms(groomsData);
-        setBrides(bridesData);
+        setGrooms(groomsResult.clients);
+        setBrides(bridesResult.clients);
       } catch (err) {
         const errorMessage = err instanceof Error ? err.message : "클라이언트 목록을 불러오는데 실패했습니다.";
         setError(errorMessage);

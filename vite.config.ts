@@ -3,6 +3,11 @@
   import react from '@vitejs/plugin-react-swc';
   import path from 'path';
 
+  // 빌드 타겟에 따라 출력 디렉토리 결정
+  // 웹: build/, 모바일: dist/
+  const buildTarget = process.env.VITE_BUILD_TARGET || 'web';
+  const outDir = buildTarget === 'mobile' ? 'dist' : 'build';
+
   export default defineConfig({
     plugins: [react()],
     resolve: {
@@ -51,7 +56,7 @@
     },
     build: {
       target: 'esnext',
-      outDir: 'build',
+      outDir: outDir,
     },
     server: {
       port: 4001,

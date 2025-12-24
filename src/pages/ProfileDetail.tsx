@@ -9,7 +9,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs'
 import { 
   ChevronLeft, MessageCircle, Share2, Calendar, Ruler, 
   Briefcase, MapPin, Heart, User, Users, DollarSign, 
-  Info, Phone, Globe, GraduationCap 
+  Info, Phone, Globe, GraduationCap, ArrowUp
 } from 'lucide-react';
 import { ImageWithFallback } from '../components/figma/ImageWithFallback';
 import { ProfileImageSlider } from '../components/ProfileImageSlider';
@@ -22,6 +22,7 @@ import { useAuth } from '../components/AuthContext';
 import { toast } from 'sonner';
 import { ProfileSelectDialog } from '../components/ProfileSelectDialog';
 import { SEO } from '../components/SEO';
+import { motion, AnimatePresence } from 'motion/react';
 
 export default function ProfileDetail() {
   const { id } = useParams();
@@ -36,6 +37,8 @@ export default function ProfileDetail() {
   const [favoriteLoading, setFavoriteLoading] = useState(false);
   const [isProfileSelectDialogOpen, setIsProfileSelectDialogOpen] = useState(false);
   const [pendingFavoriteClientId, setPendingFavoriteClientId] = useState<number | null>(null);
+  const [showScrollTop, setShowScrollTop] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
     const loadProfile = async () => {
@@ -71,6 +74,45 @@ export default function ProfileDetail() {
 
     loadProfile();
   }, [id]);
+
+  // 화면 크기 감지 (모바일/데스크탑 구분)
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
+  // 스크롤 위치 감지
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollTop = window.pageYOffset || document.documentElement.scrollTop || 0;
+      const shouldShow = scrollTop > 300; // 300px 이상 스크롤 시 버튼 표시
+      setShowScrollTop(shouldShow);
+    };
+
+    // 초기 스크롤 위치 확인
+    handleScroll();
+
+    // 스크롤 이벤트 리스너 추가
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    
+    // cleanup
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+    };
+  }, []);
+
+  // 스크롤 탑 함수
+  const scrollToTop = () => {
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth',
+    });
+  };
 
   // 찜 목록 로드 및 상태 확인
   useEffect(() => {
@@ -251,7 +293,10 @@ export default function ProfileDetail() {
                   <video
                     src={profile.videoUrl}
                     controls
-                    className="object-contain object-center w-full h-full bg-slate-900"
+                    className="object-contain object-center w-full h-full bg-slate-900 select-none"
+                    draggable={false}
+                    onContextMenu={(e) => e.preventDefault()}
+                    style={{ userSelect: 'none', WebkitUserDrag: 'none' }}
                   />
                 ) : (
                   <ImageWithFallback 
@@ -416,6 +461,29 @@ export default function ProfileDetail() {
           profileType={profile.type}
         />
       )}
+
+      {/* 스크롤 탑 버튼 */}
+      <AnimatePresence>
+        {showScrollTop && (
+          <motion.button
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.8 }}
+            onClick={scrollToTop}
+            className="fixed bottom-20 md:bottom-6 right-4 z-[100] h-12 w-12 rounded-full bg-gradient-to-r from-rose-500 to-pink-600 text-white shadow-lg hover:shadow-xl transition-shadow flex items-center justify-center hover:scale-110 active:scale-95"
+            aria-label="맨 위로 이동"
+            style={{ 
+              position: 'fixed',
+              bottom: isMobile ? '80px' : '24px',
+              right: '16px',
+              zIndex: 100,
+              pointerEvents: 'auto'
+            }}
+          >
+            <ArrowUp className="h-6 w-6" />
+          </motion.button>
+        )}
+      </AnimatePresence>
     </div>
     </>
   );

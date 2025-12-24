@@ -3,6 +3,9 @@
       "version": "0.1.0",
       "private": true,
       "dependencies": {
+            "@capacitor/android": "^8.0.0",
+            "@capacitor/cli": "^8.0.0",
+            "@capacitor/core": "^8.0.0",
             "@radix-ui/react-accordion": "^1.2.3",
             "@radix-ui/react-alert-dialog": "^1.1.6",
             "@radix-ui/react-aspect-ratio": "^1.1.2",
@@ -75,6 +78,12 @@
       "scripts": {
             "dev": "vite",
             "build": "vite build",
+            "build:web": "vite build",
+            "build:mobile": "VITE_BUILD_TARGET=mobile vite build",
+            "cap:sync": "npx cap sync",
+            "cap:sync:android": "npx cap sync android",
+            "cap:android": "npx cap open android",
+            "cap:build:android": "npm run build:mobile && npx cap sync android",
             "build:server": "tsc --project server/tsconfig.json",
             "start:server": "node server/dist/index.js",
             "dev:server": "tsx watch server/index.ts",

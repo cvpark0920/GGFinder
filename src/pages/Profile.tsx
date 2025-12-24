@@ -31,17 +31,11 @@ export default function Profile() {
         </CardHeader>
         <CardContent className="space-y-6">
           <div className="flex items-center gap-4">
-            {user.picture ? (
-              <img 
-                src={user.picture} 
-                alt={user.name}
-                className="w-20 h-20 rounded-full object-cover ring-4 ring-rose-100"
-              />
-            ) : (
-              <div className="w-20 h-20 rounded-full bg-gradient-to-br from-indigo-400 to-indigo-600 text-white font-semibold text-xl flex items-center justify-center ring-4 ring-rose-100">
-                {user.name?.slice(0, 1) || 'U'}
-              </div>
-            )}
+            <img 
+              src={user.picture} 
+              alt={user.name}
+              className="w-20 h-20 rounded-full object-cover ring-4 ring-rose-100"
+            />
             <div>
               <h3 className="font-medium text-slate-900">{user.name}</h3>
               <p className="text-sm text-slate-500">

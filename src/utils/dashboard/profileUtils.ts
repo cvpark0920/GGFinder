@@ -1,5 +1,46 @@
 import { Client } from '../../types/dashboard';
 import { BrideProfile, GroomProfile, ProfileStatus } from '../../types';
+import { isNativePlatform } from '../platform';
+
+// 이미지/정적 파일 서빙 URL 가져오기
+// 개발 환경에서는 프론트엔드 서버(4001)를 통해, 프로덕션에서는 백엔드 서버를 통해 서빙
+const getStaticFileUrl = (): string => {
+  if (isNativePlatform()) {
+    return import.meta.env.VITE_API_BASE_URL || 'https://finder.ggacademy.top';
+  }
+  
+  // 개발 환경: 프론트엔드 서버 포트 사용 (Vite dev server)
+  const isDevelopment = import.meta.env.DEV;
+  if (isDevelopment) {
+    return window.location.origin; // 현재 프론트엔드 서버의 origin 사용 (예: http://localhost:4001)
+  }
+  
+  // 프로덕션: 백엔드 서버 사용
+  return import.meta.env.VITE_API_BASE_URL || 'http://localhost:4000';
+};
+
+// 이미지 URL을 절대 URL로 변환
+function normalizeImageUrl(url: string | undefined | null): string {
+  if (!url) return '';
+  
+  // 개발 환경에서 백엔드 포트(4000)를 프론트엔드 포트(4001)로 변경
+  const isDevelopment = import.meta.env.DEV && !isNativePlatform();
+  
+  if (url.startsWith('http://') || url.startsWith('https://')) {
+    // 이미 절대 URL인 경우
+    if (isDevelopment && url.includes('localhost:4000')) {
+      // 개발 환경에서 백엔드 포트를 프론트엔드 포트로 변경
+      return url.replace('localhost:4000', 'localhost:4001');
+    }
+    return url;
+  }
+  
+  // 상대 경로인 경우 정적 파일 서빙 URL 추가
+  const staticFileUrl = getStaticFileUrl();
+  // URL이 /로 시작하면 그대로, 아니면 / 추가
+  const normalizedPath = url.startsWith('/') ? url : `/${url}`;
+  return `${staticFileUrl}${normalizedPath}`;
+}
 
 /**
  * DB ClientStatus를 ProfileStatus로 변환
@@ -86,10 +127,13 @@ export function mapClientToBrideProfile(client: Client & any): BrideProfile {
     desiredDestination: client.desiredDestination || '',
     guarantee: client.guarantee || false,
     images: Array.isArray(client.images) 
-      ? client.images.map((img: any) => typeof img === 'string' ? img : img.url || img)
+      ? client.images.map((img: any) => {
+          const imgUrl = typeof img === 'string' ? img : (img?.url || img);
+          return normalizeImageUrl(imgUrl);
+        }).filter((url: string) => url !== '')
       : [],
-    videoUrl: client.video,
-    avatarUrl: client.avatarUrl,
+    videoUrl: normalizeImageUrl(client.video),
+    avatarUrl: normalizeImageUrl(client.avatarUrl),
   };
   
   return result;
@@ -122,10 +166,13 @@ export function mapClientToGroomProfile(client: Client & any): GroomProfile {
     religion: client.religion || '',
     idealType: parseIdealType(client.idealType),
     images: Array.isArray(client.images) 
-      ? client.images.map((img: any) => typeof img === 'string' ? img : img.url || img)
+      ? client.images.map((img: any) => {
+          const imgUrl = typeof img === 'string' ? img : (img?.url || img);
+          return normalizeImageUrl(imgUrl);
+        }).filter((url: string) => url !== '')
       : [],
-    videoUrl: client.video,
-    avatarUrl: client.avatarUrl,
+    videoUrl: normalizeImageUrl(client.video),
+    avatarUrl: normalizeImageUrl(client.avatarUrl),
   };
   
   return result;

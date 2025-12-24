@@ -151,7 +151,8 @@ export default function ReceivedFavoritesPage() {
       } else if (favorite.user.agency?.id) {
         // 해당 소속사의 상대방 프로필 목록 조회
         const oppositeType = isBrideAgency ? 'groom' : 'bride';
-        const oppositeClients = await fetchClients(oppositeType);
+        const oppositeResult = await fetchClients({ type: oppositeType });
+        const oppositeClients = oppositeResult.clients;
         oppositeClient = oppositeClients.find(c => c.agencyId === favorite.user.agency.id) || null;
       }
 
@@ -171,7 +172,8 @@ export default function ReceivedFavoritesPage() {
     try {
       // 자신의 프로필 타입 결정
       const profileType = isBrideAgency ? 'bride' : 'groom';
-      const clients = await fetchClients(profileType, true);
+      const result = await fetchClients({ type: profileType, ownAgency: true });
+      const clients = result.clients;
       const client = clients.find(c => c.id === profileData.profile.id);
       
       if (client) {

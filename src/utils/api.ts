@@ -1,88 +1,19 @@
 import { User, Agency, Client, YouTubeVideo } from '../types/dashboard';
+import { isNativePlatform } from './platform';
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:4000';
-
-/**
- * JWT 토큰의 payload 파싱
- */
-function parseJwtPayload(token: string): any {
-  try {
-    const base64Url = token.split('.')[1];
-    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-    const jsonPayload = decodeURIComponent(
-      atob(base64)
-        .split('')
-        .map((c) => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
-        .join('')
-    );
-    return JSON.parse(jsonPayload);
-  } catch (error) {
-    console.error('Failed to parse JWT token:', error);
-    return null;
+// 플랫폼별 API URL 결정
+// 모바일 환경에서는 환경 변수 또는 기본값 사용
+// 웹 환경에서는 기존 VITE_API_BASE_URL 사용
+const getApiBaseUrl = (): string => {
+  // 모바일 환경에서는 VITE_API_BASE_URL 또는 기본 프로덕션 URL 사용
+  if (isNativePlatform()) {
+    return import.meta.env.VITE_API_BASE_URL || 'https://finder.ggacademy.top';
   }
-}
+  // 웹 환경에서는 기존 로직 유지
+  return import.meta.env.VITE_API_BASE_URL || 'http://localhost:4000';
+};
 
-/**
- * ID Token의 만료 시간 확인 (초 단위 Unix timestamp)
- */
-export function getTokenExpiry(token: string): number | null {
-  const payload = parseJwtPayload(token);
-  return payload?.exp || null;
-}
-
-/**
- * 토큰이 만료되었는지 확인
- */
-export function isTokenExpired(token: string): boolean {
-  const exp = getTokenExpiry(token);
-  if (!exp) return true;
-  const now = Math.floor(Date.now() / 1000);
-  return exp <= now;
-}
-
-/**
- * 토큰이 만료 임박인지 확인 (10분 전)
- */
-export function isTokenExpiringSoon(token: string, bufferMinutes: number = 10): boolean {
-  const exp = getTokenExpiry(token);
-  if (!exp) return true;
-  const now = Math.floor(Date.now() / 1000);
-  const bufferSeconds = bufferMinutes * 60;
-  return exp <= now + bufferSeconds;
-}
-
-/**
- * Refresh Token으로 새 ID Token 발급
- */
-export async function refreshToken(): Promise<string | null> {
-  try {
-    const response = await fetch(`${API_BASE_URL}/api/auth/refresh`, {
-      method: 'POST',
-      credentials: 'include', // 쿠키 포함
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
-
-    if (!response.ok) {
-      throw new Error('Failed to refresh token');
-    }
-
-    const data = await response.json();
-    const newIdToken = data.idToken;
-
-    if (newIdToken) {
-      // 새 토큰을 localStorage에 저장
-      localStorage.setItem('idToken', newIdToken);
-      return newIdToken;
-    }
-
-    return null;
-  } catch (error) {
-    console.error('Token refresh error:', error);
-    return null;
-  }
-}
+const API_BASE_URL = getApiBaseUrl();
 
 /**
  * API 호출 헬퍼 함수
@@ -91,26 +22,10 @@ async function apiCall<T>(
   endpoint: string,
   options: RequestInit = {}
 ): Promise<T> {
-  let token = localStorage.getItem('idToken');
+  const token = localStorage.getItem('idToken');
   
   if (!token) {
     throw new Error('인증 토큰이 없습니다.');
-  }
-
-  // 토큰이 만료 임박(10분 전)이면 자동 갱신
-  if (isTokenExpiringSoon(token, 10)) {
-    const newToken = await refreshToken();
-    if (newToken) {
-      token = newToken;
-    } else {
-      // 갱신 실패 시 401 에러 처리
-      localStorage.removeItem('idToken');
-      localStorage.removeItem('user');
-      if (typeof window !== 'undefined') {
-        window.dispatchEvent(new CustomEvent('auth:unauthorized'));
-      }
-      throw new Error('인증이 만료되었습니다. 다시 로그인해주세요.');
-    }
   }
 
   const url = `${API_BASE_URL}${endpoint}`;
@@ -321,15 +236,133 @@ async function apiCallWithFiles<T>(
 }
 
 /**
+ * 클라이언트 목록 조회 파라미터 인터페이스
+ */
+export interface FetchClientsParams {
+  type?: 'groom' | 'bride';
+  ownAgency?: boolean;
+  page?: number;
+  limit?: number;
+  filters?: {
+    search?: string;
+    status?: string;
+    ageRange?: [number, number];
+    heightRange?: [number, number];
+    weightRange?: [number, number];
+    maritalStatus?: string;
+    education?: string;
+    educationRange?: [number, number];
+    job?: string;
+    tattoo?: string;
+    location?: string;
+    residence?: string;
+    children?: string;
+    religion?: string;
+    annualIncomeRange?: [number, number];
+    smoking?: string;
+    drinking?: string;
+  };
+  sortBy?: string;
+  sortOrder?: 'asc' | 'desc';
+}
+
+/**
+ * 클라이언트 목록 조회 응답 인터페이스
+ */
+export interface FetchClientsResponse {
+  clients: Client[];
+  pagination: {
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+    hasMore: boolean;
+  };
+}
+
+/**
  * 클라이언트 목록 조회
  */
-export async function fetchClients(type?: 'groom' | 'bride', ownAgency?: boolean): Promise<Client[]> {
-  const params = new URLSearchParams();
-  if (type) params.append('type', type);
-  if (ownAgency) params.append('ownAgency', 'true');
-  const queryParam = params.toString() ? `?${params.toString()}` : '';
-  const data = await apiCall<{ clients: Client[] }>(`/api/clients${queryParam}`);
-  return data.clients;
+export async function fetchClients(params: FetchClientsParams = {}): Promise<FetchClientsResponse> {
+  const {
+    type,
+    ownAgency,
+    page = 1,
+    limit = 12,
+    filters,
+    sortBy = 'recent',
+    sortOrder = 'desc',
+  } = params;
+
+  const queryParams = new URLSearchParams();
+  
+  if (type) queryParams.append('type', type);
+  if (ownAgency) queryParams.append('ownAgency', 'true');
+  
+  // 페이지네이션
+  queryParams.append('page', page.toString());
+  queryParams.append('limit', limit.toString());
+  
+  // 정렬
+  queryParams.append('sortBy', sortBy);
+  queryParams.append('sortOrder', sortOrder);
+  
+  // 필터링 파라미터 추가
+  if (filters) {
+    if (filters.search) queryParams.append('search', filters.search);
+    if (filters.status && filters.status !== 'all') queryParams.append('status', filters.status);
+    
+    // 나이 범위 필터: 기본값([18, 70])이 아닐 때만 적용
+    if (filters.ageRange && (filters.ageRange[0] !== 18 || filters.ageRange[1] !== 70)) {
+      queryParams.append('ageMin', filters.ageRange[0].toString());
+      queryParams.append('ageMax', filters.ageRange[1].toString());
+    }
+    
+    // 키 범위 필터: 기본값([140, 190])이 아닐 때만 적용
+    if (filters.heightRange && (filters.heightRange[0] !== 140 || filters.heightRange[1] !== 190)) {
+      queryParams.append('heightMin', filters.heightRange[0].toString());
+      queryParams.append('heightMax', filters.heightRange[1].toString());
+    }
+    
+    // 몸무게 범위 필터: 기본값([40, 120])이 아닐 때만 적용
+    if (filters.weightRange && (filters.weightRange[0] !== 40 || filters.weightRange[1] !== 120)) {
+      queryParams.append('weightMin', filters.weightRange[0].toString());
+      queryParams.append('weightMax', filters.weightRange[1].toString());
+    }
+    
+    if (filters.maritalStatus && filters.maritalStatus !== 'all') {
+      queryParams.append('maritalStatus', filters.maritalStatus);
+    }
+    
+    if (filters.job) queryParams.append('job', filters.job);
+    if (filters.tattoo && filters.tattoo !== 'all') queryParams.append('tattoo', filters.tattoo);
+    if (filters.religion) queryParams.append('religion', filters.religion);
+    
+    // 타입별 필터
+    if (type === 'bride') {
+      if (filters.location) queryParams.append('location', filters.location);
+      if (filters.children) queryParams.append('children', filters.children);
+      // 학력 범위 필터: 기본값([0, 12])이 아닐 때만 적용
+      if (filters.educationRange && (filters.educationRange[0] !== 0 || filters.educationRange[1] !== 12)) {
+        queryParams.append('educationMin', filters.educationRange[0].toString());
+        queryParams.append('educationMax', filters.educationRange[1].toString());
+      }
+    } else if (type === 'groom') {
+      if (filters.residence) queryParams.append('residence', filters.residence);
+      if (filters.education) queryParams.append('education', filters.education);
+      if (filters.smoking && filters.smoking !== 'all') queryParams.append('smoking', filters.smoking);
+      if (filters.drinking && filters.drinking !== 'all') queryParams.append('drinking', filters.drinking);
+      // 연봉 범위 필터: 기본값([0, 100000000])이 아닐 때만 적용
+      if (filters.annualIncomeRange && (filters.annualIncomeRange[0] !== 0 || filters.annualIncomeRange[1] !== 100000000)) {
+        queryParams.append('incomeMin', filters.annualIncomeRange[0].toString());
+        queryParams.append('incomeMax', filters.annualIncomeRange[1].toString());
+      }
+    }
+  }
+  
+  const queryString = queryParams.toString();
+  const data = await apiCall<FetchClientsResponse>(`/api/clients${queryString ? `?${queryString}` : ''}`);
+  return data;
 }
 
 /**

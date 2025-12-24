@@ -25,18 +25,144 @@ import {
   Trash2,
 } from "lucide-react";
 import { Agency } from "../../types/dashboard";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationEllipsis,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "../ui/pagination";
+import { useLanguage } from "../LanguageContext";
 
 interface AgencyTabContentProps {
   agencies: Agency[];
   onEdit: (agency: Agency) => void;
   onDelete: (id: number) => void;
+  currentPage?: number;
+  totalPages?: number;
+  totalItems?: number;
+  itemsPerPage?: number;
+  onPageChange?: (page: number) => void;
 }
 
 export function AgencyTabContent({
   agencies,
   onEdit,
   onDelete,
+  currentPage = 1,
+  totalPages = 1,
+  totalItems = 0,
+  itemsPerPage = 10,
+  onPageChange,
 }: AgencyTabContentProps) {
+  const { t } = useLanguage();
+  
+  // 페이징 UI 렌더링 함수
+  const renderPagination = () => {
+    if (!onPageChange || totalPages <= 1) return null;
+
+    const getPageNumbers = () => {
+      const pages: (number | 'ellipsis')[] = [];
+      const maxVisiblePages = 5;
+
+      if (totalPages <= maxVisiblePages) {
+        for (let i = 1; i <= totalPages; i++) {
+          pages.push(i);
+        }
+      } else {
+        pages.push(1);
+
+        if (currentPage <= 3) {
+          for (let i = 2; i <= 4; i++) {
+            pages.push(i);
+          }
+          pages.push('ellipsis');
+          pages.push(totalPages);
+        } else if (currentPage >= totalPages - 2) {
+          pages.push('ellipsis');
+          for (let i = totalPages - 3; i <= totalPages; i++) {
+            pages.push(i);
+          }
+        } else {
+          pages.push('ellipsis');
+          for (let i = currentPage - 1; i <= currentPage + 1; i++) {
+            pages.push(i);
+          }
+          pages.push('ellipsis');
+          pages.push(totalPages);
+        }
+      }
+
+      return pages;
+    };
+
+    const pageNumbers = getPageNumbers();
+    const startIndex = (currentPage - 1) * itemsPerPage + 1;
+    const endIndex = Math.min(currentPage * itemsPerPage, totalItems);
+
+    return (
+      <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mt-4 px-4 py-3 border-t border-slate-200 bg-slate-50/50">
+        <div className="text-sm text-slate-600 whitespace-nowrap min-w-fit">
+          {totalItems > 0 ? (
+            <>
+              {startIndex}-{endIndex} / {totalItems} {t('dashboard.table.items') || '개'}
+            </>
+          ) : (
+            '등록된 소속사가 없습니다.'
+          )}
+        </div>
+        <Pagination>
+          <PaginationContent>
+            <PaginationItem>
+              <PaginationPrevious
+                href="#"
+                onClick={(e) => {
+                  e.preventDefault();
+                  if (currentPage > 1) {
+                    onPageChange(currentPage - 1);
+                  }
+                }}
+                className={currentPage === 1 ? 'pointer-events-none opacity-50' : ''}
+              />
+            </PaginationItem>
+            {pageNumbers.map((page, index) => (
+              <PaginationItem key={index}>
+                {page === 'ellipsis' ? (
+                  <PaginationEllipsis />
+                ) : (
+                  <PaginationLink
+                    href="#"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      onPageChange(page);
+                    }}
+                    isActive={page === currentPage}
+                  >
+                    {page}
+                  </PaginationLink>
+                )}
+              </PaginationItem>
+            ))}
+            <PaginationItem>
+              <PaginationNext
+                href="#"
+                onClick={(e) => {
+                  e.preventDefault();
+                  if (currentPage < totalPages) {
+                    onPageChange(currentPage + 1);
+                  }
+                }}
+                className={currentPage === totalPages ? 'pointer-events-none opacity-50' : ''}
+              />
+            </PaginationItem>
+          </PaginationContent>
+        </Pagination>
+      </div>
+    );
+  };
+
   return (
     <>
       {/* Mobile View: Cards */}
@@ -123,6 +249,10 @@ export function AgencyTabContent({
               등록된 소속사가 없습니다.
             </div>
           )}
+          {/* Mobile Pagination */}
+          <div className="md:hidden">
+            {renderPagination()}
+          </div>
       </div>
 
       {/* Desktop View: Table */}
@@ -223,6 +353,10 @@ export function AgencyTabContent({
             )}
           </TableBody>
         </Table>
+        {/* Desktop Pagination */}
+        <div className="hidden md:block">
+          {renderPagination()}
+        </div>
       </div>
     </>
   );

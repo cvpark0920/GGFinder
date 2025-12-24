@@ -100,6 +100,13 @@ export default function Dashboard() {
     type: "groom" | "bride" | "agency" | "user" | "video";
     name: string;
   } | null>(null);
+  
+  // 페이징 상태 (신랑/신부/소속사/사용자 각각)
+  const [groomPage, setGroomPage] = useState(1);
+  const [bridePage, setBridePage] = useState(1);
+  const [agencyPage, setAgencyPage] = useState(1);
+  const [userPage, setUserPage] = useState(1);
+  const itemsPerPage = 10; // 페이지당 항목 수
 
   // 소속사 회원이 관리 탭에 접근하려고 하면 기본 탭으로 리디렉션
   useEffect(() => {
@@ -221,6 +228,56 @@ export default function Dashboard() {
       ),
     [videosHook.videos, filtersHook.searchTerm, filtersHook.filterStatus]
   );
+
+  // 페이징된 클라이언트 목록 계산
+  const paginatedGrooms = useMemo(() => {
+    const startIndex = (groomPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    return filteredGrooms.slice(startIndex, endIndex);
+  }, [filteredGrooms, groomPage, itemsPerPage]);
+
+  const paginatedBrides = useMemo(() => {
+    const startIndex = (bridePage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    return filteredBrides.slice(startIndex, endIndex);
+  }, [filteredBrides, bridePage, itemsPerPage]);
+
+  // 페이징된 소속사 목록 계산
+  const paginatedAgencies = useMemo(() => {
+    const startIndex = (agencyPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    return filteredAgenciesList.slice(startIndex, endIndex);
+  }, [filteredAgenciesList, agencyPage, itemsPerPage]);
+
+  // 페이징된 사용자 목록 계산
+  const paginatedUsers = useMemo(() => {
+    const startIndex = (userPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    return filteredUsersList.slice(startIndex, endIndex);
+  }, [filteredUsersList, userPage, itemsPerPage]);
+
+  // 총 페이지 수 계산
+  const totalGroomPages = Math.ceil(filteredGrooms.length / itemsPerPage);
+  const totalBridePages = Math.ceil(filteredBrides.length / itemsPerPage);
+  const totalAgencyPages = Math.ceil(filteredAgenciesList.length / itemsPerPage);
+  const totalUserPages = Math.ceil(filteredUsersList.length / itemsPerPage);
+
+  // 필터 변경 시 첫 페이지로 리셋
+  useEffect(() => {
+    setGroomPage(1);
+  }, [filtersHook.searchTerm, filtersHook.filterStatus, filtersHook.sortConfig]);
+
+  useEffect(() => {
+    setBridePage(1);
+  }, [filtersHook.searchTerm, filtersHook.filterStatus, filtersHook.sortConfig]);
+
+  useEffect(() => {
+    setAgencyPage(1);
+  }, [filtersHook.searchTerm, filtersHook.filterAgencyRole, filtersHook.filterStatus]);
+
+  useEffect(() => {
+    setUserPage(1);
+  }, [filtersHook.searchTerm, filtersHook.filterUserRole, filtersHook.filterStatus]);
 
   // Handlers
   const handleOpenDeleteDialog = (
@@ -655,7 +712,7 @@ export default function Dashboard() {
 
         <TabsContent value="grooms">
           <ClientTabContent
-            clients={filteredGrooms}
+            clients={paginatedGrooms}
             agencies={agenciesHook.agencies}
             type="groom"
             onStatusUpdate={clientsHook.handleUpdateStatus}
@@ -667,12 +724,17 @@ export default function Dashboard() {
             onSort={filtersHook.handleSort}
             sortConfig={filtersHook.sortConfig}
             onAvatarClick={handleAvatarClick}
+            currentPage={groomPage}
+            totalPages={totalGroomPages}
+            totalItems={filteredGrooms.length}
+            itemsPerPage={itemsPerPage}
+            onPageChange={setGroomPage}
           />
         </TabsContent>
 
         <TabsContent value="brides">
           <ClientTabContent
-            clients={filteredBrides}
+            clients={paginatedBrides}
             agencies={agenciesHook.agencies}
             type="bride"
             onStatusUpdate={clientsHook.handleUpdateStatus}
@@ -684,13 +746,18 @@ export default function Dashboard() {
             onSort={filtersHook.handleSort}
             sortConfig={filtersHook.sortConfig}
             onAvatarClick={handleAvatarClick}
+            currentPage={bridePage}
+            totalPages={totalBridePages}
+            totalItems={filteredBrides.length}
+            itemsPerPage={itemsPerPage}
+            onPageChange={setBridePage}
           />
         </TabsContent>
 
         {!isAgencyMember && (
           <TabsContent value="agencies">
             <AgencyTabContent
-              agencies={filteredAgenciesList}
+              agencies={paginatedAgencies}
               onEdit={(agency) => {
                 agenciesHook.handleEditAgency(agency);
                 dialogStateHook.setIsEditAgencyOpen(true);
@@ -701,6 +768,11 @@ export default function Dashboard() {
                   handleOpenDeleteDialog(id, "agency", agency.name);
                 }
               }}
+              currentPage={agencyPage}
+              totalPages={totalAgencyPages}
+              totalItems={filteredAgenciesList.length}
+              itemsPerPage={itemsPerPage}
+              onPageChange={setAgencyPage}
             />
           </TabsContent>
         )}
@@ -708,7 +780,7 @@ export default function Dashboard() {
         {!isAgencyMember && (
           <TabsContent value="users">
             <UserTabContent
-              users={filteredUsersList}
+              users={paginatedUsers}
               agencies={agenciesHook.agencies}
               currentUser={user}
               onUpdateStatus={usersHook.handleUpdateUserStatus}
@@ -717,6 +789,11 @@ export default function Dashboard() {
                 dialogStateHook.setIsEditUserOpen(true);
               }}
               onDelete={usersHook.handleDeleteUser}
+              currentPage={userPage}
+              totalPages={totalUserPages}
+              totalItems={filteredUsersList.length}
+              itemsPerPage={itemsPerPage}
+              onPageChange={setUserPage}
             />
           </TabsContent>
         )}

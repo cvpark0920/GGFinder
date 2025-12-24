@@ -61,7 +61,10 @@ export function ProfileImageSlider({ images, name, videoUrl }: ProfileImageSlide
             ref={videoRef}
             src={videoUrl}
             controls
-            className="object-contain object-center w-full h-full bg-slate-900"
+            className="object-contain object-center w-full h-full bg-slate-900 select-none"
+            draggable={false}
+            onContextMenu={(e) => e.preventDefault()}
+            style={{ userSelect: 'none', WebkitUserDrag: 'none' }}
           />
           <div className="absolute top-3 right-3 z-10 pointer-events-none">
             <div className="bg-black/30 backdrop-blur-sm text-white text-[10px] px-2 py-1 rounded-full flex items-center gap-1">
@@ -80,7 +83,10 @@ export function ProfileImageSlider({ images, name, videoUrl }: ProfileImageSlide
         <ImageWithFallback
             src={images[0]}
             alt={name}
-            className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-500"
+            className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-500 select-none"
+            draggable={false}
+            onContextMenu={(e) => e.preventDefault()}
+            style={{ userSelect: 'none', WebkitUserDrag: 'none' }}
         />
     );
   }
@@ -101,7 +107,10 @@ export function ProfileImageSlider({ images, name, videoUrl }: ProfileImageSlide
                  <ImageWithFallback
                    src={img}
                    alt={`${name} ${index + 1}`}
-                   className="object-contain object-center w-full h-full bg-slate-900"
+                   className="object-contain object-center w-full h-full bg-slate-900 select-none"
+                   draggable={false}
+                   onContextMenu={(e) => e.preventDefault()}
+                   style={{ userSelect: 'none', WebkitUserDrag: 'none' }}
                  />
               </div>
             </CarouselItem>
@@ -113,7 +122,10 @@ export function ProfileImageSlider({ images, name, videoUrl }: ProfileImageSlide
                   ref={videoRef}
                   src={videoUrl}
                   controls
-                  className="object-contain object-center w-full h-full bg-slate-900"
+                  className="object-contain object-center w-full h-full bg-slate-900 select-none"
+                  draggable={false}
+                  onContextMenu={(e) => e.preventDefault()}
+                  style={{ userSelect: 'none', WebkitUserDrag: 'none' }}
                 />
                 <div className="absolute top-3 right-3 z-10 pointer-events-none">
                   <div className="bg-black/30 backdrop-blur-sm text-white text-[10px] px-2 py-1 rounded-full flex items-center gap-1">
@@ -127,7 +139,7 @@ export function ProfileImageSlider({ images, name, videoUrl }: ProfileImageSlide
         </CarouselContent>
         
         <CarouselPrevious 
-            className="left-2 opacity-0 group-hover/slider:opacity-100 transition-opacity z-10 h-8 w-8 border-none bg-black/20 hover:bg-black/50 text-white hover:text-white" 
+            className="left-2 opacity-0 group-hover/slider:opacity-100 transition-opacity z-20 h-8 w-8 border-none bg-black/20 hover:bg-black/50 text-white hover:text-white" 
             onClick={(e) => {
                 e.preventDefault();
                 e.stopPropagation();
@@ -135,7 +147,7 @@ export function ProfileImageSlider({ images, name, videoUrl }: ProfileImageSlide
             }}
         />
         <CarouselNext 
-            className="right-2 opacity-0 group-hover/slider:opacity-100 transition-opacity z-10 h-8 w-8 border-none bg-black/20 hover:bg-black/50 text-white hover:text-white" 
+            className="right-2 opacity-0 group-hover/slider:opacity-100 transition-opacity z-20 h-8 w-8 border-none bg-black/20 hover:bg-black/50 text-white hover:text-white" 
             onClick={(e) => {
                 e.preventDefault();
                 e.stopPropagation();
@@ -160,7 +172,7 @@ export function ProfileImageSlider({ images, name, videoUrl }: ProfileImageSlide
       </div>
 
       {/* Dots Indicator */}
-      <div className="absolute bottom-3 left-0 right-0 flex justify-center gap-1 z-10 pointer-events-none">
+      <div className="absolute bottom-3 left-0 right-0 flex justify-center gap-1 z-20 pointer-events-none">
         {Array.from({ length: count }).map((_, index) => (
           <button
             key={index}

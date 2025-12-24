@@ -4,24 +4,28 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../co
 import { Heart } from 'lucide-react';
 import { useAuth } from '../components/AuthContext';
 import { toast } from 'sonner';
+import { isNativePlatform } from '../utils/platform';
 
 // GoogleLoginButton은 조건부로만 로드
-// Cursor 브라우저에서는 절대 로드되지 않도록 별도 파일로 분리
+// 모바일 및 Cursor 브라우저에서는 절대 로드되지 않도록 별도 파일로 분리
 const GoogleLoginButton = lazy(() => {
-  // 모듈 로드 시점에 브라우저 감지
+  // 모듈 로드 시점에 브라우저 및 플랫폼 감지
   if (typeof window !== 'undefined') {
     const userAgent = navigator.userAgent.toLowerCase();
     const isCursorBrowser = userAgent.includes('electron') || userAgent.includes('cursor');
     
-    if (isCursorBrowser) {
-      // Cursor 브라우저에서는 빈 컴포넌트 반환 (모듈 로드 방지)
+    // 모바일 환경 감지 (동적 import이므로 직접 확인 필요)
+    const isMobile = window.Capacitor && window.Capacitor.isNativePlatform();
+    
+    if (isCursorBrowser || isMobile) {
+      // Cursor 브라우저 또는 모바일에서는 빈 컴포넌트 반환 (모듈 로드 방지)
       return Promise.resolve({ 
         default: () => null
       });
     }
   }
   
-  // 일반 브라우저에서만 실제 컴포넌트 로드
+  // 일반 웹 브라우저에서만 실제 컴포넌트 로드
   return import('../components/GoogleLoginButton');
 });
 
@@ -44,11 +48,12 @@ export default function Login({ onSuccess }: LoginProps) {
     }
   }, [searchParams]);
   
-  // 리디렉션 방식 로그인 핸들러
+  // 리디렉션 방식 로그인 핸들러 (모바일 및 웹 모두 지원)
   const handleGoogleLoginRedirect = () => {
     setIsLoading(true);
     const returnUrl = window.location.pathname === '/login' ? '/' : window.location.pathname;
-    const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:4000';
+    // 모바일 환경에서는 API URL을 플랫폼별로 처리
+    const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || (isNativePlatform() ? 'https://finder.ggacademy.top' : 'http://localhost:4000');
     const redirectUrl = `${apiBaseUrl}/api/auth/google/redirect?returnUrl=${encodeURIComponent(returnUrl)}`;
     window.location.href = redirectUrl;
   };
@@ -128,38 +133,31 @@ export default function Login({ onSuccess }: LoginProps) {
                 </span>
               </button>
               
-              {/* 팝업 방식 로그인 버튼 (선택사항, 일반 브라우저에서만) */}
+              {/* 팝업 방식 로그인 버튼 (웹 브라우저에서만, 모바일 제외) */}
               {(() => {
                 const userAgent = navigator.userAgent.toLowerCase();
                 const isCursorBrowser = userAgent.includes('electron') || userAgent.includes('cursor');
+                const isMobile = isNativePlatform();
                 
-                if (!isCursorBrowser) {
+                // 모바일이 아니고 Cursor 브라우저가 아닐 때만 팝업 방식 표시
+                if (!isMobile && !isCursorBrowser) {
                   return (
-                    <div className="relative">
-                      <div className="absolute inset-0 flex items-center">
-                        <span className="w-full border-t" />
+                    <>
+                      <div className="relative">
+                        <div className="absolute inset-0 flex items-center">
+                          <span className="w-full border-t" />
+                        </div>
+                        <div className="relative flex justify-center text-xs uppercase">
+                          <span className="bg-white px-2 text-gray-500">또는</span>
+                        </div>
                       </div>
-                      <div className="relative flex justify-center text-xs uppercase">
-                        <span className="bg-white px-2 text-gray-500">또는</span>
-                      </div>
-                    </div>
-                  );
-                }
-                return null;
-              })()}
-              
-              {(() => {
-                const userAgent = navigator.userAgent.toLowerCase();
-                const isCursorBrowser = userAgent.includes('electron') || userAgent.includes('cursor');
-                
-                if (!isCursorBrowser) {
-                  return (
-                    <Suspense fallback={<div className="text-sm text-gray-500">로딩 중...</div>}>
-                      <GoogleLoginButton
-                        onSuccess={handleGoogleLoginSuccess}
-                        onError={handleGoogleLoginError}
-                      />
-                    </Suspense>
+                      <Suspense fallback={<div className="text-sm text-gray-500">로딩 중...</div>}>
+                        <GoogleLoginButton
+                          onSuccess={handleGoogleLoginSuccess}
+                          onError={handleGoogleLoginError}
+                        />
+                      </Suspense>
+                    </>
                   );
                 }
                 return null;

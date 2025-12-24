@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { 
   MapPin, 
   Ruler, 
@@ -17,7 +17,8 @@ import {
   FileEdit,
   Calendar,
   Phone,
-  Circle
+  Circle,
+  ArrowUp
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Badge } from '../components/ui/badge';
@@ -34,7 +35,9 @@ import {
 import { useLanguage } from '../components/LanguageContext';
 import { ProfileFilters, FilterState, INITIAL_FILTERS } from '../components/ProfileFilters';
 import { ProfileImageSlider } from '../components/ProfileImageSlider';
+import { FullscreenGallery } from '../components/FullscreenGallery';
 import { BrideProfile, GroomProfile, Profile, ProfileStatus } from '../types';
+import { Client } from '../types/dashboard';
 import { fetchClients, fetchFavorites, addFavorite, removeFavorite } from '../utils/api';
 import { mapClientToBrideProfile, mapClientToGroomProfile } from '../utils/dashboard/profileUtils';
 import { getProfileDisplayName } from '../utils/profileUtils';
@@ -72,9 +75,30 @@ export default function ProfileList({ type }: ProfileListProps) {
   const [isProfileSelectDialogOpen, setIsProfileSelectDialogOpen] = useState(false);
   const [pendingFavoriteClientId, setPendingFavoriteClientId] = useState<number | null>(null);
   const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
-  const [profiles, setProfiles] = useState<Profile[]>([]);
+  const [allProfiles, setAllProfiles] = useState<Profile[]>([]);
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const [total, setTotal] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const sentinelRef = useRef<HTMLDivElement>(null);
+  
+  // 전체 화면 갤러리 상태
+  const [galleryOpen, setGalleryOpen] = useState(false);
+  const [selectedProfileForGallery, setSelectedProfileForGallery] = useState<Profile | null>(null);
+  const [galleryInitialIndex, setGalleryInitialIndex] = useState(0);
+  
+  // 스크롤 탑 버튼 상태
+  const [showScrollTop, setShowScrollTop] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+
+  // 갤러리 열기 핸들러
+  const handleOpenGallery = (profile: Profile, initialIndex: number = 0) => {
+    setSelectedProfileForGallery(profile);
+    setGalleryInitialIndex(initialIndex);
+    setGalleryOpen(true);
+  };
 
   // 인증 상태 확인 및 리다이렉트
   useEffect(() => {
@@ -83,7 +107,46 @@ export default function ProfileList({ type }: ProfileListProps) {
     }
   }, [authLoading, isAuthenticated, navigate]);
 
-  // 프로필 목록 로드
+  // 화면 크기 감지 (모바일/데스크탑 구분)
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
+  // 스크롤 위치 감지
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollTop = window.pageYOffset || document.documentElement.scrollTop || 0;
+      const shouldShow = scrollTop > 300; // 300px 이상 스크롤 시 버튼 표시
+      setShowScrollTop(shouldShow);
+    };
+
+    // 초기 스크롤 위치 확인
+    handleScroll();
+
+    // 스크롤 이벤트 리스너 추가
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    
+    // cleanup
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+    };
+  }, []);
+
+  // 스크롤 탑 함수
+  const scrollToTop = () => {
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth',
+    });
+  };
+
+  // 프로필 목록 로드 (필터/정렬 변경 시)
   useEffect(() => {
     // 인증되지 않은 상태면 API 호출하지 않음
     if (!isAuthenticated || authLoading) {
@@ -111,8 +174,69 @@ export default function ProfileList({ type }: ProfileListProps) {
     const loadProfiles = async () => {
       setIsLoading(true);
       setError(null);
+      setPage(1);
+      setAllProfiles([]);
+      setHasMore(true);
+      
       try {
-        const clients = await fetchClients(type);
+        console.log('[ProfileList] Loading profiles with filters:', {
+          type,
+          filters,
+          sortBy,
+        });
+        
+        const result = await fetchClients({
+          type,
+          page: 1,
+          limit: 12,
+          filters,
+          sortBy,
+          sortOrder: 'desc',
+        });
+        
+        console.log('[ProfileList] API Response:', {
+          result,
+          clientsCount: result?.clients?.length || 0,
+          pagination: result?.pagination,
+        });
+        
+        // 응답 형식 확인 및 호환성 처리
+        let clients: Client[];
+        let pagination: { page: number; limit: number; total: number; totalPages: number; hasMore: boolean };
+        
+        if (!result) {
+          throw new Error('No response received from server');
+        }
+        
+        // 기존 형식 (pagination 없음) 또는 새 형식 (pagination 있음) 모두 처리
+        if (Array.isArray(result)) {
+          // 기존 형식: result가 배열인 경우
+          clients = result;
+          pagination = {
+            page: 1,
+            limit: result.length,
+            total: result.length,
+            totalPages: 1,
+            hasMore: false,
+          };
+        } else if (result.clients) {
+          // 새 형식: { clients: [...], pagination: {...} }
+          clients = result.clients;
+          if (result.pagination) {
+            pagination = result.pagination;
+          } else {
+            // pagination이 없는 경우 기본값 설정
+            pagination = {
+              page: 1,
+              limit: clients.length,
+              total: clients.length,
+              totalPages: 1,
+              hasMore: false,
+            };
+          }
+        } else {
+          throw new Error('Invalid response format from server');
+        }
         
         const mappedProfiles = clients.map((client) => {
           if (type === 'bride') {
@@ -122,8 +246,9 @@ export default function ProfileList({ type }: ProfileListProps) {
           }
         });
         
-        
-        setProfiles(mappedProfiles);
+        setAllProfiles(mappedProfiles);
+        setTotal(pagination.total);
+        setHasMore(pagination.hasMore);
       } catch (err) {
         const errorMessage = err instanceof Error ? err.message : '프로필 목록을 불러오는데 실패했습니다.';
         setError(errorMessage);
@@ -134,7 +259,122 @@ export default function ProfileList({ type }: ProfileListProps) {
     };
 
     loadProfiles();
-  }, [type, isAuthenticated, authLoading, user]);
+  }, [type, isAuthenticated, authLoading, user, filters, sortBy]);
+
+  // Infinite Scroll: 추가 프로필 로드
+  const loadMoreProfiles = async () => {
+    if (isLoadingMore || !hasMore) return;
+    
+    setIsLoadingMore(true);
+    try {
+      const nextPage = page + 1;
+      const result = await fetchClients({
+        type,
+        page: nextPage,
+        limit: 12,
+        filters,
+        sortBy,
+        sortOrder: 'desc',
+      });
+      
+      // 응답 형식 확인 및 호환성 처리
+      let clients: Client[];
+      let pagination: { page: number; limit: number; total: number; totalPages: number; hasMore: boolean };
+      
+      if (!result) {
+        console.error('No response received');
+        setHasMore(false);
+        return;
+      }
+      
+      // 기존 형식 (pagination 없음) 또는 새 형식 (pagination 있음) 모두 처리
+      if (Array.isArray(result)) {
+        // 기존 형식: result가 배열인 경우
+        clients = result;
+        pagination = {
+          page: nextPage,
+          limit: clients.length,
+          total: clients.length,
+          totalPages: 1,
+          hasMore: false,
+        };
+      } else if (result.clients) {
+        // 새 형식: { clients: [...], pagination: {...} }
+        clients = result.clients;
+        if (result.pagination) {
+          pagination = result.pagination;
+        } else {
+          // pagination이 없는 경우 기본값 설정
+          pagination = {
+            page: nextPage,
+            limit: clients.length,
+            total: clients.length,
+            totalPages: 1,
+            hasMore: false,
+          };
+        }
+      } else {
+        console.error('Invalid response format:', result);
+        setHasMore(false);
+        return;
+      }
+      
+      const mappedProfiles = clients.map((client) => {
+        if (type === 'bride') {
+          return mapClientToBrideProfile(client);
+        } else {
+          return mapClientToGroomProfile(client);
+        }
+      });
+      
+      // 중복 프로필 제거: 기존 프로필 ID와 비교하여 중복되지 않은 프로필만 추가
+      setAllProfiles(prev => {
+        const existingIds = new Set(prev.map(p => p.id));
+        const uniqueNewProfiles = mappedProfiles.filter(p => !existingIds.has(p.id));
+        
+        console.log('[Infinite Scroll] 추가 프로필 로드 완료:', {
+          page: nextPage,
+          loadedProfiles: mappedProfiles.length,
+          uniqueProfiles: uniqueNewProfiles.length,
+          duplicates: mappedProfiles.length - uniqueNewProfiles.length,
+          totalProfiles: prev.length + uniqueNewProfiles.length,
+          hasMore: pagination.hasMore,
+        });
+        
+        return [...prev, ...uniqueNewProfiles];
+      });
+      setPage(nextPage);
+      setHasMore(pagination.hasMore);
+    } catch (err) {
+      console.error('Failed to load more profiles:', err);
+      setHasMore(false); // 에러 발생 시 더 이상 로드하지 않음
+    } finally {
+      setIsLoadingMore(false);
+    }
+  };
+
+  // Intersection Observer 설정
+  useEffect(() => {
+    if (!sentinelRef.current || !hasMore || isLoadingMore || isLoading) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) {
+          console.log('[Infinite Scroll] 감시 요소가 뷰포트에 진입했습니다. 다음 페이지 로드 시작...', {
+            currentPage: page,
+            nextPage: page + 1,
+            hasMore,
+            totalProfiles: allProfiles.length,
+          });
+          loadMoreProfiles();
+        }
+      },
+      { rootMargin: '100px' } // 100px 전에 미리 로드
+    );
+
+    observer.observe(sentinelRef.current);
+    return () => observer.disconnect();
+  }, [hasMore, isLoadingMore, isLoading, page, filters, sortBy, allProfiles.length]);
 
   // 찜 목록 로드 (인증된 사용자만)
   useEffect(() => {
@@ -238,185 +478,16 @@ export default function ProfileList({ type }: ProfileListProps) {
     }
   };
 
-  const filteredProfiles = useMemo(() => {
-    return profiles.filter((profile) => {
-      const isBride = profile.type === 'bride';
-      const age = getAge(profile);
-
-      // 0. Status Filter (Common)
-      if (filters.status !== 'all' && profile.status !== filters.status) {
-        return false;
-      }
-
-      // 1. Name Search (Common) - Search by profile code (BR-001, GR-001)
-      if (filters.search) {
-        const displayName = getProfileDisplayName(profile);
-        if (!displayName.toLowerCase().includes(filters.search.toLowerCase())) {
-          return false;
-        }
-      }
-
-      // 2. Age Range (Common)
-      if (age < filters.ageRange[0] || age > filters.ageRange[1]) {
-        return false;
-      }
-
-      // 3. Height Range (Common) - null/undefined/0 체크 추가 (값이 없거나 0이면 필터링하지 않음)
-      if (profile.height != null && profile.height > 0 && (profile.height < filters.heightRange[0] || profile.height > filters.heightRange[1])) {
-        return false;
-      }
-
-      // 4. Weight Range (Common) - null/undefined/0 체크 추가 (값이 없거나 0이면 필터링하지 않음)
-      if (profile.weight != null && profile.weight > 0 && (profile.weight < filters.weightRange[0] || profile.weight > filters.weightRange[1])) {
-        return false;
-      }
-
-      // 5. Marital Status (Common)
-      if (filters.maritalStatus !== 'all') {
-        if (profile.maritalStatus !== filters.maritalStatus) {
-          return false;
-        }
-      }
-
-      // 6. Education (Type-specific)
-      if (isBride) {
-        // Bride: Education Range (0-12)
-        const brideProfile = profile as BrideProfile;
-        const educationValue = parseInt(brideProfile.education) || 0;
-        if (educationValue < filters.educationRange[0] || educationValue > filters.educationRange[1]) {
-          return false;
-        }
-      } else {
-        // Groom: Education Text Search
-        const groomProfile = profile as GroomProfile;
-        if (filters.education) {
-          const edu = groomProfile.education.toLowerCase();
-          if (!edu.includes(filters.education.toLowerCase())) return false;
-        }
-      }
-
-      // 7. Job (Common)
-      if (filters.job) {
-        const job = profile.job.toLowerCase();
-        if (!job.includes(filters.job.toLowerCase())) return false;
-      }
-      
-      // 8. Tattoo (Common)
-      if (filters.tattoo !== 'all') {
-        if (profile.tattoo !== filters.tattoo) {
-          return false;
-        }
-      }
-
-      // Type Specific Filters
-      if (isBride) {
-        const p = profile as BrideProfile;
-        
-        // Location (Current Address or loc)
-        if (filters.location) {
-           const loc = (p.currentAddress || '').toLowerCase();
-           const locField = (p as any).loc ? String((p as any).loc).toLowerCase() : '';
-           const searchTerm = filters.location.toLowerCase();
-           if (!loc.includes(searchTerm) && !locField.includes(searchTerm)) return false;
-        }
-        
-        // Religion
-        if (filters.religion) {
-          if (p.religion !== filters.religion) {
-            return false;
-          }
-        }
-        
-        // Children
-        if (filters.children) {
-           const children = p.children.toLowerCase();
-           if (!children.includes(filters.children.toLowerCase())) return false;
-        }
-
-      } else {
-        const p = profile as GroomProfile;
-        
-        // Residence
-        if (filters.residence && !p.residence.toLowerCase().includes(filters.residence.toLowerCase())) {
-          return false;
-        }
-        
-        // Annual Income Range Filter (Groom)
-        if (filters.annualIncomeRange[0] !== 0 || filters.annualIncomeRange[1] !== 100000000) {
-          // income 문자열에서 숫자 추출 (예: "3000만원" -> 30000000)
-          const incomeStr = p.income || '';
-          // 숫자만 추출 (만원, 억원 등 단위 제거)
-          const incomeMatch = incomeStr.match(/(\d+(?:\.\d+)?)/);
-          let incomeValue = 0;
-          
-          if (incomeMatch) {
-            const num = parseFloat(incomeMatch[1]);
-            // "만원" 단위인지 "억원" 단위인지 확인
-            if (incomeStr.includes('억') || incomeStr.includes('억원')) {
-              incomeValue = num * 100000000; // 억원 -> 원
-            } else if (incomeStr.includes('만') || incomeStr.includes('만원')) {
-              incomeValue = num * 10000; // 만원 -> 원
-            } else {
-              // 단위가 없으면 그대로 사용 (원 단위로 가정)
-              incomeValue = num;
-            }
-          }
-          
-          if (incomeValue < filters.annualIncomeRange[0] || incomeValue > filters.annualIncomeRange[1]) {
-            return false;
-          }
-        }
-        
-        
-        // Smoking
-        if (filters.smoking !== 'all') {
-          if (p.smoking !== filters.smoking) {
-            return false;
-          }
-        }
-        
-        // Drinking (Text search)
-        if (filters.drinking && filters.drinking !== 'all') {
-          const drinking = p.drinking.toLowerCase();
-          const searchTerm = filters.drinking.toLowerCase();
-          if (!drinking.includes(searchTerm)) return false;
-        }
-        
-        // Religion (exact match)
-        if (filters.religion) {
-          if (p.religion !== filters.religion) {
-            return false;
-          }
-        }
-      }
-
-      return true;
-    });
-  }, [profiles, filters, type]);
-
-  const sortedProfiles = useMemo(() => {
-    let profilesToSort = filteredProfiles;
+  // 찜 필터 적용 (클라이언트 사이드에서만 처리)
+  const displayedProfiles = useMemo(() => {
+    let profilesToShow = allProfiles;
     
-    // Apply favorites filter if enabled
     if (showFavoritesOnly) {
-      profilesToSort = filteredProfiles.filter(profile => favorites.has(profile.id));
+      profilesToShow = allProfiles.filter(profile => favorites.has(profile.id));
     }
     
-    return [...profilesToSort].sort((a, b) => {
-      if (sortBy === 'name') return a.name.localeCompare(b.name);
-      
-      if (sortBy === 'age') {
-        return getAge(a) - getAge(b);
-      }
-      
-      if (sortBy === 'status') {
-        const order: Record<ProfileStatus, number> = { active: 1, consulting: 2, matched: 3, inactive: 4 };
-        return (order[a.status] || 99) - (order[b.status] || 99);
-      }
-      
-      return 0; // recent (keep original order)
-    });
-  }, [filteredProfiles, sortBy, showFavoritesOnly, favorites]);
+    return profilesToShow;
+  }, [allProfiles, showFavoritesOnly, favorites]);
 
   const renderDetailRow = (icon: React.ReactNode, label: string, value: string | number) => (
     <div className="flex items-start gap-3 text-sm">
@@ -503,7 +574,7 @@ export default function ProfileList({ type }: ProfileListProps) {
           </Sheet>
           
           <span className="text-sm text-slate-500 hidden sm:inline-block">
-            {sortedProfiles.length}{t('profile.found')}
+            {showFavoritesOnly ? displayedProfiles.length : total}{t('profile.found')}
           </span>
         </div>
       </div>
@@ -526,17 +597,22 @@ export default function ProfileList({ type }: ProfileListProps) {
               <h3 className="font-medium text-slate-900">프로필을 불러올 수 없습니다</h3>
               <p className="text-sm text-slate-500 mt-1">{error}</p>
             </div>
-          ) : sortedProfiles.length > 0 ? (
-            sortedProfiles.map((profile) => {
+          ) : displayedProfiles.length > 0 ? (
+            displayedProfiles.map((profile, index) => {
               const isExpanded = expandedProfileId === profile.id;
+              // 고유 키 생성: type과 id를 조합하여 중복 방지
+              const uniqueKey = `${type}-${profile.id}-${index}`;
               return (
-                <div key={profile.id} className="group">
+                <div key={uniqueKey} className="group">
                   <Card className="overflow-visible border-0 shadow-sm hover:shadow-lg transition-all duration-300 flex flex-col bg-gradient-to-br from-white to-slate-50/30">
                     {/* Accent bar */}
                     <div className="absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-rose-400 to-pink-500 opacity-0 group-hover:opacity-100 transition-opacity z-10"></div>
                     
                     {/* 갤러리 영역 - 항상 표시 */}
-                    <div className="aspect-[3/4] relative overflow-hidden bg-slate-100">
+                    <div 
+                      className="aspect-[3/4] relative overflow-hidden bg-slate-100 cursor-pointer"
+                      onClick={() => handleOpenGallery(profile, 0)}
+                    >
                       {profile.images.length > 1 || profile.videoUrl ? (
                         <ProfileImageSlider 
                           images={profile.images} 
@@ -547,7 +623,10 @@ export default function ProfileList({ type }: ProfileListProps) {
                         <img 
                           src={profile.images[0]} 
                           alt={getProfileDisplayName(profile)}
-                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300 select-none"
+                          draggable={false}
+                          onContextMenu={(e) => e.preventDefault()}
+                          style={{ userSelect: 'none', WebkitUserDrag: 'none' } as React.CSSProperties}
                         />
                       )}
                       
@@ -564,8 +643,11 @@ export default function ProfileList({ type }: ProfileListProps) {
                       {/* 찜하기 버튼 - 프로필 목록 카드 사진 위 */}
                       {((type === 'bride' && user?.agency?.role === 'groom') || (type === 'groom' && user?.agency?.role === 'bride')) && (
                         <motion.button
-                          onClick={(e) => toggleFavorite(e, profile.id)}
-                          className="absolute bottom-3 right-3 z-10 w-12 h-12 rounded-full bg-white/90 backdrop-blur-sm shadow-lg flex items-center justify-center hover:bg-white transition-colors"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            toggleFavorite(e, profile.id);
+                          }}
+                          className="absolute bottom-3 right-3 z-20 w-12 h-12 rounded-full bg-white/90 backdrop-blur-sm shadow-lg flex items-center justify-center hover:bg-white transition-colors"
                           whileTap={{ scale: 0.9 }}
                           aria-label={favorites.has(profile.id) ? "찜 해제" : "찜하기"}
                         >
@@ -823,7 +905,7 @@ export default function ProfileList({ type }: ProfileListProps) {
                             </Card>
 
                             {/* Memo Card if exists */}
-                            {profile.memo && (
+                            {(profile as any).memo && (
                               <Card>
                                 <CardHeader>
                                   <div className="flex items-center gap-2">
@@ -834,7 +916,7 @@ export default function ProfileList({ type }: ProfileListProps) {
                                 </CardHeader>
                                 <CardContent>
                                   <div className="bg-slate-50 border border-slate-200 rounded-lg p-4">
-                                    <p className="text-sm text-slate-700 whitespace-pre-wrap leading-relaxed">{profile.memo}</p>
+                                    <p className="text-sm text-slate-700 whitespace-pre-wrap leading-relaxed">{(profile as any).memo}</p>
                                   </div>
                                 </CardContent>
                               </Card>
@@ -857,6 +939,31 @@ export default function ProfileList({ type }: ProfileListProps) {
               </Button>
             </div>
           )}
+          
+          {/* Infinite Scroll 감시 요소 */}
+          {hasMore && (
+            <div 
+              ref={sentinelRef} 
+              className="col-span-full h-20 flex flex-col items-center justify-center gap-2 py-4"
+              style={{ minHeight: '80px' }}
+            >
+              {isLoadingMore ? (
+                <>
+                  <div className="text-slate-500 text-sm font-medium">추가 프로필 로딩 중...</div>
+                  <div className="w-6 h-6 border-2 border-slate-300 border-t-slate-600 rounded-full animate-spin"></div>
+                </>
+              ) : (
+                <div className="text-slate-400 text-xs">스크롤하여 더 보기</div>
+              )}
+            </div>
+          )}
+          
+          {/* 더 이상 불러올 데이터가 없을 때 */}
+          {!hasMore && allProfiles.length > 0 && (
+            <div className="col-span-full text-center py-8 text-slate-500 text-sm">
+              모든 프로필을 불러왔습니다. ({allProfiles.length}개)
+            </div>
+          )}
         </div>
       </div>
 
@@ -867,6 +974,41 @@ export default function ProfileList({ type }: ProfileListProps) {
         onSelect={handleProfileSelect}
         profileType={type}
       />
+
+      {/* 전체 화면 갤러리 */}
+      {selectedProfileForGallery && (
+        <FullscreenGallery
+          open={galleryOpen}
+          onOpenChange={setGalleryOpen}
+          images={selectedProfileForGallery.images}
+          videoUrl={selectedProfileForGallery.videoUrl}
+          initialIndex={galleryInitialIndex}
+          name={getProfileDisplayName(selectedProfileForGallery)}
+        />
+      )}
+
+      {/* 스크롤 탑 버튼 */}
+      <AnimatePresence>
+        {showScrollTop && (
+          <motion.button
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.8 }}
+            onClick={scrollToTop}
+            className="fixed bottom-20 md:bottom-6 right-4 z-[100] h-12 w-12 rounded-full bg-gradient-to-r from-rose-500 to-pink-600 text-white shadow-lg hover:shadow-xl transition-shadow flex items-center justify-center hover:scale-110 active:scale-95"
+            aria-label="맨 위로 이동"
+            style={{ 
+              position: 'fixed',
+              bottom: isMobile ? '80px' : '24px',
+              right: '16px',
+              zIndex: 100,
+              pointerEvents: 'auto'
+            }}
+          >
+            <ArrowUp className="h-6 w-6" />
+          </motion.button>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

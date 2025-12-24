@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, HashRouter, Routes, Route } from 'react-router-dom';
 import { LanguageProvider } from './components/LanguageContext';
 import { AuthProvider } from './components/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
@@ -18,13 +18,33 @@ import VideoCall from './pages/VideoCall';
 import ReceivedFavoritesPage from './pages/ReceivedFavoritesPage';
 import { TooltipProvider } from "./components/ui/tooltip";
 import { Toaster } from "./components/ui/sonner";
+import { isNativePlatform } from './utils/platform';
+
+// 플랫폼에 따라 적절한 라우터 선택
+const PlatformRouter = ({ children }: { children: React.ReactNode }) => {
+  // 네이티브 플랫폼(Android/iOS)에서는 HashRouter 사용
+  // 웹에서는 BrowserRouter 사용 (SEO 최적화)
+  // 안전하게 플랫폼 감지 (웹 환경에서 Capacitor가 없을 수 있음)
+  let useHashRouter = false;
+  try {
+    useHashRouter = isNativePlatform();
+  } catch (error) {
+    // 에러 발생 시 웹 환경으로 간주
+    useHashRouter = false;
+  }
+  
+  if (useHashRouter) {
+    return <HashRouter>{children}</HashRouter>;
+  }
+  return <BrowserRouter>{children}</BrowserRouter>;
+};
 
 export default function App() {
   return (
     <AuthProvider>
       <LanguageProvider>
         <TooltipProvider>
-          <BrowserRouter>
+          <PlatformRouter>
             <Routes>
               <Route path="/" element={<Layout />}>
                 <Route index element={<Home />} />
@@ -85,7 +105,7 @@ export default function App() {
               </Route>
             </Routes>
             <Toaster />
-          </BrowserRouter>
+          </PlatformRouter>
         </TooltipProvider>
       </LanguageProvider>
     </AuthProvider>

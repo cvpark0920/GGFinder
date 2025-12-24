@@ -123,7 +123,8 @@
       "matchTitle": "Create Match",
       "editTitle": "Details/Edit",
       "deleteTitle": "Delete",
-      "registrationDateLabel": "Registration Date"
+      "registrationDateLabel": "Registration Date",
+      "items": "items"
     },
     "agency": {
       "registration": {

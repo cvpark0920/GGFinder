@@ -55,7 +55,8 @@ export function ProfileSelectDialog({
     setLoading(true);
     try {
       // 자신의 소속사 프로필만 조회
-      const clients = await fetchClients(selectableProfileType, true);
+      const result = await fetchClients({ type: selectableProfileType, ownAgency: true });
+      const clients = result.clients;
       // 자신의 소속사 프로필만 필터링
       const agencyProfiles = clients.filter(
         (client) => client.agencyId === user.agencyId

@@ -48,8 +48,9 @@ export function DashboardHeader({
 }: DashboardHeaderProps) {
   const { t } = useLanguage();
   return (
-    <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3 mb-6 sticky top-0 z-10 bg-slate-50/95 backdrop-blur supports-[backdrop-filter]:bg-slate-50/60 py-3 -mx-4 px-4 md:static md:bg-transparent md:p-0 md:mx-0">
-      <TabsList className={`w-full md:w-auto grid ${isAgencyMember ? 'grid-cols-3' : 'grid-cols-6'} h-11 bg-slate-200/50 p-1`}>
+    <div className="flex flex-col gap-3 mb-6 sticky top-0 z-10 bg-slate-50/95 backdrop-blur supports-[backdrop-filter]:bg-slate-50/60 py-3 -mx-4 px-4 md:static md:bg-transparent md:p-0 md:mx-0">
+      {/* 첫 번째 줄: 탭 버튼 (데스크탑에서 전체 너비) */}
+      <TabsList className={`w-full grid ${isAgencyMember ? 'grid-cols-3' : 'grid-cols-6'} h-11 bg-slate-200/50 p-1`}>
         <TabsTrigger value="grooms" className="text-xs md:text-sm gap-2">
           <UserIcon className="w-4 h-4" />
           <span className="hidden md:inline">{t('dashboard.tabs.grooms')}</span>
@@ -82,7 +83,8 @@ export function DashboardHeader({
         )}
       </TabsList>
 
-      <div className="flex flex-col md:flex-row items-center gap-2 w-full md:w-auto">
+      {/* 두 번째 줄: 검색과 정렬 버튼 (데스크탑에서도 아래 줄) */}
+      <div className="flex flex-col md:flex-row items-center gap-2 w-full">
         <div className="relative w-full md:w-64">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
           <Input

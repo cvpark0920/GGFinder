@@ -38,6 +38,16 @@ import {
 } from "lucide-react";
 import { Avatar, AvatarImage, AvatarFallback } from "../../components/ui/avatar";
 import { User, Agency, UserRole, UserStatus } from "../../types/dashboard";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationEllipsis,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "../../components/ui/pagination";
+import { useLanguage } from "../LanguageContext";
 
 interface UserTabContentProps {
   users: User[];
@@ -46,6 +56,11 @@ interface UserTabContentProps {
   onUpdateStatus: (userId: number, newStatus: UserStatus) => void;
   onEdit: (user: User) => void;
   onDelete: (userId: number) => void;
+  currentPage?: number;
+  totalPages?: number;
+  totalItems?: number;
+  itemsPerPage?: number;
+  onPageChange?: (page: number) => void;
 }
 
 export function UserTabContent({
@@ -55,7 +70,13 @@ export function UserTabContent({
   onUpdateStatus,
   onEdit,
   onDelete,
+  currentPage = 1,
+  totalPages = 1,
+  totalItems = 0,
+  itemsPerPage = 10,
+  onPageChange,
 }: UserTabContentProps) {
+  const { t } = useLanguage();
   const isSuperAdmin = currentUser?.role === 'super_admin';
   
   // 슈퍼 관리자가 아닌 경우 슈퍼 관리자 계정을 목록에서 제외
@@ -115,6 +136,110 @@ export function UserTabContent({
       default:
         return <span>{status}</span>;
     }
+  };
+
+  // 페이징 UI 렌더링 함수
+  const renderPagination = () => {
+    if (!onPageChange || totalPages <= 1) return null;
+
+    const getPageNumbers = () => {
+      const pages: (number | 'ellipsis')[] = [];
+      const maxVisiblePages = 5;
+
+      if (totalPages <= maxVisiblePages) {
+        for (let i = 1; i <= totalPages; i++) {
+          pages.push(i);
+        }
+      } else {
+        pages.push(1);
+
+        if (currentPage <= 3) {
+          for (let i = 2; i <= 4; i++) {
+            pages.push(i);
+          }
+          pages.push('ellipsis');
+          pages.push(totalPages);
+        } else if (currentPage >= totalPages - 2) {
+          pages.push('ellipsis');
+          for (let i = totalPages - 3; i <= totalPages; i++) {
+            pages.push(i);
+          }
+        } else {
+          pages.push('ellipsis');
+          for (let i = currentPage - 1; i <= currentPage + 1; i++) {
+            pages.push(i);
+          }
+          pages.push('ellipsis');
+          pages.push(totalPages);
+        }
+      }
+
+      return pages;
+    };
+
+    const pageNumbers = getPageNumbers();
+    const startIndex = (currentPage - 1) * itemsPerPage + 1;
+    const endIndex = Math.min(currentPage * itemsPerPage, totalItems);
+
+    return (
+      <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mt-4 px-4 py-3 border-t border-slate-200 bg-slate-50/50">
+        <div className="text-sm text-slate-600 whitespace-nowrap min-w-fit">
+          {totalItems > 0 ? (
+            <>
+              {startIndex}-{endIndex} / {totalItems} {t('dashboard.table.items') || '개'}
+            </>
+          ) : (
+            '등록된 사용자가 없습니다.'
+          )}
+        </div>
+        <Pagination>
+          <PaginationContent>
+            <PaginationItem>
+              <PaginationPrevious
+                href="#"
+                onClick={(e) => {
+                  e.preventDefault();
+                  if (currentPage > 1) {
+                    onPageChange(currentPage - 1);
+                  }
+                }}
+                className={currentPage === 1 ? 'pointer-events-none opacity-50' : ''}
+              />
+            </PaginationItem>
+            {pageNumbers.map((page, index) => (
+              <PaginationItem key={index}>
+                {page === 'ellipsis' ? (
+                  <PaginationEllipsis />
+                ) : (
+                  <PaginationLink
+                    href="#"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      onPageChange(page);
+                    }}
+                    isActive={page === currentPage}
+                  >
+                    {page}
+                  </PaginationLink>
+                )}
+              </PaginationItem>
+            ))}
+            <PaginationItem>
+              <PaginationNext
+                href="#"
+                onClick={(e) => {
+                  e.preventDefault();
+                  if (currentPage < totalPages) {
+                    onPageChange(currentPage + 1);
+                  }
+                }}
+                className={currentPage === totalPages ? 'pointer-events-none opacity-50' : ''}
+              />
+            </PaginationItem>
+          </PaginationContent>
+        </Pagination>
+      </div>
+    );
   };
 
   return (
@@ -247,6 +372,10 @@ export function UserTabContent({
             )}
           </TableBody>
         </Table>
+        {/* Desktop Pagination */}
+        <div className="hidden md:block">
+          {renderPagination()}
+        </div>
       </div>
 
       {/* Mobile View: Cards */}
@@ -347,6 +476,10 @@ export function UserTabContent({
               등록된 사용자가 없습니다.
             </div>
           )}
+          {/* Mobile Pagination */}
+          <div className="md:hidden">
+            {renderPagination()}
+          </div>
       </div>
     </>
   );

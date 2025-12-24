@@ -123,7 +123,8 @@
       "matchTitle": "매칭하기",
       "editTitle": "상세/수정",
       "deleteTitle": "삭제",
-      "registrationDateLabel": "등록일"
+      "registrationDateLabel": "등록일",
+      "items": "개"
     },
     "agency": {
       "registration": {
