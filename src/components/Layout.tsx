@@ -138,9 +138,11 @@ export default function Layout() {
       <header className="bg-white shadow-sm sticky top-0 z-50">
         <div className="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
           <Link to="/" className="flex items-center gap-2">
-            <div className="bg-gradient-to-br from-rose-500 to-pink-600 text-white px-2.5 py-1.5 rounded-lg shadow-md flex items-center justify-center">
-              <span className="font-black text-lg tracking-tighter leading-none">GG</span>
-            </div>
+            <img 
+              src="/og-image.png" 
+              alt="GG FINDER" 
+              className="h-8 w-8 rounded-lg object-cover shadow-md"
+            />
             <span className="font-bold text-xl tracking-tight text-slate-900 hidden sm:inline">FINDER</span>
           </Link>
 
@@ -252,16 +254,7 @@ export default function Layout() {
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" size="sm" className="gap-2 hover:bg-slate-100">
                     <Avatar className="w-8 h-8">
-                      {user?.picture && user.picture.trim() !== '' ? (
-                        <AvatarImage 
-                          src={user.picture} 
-                          alt={user?.name || 'User'}
-                          onError={(e) => {
-                            // 이미지 로드 실패 시 fallback 표시
-                            e.currentTarget.style.display = 'none';
-                          }}
-                        />
-                      ) : null}
+                      <AvatarImage src={user?.picture || undefined} alt={user?.name || 'User'} />
                       <AvatarFallback className="bg-gradient-to-br from-indigo-400 to-indigo-600 text-white font-semibold text-sm">
                         {user?.name?.slice(0, 1) || 'U'}
                       </AvatarFallback>
