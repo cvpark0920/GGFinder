@@ -489,6 +489,7 @@
         "updateComplete": "수정 완료",
         "cancel": "취소",
         "selectAvatar": "아바타 선택",
+        "changeAvatar": "아바타 변경",
         "selectPhotos": "사진 선택",
         "selectVideo": "동영상 선택",
         "setPrimary": "대표로 설정"
